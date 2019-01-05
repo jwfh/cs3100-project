@@ -8,10 +8,11 @@
 FROM node:11-alpine
 
 # Switch user to "node" which was created in the Node.js Dockerfile 
-USER node
+#USER node
 
 # Set the working directory for the application
 WORKDIR /usr/src/app
+#RUN chown -R node . && find . -type f | xargs chmod 644 && find . -type d | xargs chmod 755 
 
 # Copy and install app dependencies
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
