@@ -7,6 +7,9 @@
 # Build the image from the Alpine flavour of Node 11
 FROM node:11-alpine
 
+# Switch user to "node" which was created in the Node.js Dockerfile 
+USER node
+
 # Set the working directory for the application
 WORKDIR /usr/src/app
 

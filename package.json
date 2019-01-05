@@ -1,8 +1,10 @@
 {
-  "name": "docker_web_app",
+  "name": "cs3100-project",
   "version": "1.0.0",
-  "description": "Node.js on Docker",
-  "author": "First Last <first.last@example.com>",
+  "description": "Node.js Express App on Docker",
+  "author": "Jacob House <me@jwfh.ca>",
+  "license": "MIT",
+  "repository": "https://github.com/jwfh/cs3100-project",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
