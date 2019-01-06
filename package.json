@@ -1,7 +1,7 @@
 {
   "name": "cs3100-project",
   "version": "1.0.0",
-  "description": "Node.js Express App on Docker",
+  "description": "Num Hub NodeJS Express app on Docker",
   "author": "Jacob House <me@jwfh.ca>",
   "license": "MIT",
   "repository": "https://github.com/jwfh/cs3100-project",
@@ -10,6 +10,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "pug": "~2.0.3"
   }
 }

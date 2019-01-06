@@ -2,7 +2,7 @@ var express = require("express");
 var app = express();
 var router = express.Router();
 
-var path = __dirname + '/views/';
+var views = __dirname + '/views/';
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
@@ -12,16 +12,16 @@ router.use(function (req,res,next) {
 });
 
 router.get("/",function(req,res){
-  res.sendFile(path + "index.html");
+  res.sendFile(views + "index.html");
 });
 
 router.get("/sharks",function(req,res){
-  res.sendFile(path + "sharks.html");
+  res.sendFile(views + "sharks.html");
 });
 
-app.use(express.static(path));
+app.use('/assets', express.static('assets'));
 app.use("/", router);
 
 app.listen(PORT, HOST, function () {
-  console.log('Example app listening on port ' + PORT + '!')
+  console.log('Num Hub app listening on port ' + PORT + '')
 })
