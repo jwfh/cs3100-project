@@ -1,4 +1,5 @@
-    This GitHub repository contains the Num Hub site, a NodeJS-built website running with Docker to satisfy the course project requirement of Computer Science 3100 at Memorial University.
+_**This GitHub repository contains the Num Hub site, a NodeJS-built website running with Docker to satisfy the course project requirement of Computer Science 3100 at Memorial University.**_
+
 # NUM HUB
 _Num Hub_ is a website targeted to teachers and professors of mathematics and is used to share math problems. Our aim is to help educators collaborate to create new and engaging math problems for student practice and homework sheets, as well as formal examinations. 
 
@@ -23,7 +24,8 @@ Questions may be formatted with Markdown to achieve **bold face** or _oblique_ t
 
 For example, one may write 
     
-    Provide a _counterexample_ to the claim that $f(x) = \sqrt{x}$ is $f\colon \mathbb{R} \to \mathbb{R}$. State the **correct mapping  
+    Provide a _counterexample_ to the claim that $f(x) = \sqrt{x}$ is 
+    $f\colon \mathbb{R} \to \mathbb{R}$. State the **correct mapping**.
     
 ## GRAPHICS
-Images may be linked using Markdown syntax or uploaded using the **Upload Image** button. Uploaded images must be in JPEG or PNG formar and must be below 1024KB. Images uploaded undergo compression and the resultant file is accessible via a generated link that is automatically inserted, with Markdown image markup, at the location of the cursor in the text pane.
+Images may be linked using Markdown syntax or uploaded using the **Upload Image** button. Uploaded images must be in JPEG or PNG format and must be below 1024KB. Images uploaded undergo compression and the resultant file is accessible via a generated link that is automatically inserted, with Markdown image markup, at the location of the cursor in the text pane.
