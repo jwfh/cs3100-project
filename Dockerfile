@@ -4,8 +4,8 @@
 # Modified:    January 4, 2018 at 23:54
 # Modified by: Jacob House
 
-# Build the image from the Alpine flavour of Node 11
-FROM node:11-alpine
+# Build the image from the Alpine flavour of Node 10
+FROM node:10-alpine
 
 # Switch user to "node" which was created in the Node.js Dockerfile 
 #USER node
