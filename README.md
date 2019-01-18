@@ -1,4 +1,4 @@
-_**This GitHub repository contains the Num Hub site, a NodeJS-built website running with Docker to satisfy the course project requirement of Computer Science 3100 at Memorial University.**_
+_**This GitHub repository contains the Num Hub site, a NodeJS-built website running with Docker to satisfy the course project requirement of Computer Science 3100 at Memorial University. Technical documentation may be found in the**_ **docs** _**folder.**_
 
 # NUM HUB
 _Num Hub_ is a website targeted to teachers and professors of mathematics and is used to share math problems. Our aim is to help educators collaborate to create new and engaging math problems for student practice and homework sheets, as well as formal examinations. 
