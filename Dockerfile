@@ -25,10 +25,8 @@ RUN npm install
 COPY . .
 
 # Expose the ports for our site
-# This is COMP-3100 so let's use 31080 and 31443 for HTTP and HTTPS, respectively
-EXPOSE 31080/tcp
-EXPOSE 31443/tcp
-EXPOSE 8080
+# This is COMP-3100 so let's use port 3100
+EXPOSE 3100/tcp
 
 # Specify the image's entrypoint
 CMD [ "npm", "start" ]
