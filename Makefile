@@ -17,7 +17,7 @@ demo: install
 install: package.json 
 	npm install --save
 
-frontend: frontend/package.json frontend/build/index.html .FORCE
+frontend: frontend/package.json .FORCE
 	$(MAKE) -C frontend
 
 .FORCE: 
