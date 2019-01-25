@@ -10,9 +10,9 @@
 1. Wireframe of layouts for different pages
 	- Home page
 	- Post create page (Jacob)
-	- Profile page
-	- Register page
-	- Login page
+	- Profile page (Gillian)
+	- Register page(Gillian)
+	- Login page(Gillian)
 
 2. Front end features 
 	- Continuous pagination of results (see `/api/pages`)
@@ -24,7 +24,7 @@
 1. Support for pagination (Jacob)
 2. `/api` URL for single-page app support
 3. Shareable short links (generate short URL, store mapping to long URL in MySQL) (Jacob)
-4. MySQL (Jacob)
+4. MySQL (Jacob, Gillian)
 	- Tables
 		- Users table
 		- Password history table
