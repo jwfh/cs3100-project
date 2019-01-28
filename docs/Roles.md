@@ -11,7 +11,7 @@
 	- Home page
 	- Post create page (Jacob)
 	- Profile page (Gillian)
-	- Register page(Gillian)
+	- Register page (Gillian)
 	- Login page(Gillian)
 
 2. Front end features 
@@ -24,7 +24,7 @@
 1. Support for pagination (Jacob)
 2. `/api` URL for single-page app support
 3. Shareable short links (generate short URL, store mapping to long URL in MySQL) (Jacob)
-4. MySQL (Jacob, Gillian)
+4. SQLite3 (Jacob, Gillian)
 	- Tables
 		- Users table
 		- Password history table
@@ -35,5 +35,5 @@
 
 
 ### Miscellaneous
-1. Use Docker Compose with MySQL and an init.sql file to create a sample user with past activity for the demonstration in class (i.e., demonstate the password history, etc.) (Jacob)
+1. Use a Makefile to initialize the database with `init.sql` file to create a sample user with past activity for the demonstration in class (_i.e.,_ demonstrate the password history, etc.) (Jacob)
 
