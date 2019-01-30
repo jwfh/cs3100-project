@@ -1,5 +1,8 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const db = require('./db');
+
+db.test();
 
 /* POST API root */
 router.post('/', function(req, res, next) {
@@ -12,3 +15,4 @@ router.post('/profile', function(req, res, next) {
 });
 
 module.exports = router;
+
