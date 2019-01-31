@@ -13,8 +13,6 @@ md5hash.setEncoding('hex');
 const initHash = '094755635dd169d046ddc8f8d25887be';
 
 const dbFile = __dirname + '/../numhub.db';
-console.log(dbFile);
-
 
 const db = new sqlite3.Database(dbFile, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
     if (err) {
