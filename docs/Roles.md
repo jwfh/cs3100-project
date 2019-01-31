@@ -8,15 +8,15 @@
 ## Granular Breakdown of Objectives
 ### Frontend
 1. Wireframe of layouts for different pages
-	- Home page
+	- Home page (Jay)
 	- Post create page (Jacob)
 	- Profile page (Gillian)
 	- Register page (Gillian)
-	- Login page(Gillian)
-
+	- Login page(Gillian, Jay)
+,
 2. Front end features 
-	- Continuous pagination of results (see `/api/pages`)
-	- Back to top button
+	- Continuous pagination of results (see `/api/pages`) (Jay)
+	- Back to top button (Jay)
 
 3. Markdown rendering and MathJax support (Jacob)
 
@@ -24,7 +24,7 @@
 1. Support for pagination (Jacob)
 2. `/api` URL for single-page app support
 3. Shareable short links (generate short URL, store mapping to long URL in MySQL) (Jacob)
-4. SQLite3 (Jacob, Gillian)
+4. SQLite3 (Jacob, Gillian, Jay)
 	- Tables
 		- Users table
 		- Password history table
