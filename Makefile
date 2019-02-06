@@ -1,6 +1,5 @@
 EXECUTABLES = \
 		npm \
-		sqlite3 \
 
 FOUND := $(foreach exec,$(EXECUTABLES),\
         $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))

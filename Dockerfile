@@ -7,8 +7,8 @@
 # Build the image from the Alpine flavour of Node 10
 FROM node:10-alpine
 
-# Switch user to "node" which was created in the Node.js Dockerfile 
-#USER node
+# Install make
+RUN apk update && apk add make
 
 # Set the working directory for the application
 WORKDIR /usr/src/app
@@ -17,13 +17,12 @@ WORKDIR /usr/src/app
 # Copy and install app dependencies
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 COPY package*.json ./
-RUN npm install
-
 COPY . .
+RUN make install && make -C frontend 
 
 # Expose the ports for our site
 # This is COMP-3100 so let's use port 3100
 EXPOSE 3100/tcp
 
 # Specify the image's entrypoint
-CMD [ "make" ]
+CMD [ "npm", "start" ]
