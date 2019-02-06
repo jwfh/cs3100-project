@@ -1,21 +1,23 @@
 EXECUTABLES = \
 		npm \
 		sqlite3 \
-		sed \
-		md5 \
 
 FOUND := $(foreach exec,$(EXECUTABLES),\
         $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
 
-run: install 
+run: install frontend
 	npm start 
 
 init: install
-	cat init.sql | sqlite3 numhub.db
+	node backend/init-db.js
 
-demo: init
-	cat demo.sql | sqlite3 numhub.db
+demo: install
+	node backend/demo-db.js
 
-install: package.json
+install: package.json 
 	npm install --save
-	sed -i -e "s/const initHash = '[A-Za-f0-9]*';/const initHash = '`md5 -q init.sql`';/" routes/db.js
+
+frontend: frontend/package.json frontend/build/index.html .FORCE
+	$(MAKE) -C frontend
+
+.FORCE: 

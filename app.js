@@ -4,24 +4,23 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const apiRouter = require('./routes/api');
-
 const app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
+// Configure Express
+// app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// Serve static React frontend
+app.use(express.static(path.join(__dirname, 'frontend/build')));
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+});
+
+// API routes to backend logic
+const apiRouter = require('./backend/api');
 app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
@@ -37,7 +36,8 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.type('text');
+  res.send(err.status + ' ' + res.locals.message);
 });
 
 module.exports = app;
