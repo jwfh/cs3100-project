@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../app/db');
+const db = require('./db');
 
-db.test();
-
-/* POST API root */
-router.post('/', function(req, res, next) {
-  res.json({ title: 'Express' });
+/* GET should never give any data. All requests should be POST. */
+router.get('/*', function(req, res, next) {
+	res.status(404);
+	res.type('text');
+	res.send('404 Not Found');
 });
 
 /* POST User profile page */
