@@ -1,0 +1,103 @@
+<html><head>
+		<link rel="icon" href="../favicon.ico"/>
+		<style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style></head><body><div id="MathJax_Message" style="display: none;"></div><link rel="stylesheet" type="text/css" href="../torpedo.css" id="_theme"><div id="_html" class="markdown-theme"><h1 id="breakdown-of-tasks-and-roles"><a class="anchor" name="breakdown-of-tasks-and-roles" href="#breakdown-of-tasks-and-roles"><span class="octicon octicon-link"></span></a>Breakdown of Tasks and Roles</h1>
+<h2 id="objectives"><a class="anchor" name="objectives" href="#objectives"><span class="octicon octicon-link"></span></a>Objectives</h2>
+<ol>
+<li>Frontend using Material UI</li>
+<li>Backend using NodeJS</li>
+<li>Single page application with a default HTML page; all else returned from the server's <code>/api</code> URL using AJAX.</li>
+</ol>
+<h2 id="granular-breakdown-of-objectives"><a class="anchor" name="granular-breakdown-of-objectives" href="#granular-breakdown-of-objectives"><span class="octicon octicon-link"></span></a>Granular Breakdown of Objectives</h2>
+<h3 id="frontend"><a class="anchor" name="frontend" href="#frontend"><span class="octicon octicon-link"></span></a>Frontend</h3>
+<ol>
+<li>
+<p>Wireframe of layouts for different pages
+- Home page (Jay)
+- Post create page (Jacob)
+- Profile page (Gillian)
+- Register page (Gillian)
+- Login page(Gillian, Jay)
+,</p>
+</li>
+<li>
+<p>Front end features </p>
+<ul>
+<li>Continuous pagination of results (see <code>/api/pages</code>) (Jay)</li>
+<li>Back to top button (Jay)</li>
+</ul>
+</li>
+<li>
+<p>Markdown rendering and MathJax support (Jacob)</p>
+</li>
+</ol>
+<h3 id="backend"><a class="anchor" name="backend" href="#backend"><span class="octicon octicon-link"></span></a>Backend</h3>
+<ol>
+<li>Support for pagination (Jacob)</li>
+<li><code>/api</code> URL for single-page app support</li>
+<li>Shareable short links (generate short URL, store mapping to long URL in MySQL) (Jacob)</li>
+<li>
+<p>SQLite3 (Jacob, Gillian, Jay)</p>
+<ul>
+<li>Tables
+- Users table
+- Password history table
+- Questions table
+- Answers table
+- Categories table
+- URL shortener table</li>
+</ul>
+</li>
+</ol>
+<h3 id="miscellaneous"><a class="anchor" name="miscellaneous" href="#miscellaneous"><span class="octicon octicon-link"></span></a>Miscellaneous</h3>
+<ol>
+<li>Use a Makefile to initialize the database with <code>init.sql</code> file to create a sample user with past activity for the demonstration in class (<em>i.e.,</em> demonstrate the password history, etc.) (Jacob)</li>
+</ol>
+</div><script type="text/x-mathjax-config;executed=true">
+              // TeX-AMS_HTML
+              MathJax.Hub.Config({
+                jax: [
+                  'input/TeX',
+                  'output/HTML-CSS',
+                  'output/PreviewHTML',
+                ],
+                extensions: [
+                  'tex2jax.js',
+                  'AssistiveMML.js',
+                  'a11y/accessibility-menu.js',
+                ],
+                TeX: {
+                  extensions: [
+                    'AMSmath.js',
+                    'AMSsymbols.js',
+                    'noErrors.js',
+                    'noUndefined.js',
+                  ]
+                },
+                tex2jax: {
+                  inlineMath: [
+                    ['$', '$'],
+                    ['\\(', '\\)'],
+                  ],
+                  displayMath: [
+                    ['$$', '$$'],
+                    ['\\[', '\\]'],
+                  ],
+                  processEscapes: true
+                },
+                showMathMenu: false,
+                showProcessingMessages: false,
+                messageStyle: 'none',
+                skipStartupTypeset: true, // disable initial rendering
+                positionToHash: false
+              })
+              // set specific container to render, can be delayed too
+              MathJax.Hub.Queue(
+                ['Typeset', MathJax.Hub, '_html']
+              )
+            </script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script></body></html>

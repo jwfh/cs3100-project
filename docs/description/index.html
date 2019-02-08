@@ -1,0 +1,107 @@
+<html><head>
+		<link rel="icon" href="../favicon.ico"/>
+		<style type="text/css">body {margin: auto;}
+.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style></head><body><div id="MathJax_Message" style="display: none;"></div><link rel="stylesheet" type="text/css" href="../torpedo.css" id="_theme"><div id="_html" class="markdown-theme"><h1 id="project-page-description"><a class="anchor" name="project-page-description" href="#project-page-description"><span class="octicon octicon-link"></span></a>Project Page Description</h1>
+<h4 id="submitted-friday-february-8-2018"><a class="anchor" name="submitted-friday-february-8-2018" href="#submitted-friday-february-8-2018"><span class="octicon octicon-link"></span></a>Submitted Friday, February 8, 2018</h4>
+<h2 id="authentication"><a class="anchor" name="authentication" href="#authentication"><span class="octicon octicon-link"></span></a>Authentication</h2>
+<ul>
+<li>Login page</li>
+<li>
+<p>Registration page</p>
+<ul>
+<li>Get account username, password, and password confirmation. Consult the backend API to check that the username is unique. Check that the password meets complexity requirements.</li>
+<li>Get remaining information such as full name, email address, security question and answer, etc.</li>
+</ul>
+</li>
+<li>
+<p>Forgot password page</p>
+<ul>
+<li>Prompt the user for their username.</li>
+<li>Given a username, query the backend API to get the security question that this user answered. Check their answer.</li>
+<li>If the answer is correct (send to the backend API and have it return true or false) then let the user reset their password.</li>
+</ul>
+</li>
+</ul>
+<h2 id="homepage"><a class="anchor" name="homepage" href="#homepage"><span class="octicon octicon-link"></span></a>Homepage</h2>
+<ul>
+<li>Will, by default, display most-recent questions posted to the site.</li>
+<li>Browsing for questions will happen on this page through filters.</li>
+<li>On this page, questions displayed in an "accordion"-like fashion with expandable nodes.</li>
+<li>Expanding nodes gives a short preview of the question.</li>
+<li>Clicking on "See More..." within the preview will go to that question's page which shows the full question, as well as any answer(s) to the question.</li>
+<li>Beside the results there will be a floating widget that enables filtering of results on the screen (think of a filter on the side when you're online shopping and want to pick a sub-category of products) by category (<em>i.e.,</em> geometry, number theory, trigonometry, etc.) within the current level, by difficulty, etc.</li>
+<li>See Layout section for more information about manipulating the results.</li>
+</ul>
+<h2 id="post-creation-page"><a class="anchor" name="post-creation-page" href="#post-creation-page"><span class="octicon octicon-link"></span></a>Post Creation Page</h2>
+<ul>
+<li>Will maintain site layout with the top app bar and left-hand drawer.</li>
+<li>Contains a large text input for the title of the new question to be posted.</li>
+<li>Below the title, include a textarea-like field to type the body of the question.</li>
+<li>Below this, allow the user to specify the level of the question (<em>i.e.,</em> primary, elementary, high school, undergrad, graduate) using a select drop-down.</li>
+<li>Given the input for the level of the question, populate another select drop-down menu with categories for the level chosen (<em>i.e.,</em> for undergrad allow calculus, linear algebra, number theory, set theory, abstract algebra, etc.)</li>
+<li>Allow the user to add tags to their question to even further classify it (<em>i.e.,</em> a calculus question may be categorised as differential calculus).</li>
+<li>A submit button to post the question.</li>
+</ul>
+<h2 id="profile-page"><a class="anchor" name="profile-page" href="#profile-page"><span class="octicon octicon-link"></span></a>Profile Page</h2>
+<ul>
+<li>Will allow the user to update their personal information and perhaps add a profile picture.</li>
+<li>Includes text fields for all personal information (given name, surname, location, etc.) pre-populated with the information given at registration.</li>
+<li>A submit button to commit any edits to the backend database.</li>
+<li>Display to the user their "reputation" based on their questions being upvoted, answers marked as useful, etc.</li>
+</ul>
+<h2 id="general-page-layout"><a class="anchor" name="general-page-layout" href="#general-page-layout"><span class="octicon octicon-link"></span></a>General Page Layout</h2>
+<ul>
+<li>All pages will adhere to a single page layout.</li>
+<li>All pages will attempt to not "stray" far from the homepage since its a single page app.</li>
+<li>A menu bar at the top which spans the full width should include a search bar to search for specific questions by keywords, links to profile, sign-out, messages, etc., and the NumHub logo in the top left-hand corner.</li>
+<li>A "drawer" slide-out menu on the left-hand side of the screen will allow the user to switch between different levels (<em>i.e.,</em> primary, elementary, high school, undergrad, etc.) as these will each have their own distinct "site". That is, no questions from one level will appear at all on another level one may think of each level as it's own sub-website. </li>
+</ul>
+</div><script type="text/x-mathjax-config;executed=true">
+              // TeX-AMS_HTML
+              MathJax.Hub.Config({
+                jax: [
+                  'input/TeX',
+                  'output/HTML-CSS',
+                  'output/PreviewHTML',
+                ],
+                extensions: [
+                  'tex2jax.js',
+                  'AssistiveMML.js',
+                  'a11y/accessibility-menu.js',
+                ],
+                TeX: {
+                  extensions: [
+                    'AMSmath.js',
+                    'AMSsymbols.js',
+                    'noErrors.js',
+                    'noUndefined.js',
+                  ]
+                },
+                tex2jax: {
+                  inlineMath: [
+                    ['$', '$'],
+                    ['\\(', '\\)'],
+                  ],
+                  displayMath: [
+                    ['$$', '$$'],
+                    ['\\[', '\\]'],
+                  ],
+                  processEscapes: true
+                },
+                showMathMenu: false,
+                showProcessingMessages: false,
+                messageStyle: 'none',
+                skipStartupTypeset: true, // disable initial rendering
+                positionToHash: false
+              })
+              // set specific container to render, can be delayed too
+              MathJax.Hub.Queue(
+                ['Typeset', MathJax.Hub, '_html']
+              )
+            </script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script></body></html>
