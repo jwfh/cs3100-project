@@ -1,0 +1,29 @@
+@font-face {
+    font-family: 'BellSlim';
+    src: local('BellSlim SemiBold Regular'), local('BellSlimSemiBold'),
+        url('/assets/fonts/BellSlimSemiBold.woff2') format('woff2'),
+        url('/assets/fonts/BellSlimSemiBold.woff') format('woff'),
+        url('/assets/fonts/BellSlimSemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BellSlim';
+    src: local('BellSlim Regular'), local('BellSlim'),
+        url('/assets/fonts/BellSlim.woff2') format('woff2'),
+        url('/assets/fonts/BellSlim.woff') format('woff'),
+        url('/assets/fonts/BellSlim.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BellSlim';
+    src: local('BellSlim Medium Regular'), local('BellSlimMedium'),
+        url('/assets/fonts/BellSlimMedium.woff2') format('woff2'),
+        url('/assets/fonts/BellSlimMedium.woff') format('woff'),
+        url('/assets/fonts/BellSlimMedium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}

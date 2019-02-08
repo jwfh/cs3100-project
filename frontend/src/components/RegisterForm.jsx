@@ -13,6 +13,7 @@
 import React, { Component } from 'react'
 import RegisterFormAccount from './RegisterFormAccount'
 import RegisterFormDetails from './RegisterFormDetails'
+import './RegisterForm.css';
 
 export class RegisterForm extends Component {
   state = {
@@ -47,7 +48,9 @@ export class RegisterForm extends Component {
 
   // Handle fields change
   handleChange = input => e => {
-    this.setState({[input]: e.target.value});
+    this.setState({
+      [input]: e.target.value
+    });
   }
 
   render() {
@@ -75,22 +78,31 @@ export class RegisterForm extends Component {
 
     switch (step) {
       case 1:
-      // Returning the RegisterFormAccount component 
-      return (
-        <RegisterFormAccount
-        nextStep = { this.nextStep }
-        handleChange = { this.handleChange }
-        values = { values }
-        />
-      )
+        // Returning the RegisterFormAccount component 
+        return (
+          <div className="RegisterForm">
+          <RegisterFormAccount
+          nextStep = { this.nextStep }
+          handleChange = { this.handleChange }
+          values = { values }
+          />
+          </div>
+        )
 
       case 2: 
-      // Returning the RegisterFormDetails component
-      return  (
-        <RegisterFormDetails
-          // Pass in props here 
-        />
-      )
+        // Returning the RegisterFormDetails component
+        return  (
+          <RegisterFormDetails
+            // Pass in props here 
+          />
+        )
+
+      default:
+        return (
+          <div>
+            An error ocurred.
+          </div>
+        )
     }
   }
 }
