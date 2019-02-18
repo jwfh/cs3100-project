@@ -7,6 +7,9 @@ FOUND := $(foreach exec,$(EXECUTABLES),\
 build: install
 	npm run-script build
 
+dev: install
+	npm start
+
 install: package.json 
 	npm install --save
 

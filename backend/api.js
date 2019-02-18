@@ -11,7 +11,9 @@ router.get('/*', function(req, res, next) {
 
 /* POST User profile page */
 router.post('/profile', function(req, res, next) {
-  res.json({ title: 'Profile Page'});
+  res.json({ 
+		title: 'Profile Page'
+	});
 });
 
 module.exports = router;

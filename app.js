@@ -3,8 +3,10 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const compression = require('compression')
 
 const app = express();
+app.use(compression())
 
 // Configure Express
 // app.set('view engine', 'pug');
