@@ -1,7 +1,7 @@
 # Dockerfile for COMP-3100 Course Project Node.JS App
 
-# Created:     January 4, 2018 at 23:54
-# Modified:    January 4, 2018 at 23:54
+# Created:     January 4, 2019 at 23:54
+# Modified:    February 18, 2019 at 17:08
 # Modified by: Jacob House
 
 # Build the image from the Alpine flavour of Node 10
@@ -16,9 +16,8 @@ WORKDIR /usr/src/app
 
 # Copy and install app dependencies
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
-COPY package*.json ./
 COPY . .
-RUN make install && make -C frontend 
+RUN make build
 
 # Expose the ports for our site
 # This is COMP-3100 so let's use port 3100
