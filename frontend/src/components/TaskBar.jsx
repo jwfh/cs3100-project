@@ -153,7 +153,7 @@ class TaskBar extends React.Component {
 
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
-    const { classes, theme } = this.props;
+    const { classes } = this.props;
     const { sideBarOpen } = this.props;
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);

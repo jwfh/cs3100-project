@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import { 
   List, 
   ListItem, 
   ListItemIcon, 
   ListItemText, 
+  ListSubheader,
 } from '@material-ui/core';
 import { 
   Filter1, 
@@ -12,26 +15,40 @@ import {
   Filter3, 
   Filter4, 
   Filter5, 
-  Filter6 
+  Filter6,
 } from '@material-ui/icons';
 
+function createSideBarItem(label, icon) {
+  return {label: label, icon: icon}
+}
+
+const sideBarItems = [
+  createSideBarItem('Primary', <Filter1/>),
+  createSideBarItem('Elementary', <Filter2/>),
+  createSideBarItem('Intermediate', <Filter3/>),
+  createSideBarItem('Secondary', <Filter4/>),
+  createSideBarItem('Undergraduate', <Filter5/>),
+  createSideBarItem('Graduate', <Filter6/>)
+]
+
+const styles = theme => ({
+  root: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: theme.palette.background.paper,
+  },
+  nested: {
+    paddingLeft: theme.spacing.unit * 4,
+  },
+});
+
 export class SideBar extends Component {
-
-  createSideBarItem = (label, icon) => {
-    return {label: label, icon: icon}
-  }
-
-  sideBarItems = [
-    this.createSideBarItem('Primary', <Filter1/>),
-    this.createSideBarItem('Elementary', <Filter2/>),
-    this.createSideBarItem('Intermediate', <Filter3/>),
-    this.createSideBarItem('Secondary', <Filter4/>),
-    this.createSideBarItem('Undergraduate', <Filter5/>),
-    this.createSideBarItem('Graduate', <Filter6/>)
-  ]
+  state = {
+    selectedIndex: 1,
+  };
 
   render() {
-    const { sideBarOpen } = this.props;
+    const { classes, sideBarOpen } = this.props;
     return (
       <div>
         <Drawer
@@ -39,8 +56,12 @@ export class SideBar extends Component {
           anchor="left"
           open={sideBarOpen}
         >
-          <List>
-            {this.sideBarItems.map((item, index) => (
+          <List
+            component="nav"
+            subheader={<ListSubheader component="div">Question Levels</ListSubheader>}
+            className={classes.root}
+          >
+            {sideBarItems.map((item, index) => (
               <ListItem button key={item['label']}>
                 <ListItemIcon>{item['icon']}</ListItemIcon>
                 <ListItemText primary={item['label']} />
@@ -53,4 +74,9 @@ export class SideBar extends Component {
   }
 }
 
-export default SideBar
+SideBar.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(SideBar);
+
