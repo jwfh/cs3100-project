@@ -22,8 +22,6 @@ import { fade } from "@material-ui/core/styles/colorManipulator";
 import { withStyles } from "@material-ui/core/styles";
 import Logo2 from '../assets/images/logo-02.svg';
 
-const siteVariant = 'Undergraduate'; // One of Primary, Elementary, Intermediate, Secondary, Undergraduate, Graduate
-
 const styles = theme => ({
   root: {
     width: "100%"
@@ -126,8 +124,8 @@ class TaskBar extends React.Component {
     mobileMoreAnchorEl: null
   };
 
-  handleDrawerOpen = () => {
-    this.setState({ sideBarOpen: true });
+  handleDrawer = () => {
+    this.props.globalUpdate('sideBarOpen', !this.props.sideBarOpen);
   }
 
   handleProfileMenuOpen = event => {
@@ -153,8 +151,7 @@ class TaskBar extends React.Component {
 
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
-    const { classes } = this.props;
-    const { sideBarOpen } = this.props;
+    const { classes, siteLevelName, sideBarOpen } = this.props;
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -203,28 +200,24 @@ class TaskBar extends React.Component {
             <IconButton
               color="inherit"
               aria-label="Open drawer"
-              onClick={this.handleDrawerOpen}
+              onClick={this.handleDrawer}
               className={classNames(classes.menuButton, sideBarOpen && classes.hide)}
             >
               <MenuIcon />
             </IconButton>
             <div className={classes.brand}>
-            {/* <IconButton
-              onClick={this.handleHomeButton}
-            > */}
               <img 
                 className={classes.logo}
                 src={Logo2} 
                 alt="NumHub"
               ></img>
-            {/* </IconButton> */}
             <Typography
               className={classes.siteVariant}
               variant="h5"
               color="inherit"
               noWrap
             >
-              {siteVariant}
+              {siteLevelName}
             </Typography>
             </div>
             <div className={classes.search}>
@@ -276,7 +269,10 @@ class TaskBar extends React.Component {
 }
 
 TaskBar.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  sideBarOpen: PropTypes.bool,
+  globalUpdate: PropTypes.func,
+  siteLevelName: PropTypes.string,
 };
 
 export default withStyles(styles)(TaskBar);
