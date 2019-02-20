@@ -9,27 +9,6 @@ import {
   ListItemText, 
   ListSubheader,
 } from '@material-ui/core';
-import { 
-  Filter1, 
-  Filter2, 
-  Filter3, 
-  Filter4, 
-  Filter5, 
-  Filter6,
-} from '@material-ui/icons';
-
-function createSideBarItem(label, icon) {
-  return {label: label, icon: icon}
-}
-
-const sideBarItems = [
-  createSideBarItem('Primary', <Filter1/>),
-  createSideBarItem('Elementary', <Filter2/>),
-  createSideBarItem('Intermediate', <Filter3/>),
-  createSideBarItem('Secondary', <Filter4/>),
-  createSideBarItem('Undergraduate', <Filter5/>),
-  createSideBarItem('Graduate', <Filter6/>)
-]
 
 const styles = theme => ({
   root: {
@@ -47,22 +26,30 @@ export class SideBar extends Component {
     selectedIndex: 1,
   };
 
+  handleLevelChange = (idx) => {
+    // this.props.globalUpdate('siteLevelIdx', idx);
+  }
+
   render() {
-    const { classes, sideBarOpen } = this.props;
+    const { classes, siteLevelItems } = this.props;
     return (
       <div>
         <Drawer
-          variant="persistent"
+          variant="temporary"
           anchor="left"
-          open={sideBarOpen}
+          open={this.props.sideBarOpen}
         >
           <List
             component="nav"
             subheader={<ListSubheader component="div">Question Levels</ListSubheader>}
             className={classes.root}
           >
-            {sideBarItems.map((item, index) => (
-              <ListItem button key={item['label']}>
+            {siteLevelItems.map((item, index) => (
+              <ListItem 
+                button 
+                key={item['label']}
+                onClick={this.handleLevelChange(index)}
+              >
                 <ListItemIcon>{item['icon']}</ListItemIcon>
                 <ListItemText primary={item['label']} />
               </ListItem>
@@ -76,6 +63,9 @@ export class SideBar extends Component {
 
 SideBar.propTypes = {
   classes: PropTypes.object.isRequired,
+  sideBarOpen: PropTypes.bool,
+  globalUpdate: PropTypes.func,
+  siteLevelItems: PropTypes.array,
 };
 
 export default withStyles(styles)(SideBar);

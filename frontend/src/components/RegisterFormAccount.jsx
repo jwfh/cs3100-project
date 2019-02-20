@@ -15,31 +15,33 @@ export class RegisterFormAccount extends Component {
       <MuiThemeProvider>
         <React.Fragment>
           <TextField 
-            hintText="Enter Your First Name"
-            floatingLabelText="First Name"
-            onChange={ handleChange('firstName') }
-            defaultValue={ values.firstName }
+            hintText="Enter Your Username"
+            floatingLabelText="Username"
+            onChange={ handleChange('username') }
+            defaultValue={ values.username }
           />
           <br/>
           <TextField 
-            hintText="Enter Your Last Name"
-            floatingLabelText="Last Name"
-            onChange={ handleChange('lastName') }
-            defaultValue={ values.lastName }
+            hintText="Enter Your Password"
+            type="password"
+            floatingLabelText="Password"
+            onChange={ handleChange('password') }
+            defaultValue={ values.password }
           />
           <br/>
           <TextField 
             hintText="Enter Your Email Address"
-            floatingLabelText="Email"
-            onChange={ handleChange('firstName') }
-            defaultValue={ values.emailAddress }
+            type="password"
+            floatingLabelText="Confirm Password"
+            onChange={ handleChange('confirmPassword') }
+            defaultValue={ values.confirmPassword }
           />
           <br/>
           <RaisedButton 
-          label="Continue"
-          primary={ true }
-          style={ styles.button }
-          onClick={ this.continue }
+            label="Continue"
+            primary={ true }
+            style={ styles.button }
+            onClick={ this.continue }
           />
         </React.Fragment>
       </MuiThemeProvider>

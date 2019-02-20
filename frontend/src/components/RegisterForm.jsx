@@ -81,20 +81,24 @@ export class RegisterForm extends Component {
         // Returning the RegisterFormAccount component 
         return (
           <div className="RegisterForm">
-          <RegisterFormAccount
-          nextStep = { this.nextStep }
-          handleChange = { this.handleChange }
-          values = { values }
-          />
+            <RegisterFormAccount
+              nextStep = { this.nextStep }
+              handleChange = { this.handleChange }
+              values = { values }
+            />
           </div>
         )
 
       case 2: 
         // Returning the RegisterFormDetails component
         return  (
-          <RegisterFormDetails
-            // Pass in props here 
-          />
+          <div className="RegisterForm">
+            <RegisterFormDetails
+              prevStep = { this.prevStep }
+              handleChange = { this.handleChange }
+              values = { values }
+            />
+          </div>
         )
 
       default:
