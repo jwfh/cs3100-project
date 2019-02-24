@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
+import PostPreview from './PostPreview';
 
 export class HomePage extends Component {
   render() {
     return (
-      <div>
-        Home
-      </div>
+      <center>
+        <PostPreview/>
+        <PostPreview/>
+        <PostPreview/>
+        <PostPreview/>
+        <PostPreview/>
+        <PostPreview/>
+        <PostPreview/>
+      </center>
     )
   }
 }

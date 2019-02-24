@@ -21,6 +21,9 @@ import classNames from 'classnames';
 import { fade } from "@material-ui/core/styles/colorManipulator";
 import { withStyles } from "@material-ui/core/styles";
 import Logo2 from '../assets/images/logo-02.svg';
+import {
+  sideBarDrawerWidth as drawerWidth
+} from '../App';
 
 const styles = theme => ({
   root: {
@@ -32,6 +35,9 @@ const styles = theme => ({
   menuButton: {
     marginLeft: theme.spacing.unit * -1,
     marginRight: theme.spacing.unit * 1,
+  },
+  hide: {
+    display: 'none',
   },
   logo: {
     width: theme.spacing.unit * 4,
@@ -115,7 +121,22 @@ const styles = theme => ({
     [theme.breakpoints.up("md")]: {
       display: "none"
     }
-  }
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  appBarShift: {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
 });
 
 class TaskBar extends React.Component {
@@ -195,13 +216,26 @@ class TaskBar extends React.Component {
 
     return (
       <div className={classes.root}>
-        <AppBar position="static">
-          <Toolbar>
+        <AppBar 
+          position="fixed"
+          className={classNames(classes.appBar, {
+            [classes.appBarShift]: sideBarOpen,
+          })}
+        >
+          <Toolbar 
+            // disableGutters={!sideBarOpen}
+          >
             <IconButton
               color="inherit"
               aria-label="Open drawer"
               onClick={this.handleDrawer}
-              className={classNames(classes.menuButton, sideBarOpen && classes.hide)}
+              // className={classNames(classes.menuButton, {
+              //   [classes.hide]: sideBarOpen,
+              // })}
+              className={classNames(
+                classes.menuButton, 
+                sideBarOpen && classes.hide
+              )}
             >
               <MenuIcon />
             </IconButton>
