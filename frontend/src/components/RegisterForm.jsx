@@ -10,10 +10,16 @@
  * respectively.
  */
 
-import React, { Component } from 'react'
-import RegisterFormAccount from './RegisterFormAccount'
-import RegisterFormDetails from './RegisterFormDetails'
-import './RegisterForm.css';
+import React, { Component } from 'react';
+import RegisterFormAccount from './RegisterFormAccount';
+import RegisterFormDetails from './RegisterFormDetails';
+import { withStyles } from "@material-ui/core/styles";
+
+const styles = theme => ({
+  formBody: {
+    textAlign: 'center',
+  },
+})
 
 export class RegisterForm extends Component {
   state = {
@@ -75,12 +81,13 @@ export class RegisterForm extends Component {
       securityQuestionID,
       securityAnswer
     }
+    const { classes } = this.props;
 
     switch (step) {
       case 1:
         // Returning the RegisterFormAccount component 
         return (
-          <div className="RegisterForm">
+          <div className={classes.formBody}>
             <RegisterFormAccount
               nextStep = { this.nextStep }
               handleChange = { this.handleChange }
@@ -92,7 +99,7 @@ export class RegisterForm extends Component {
       case 2: 
         // Returning the RegisterFormDetails component
         return  (
-          <div className="RegisterForm">
+          <div className={classes.formBody}>
             <RegisterFormDetails
               prevStep = { this.prevStep }
               handleChange = { this.handleChange }
@@ -111,4 +118,4 @@ export class RegisterForm extends Component {
   }
 }
 
-export default RegisterForm
+export default withStyles(styles)(RegisterForm);

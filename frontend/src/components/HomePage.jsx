@@ -4,7 +4,7 @@ import PostPreview from './PostPreview';
 export class HomePage extends Component {
   render() {
     return (
-      <center>
+      <React.Fragment>
         <PostPreview/>
         <PostPreview/>
         <PostPreview/>
@@ -12,8 +12,8 @@ export class HomePage extends Component {
         <PostPreview/>
         <PostPreview/>
         <PostPreview/>
-      </center>
-    )
+      </React.Fragment>
+    );
   }
 }
 

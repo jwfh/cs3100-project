@@ -70,36 +70,18 @@ const styles = theme => ({
   nested: {
     paddingLeft: theme.spacing.unit * 4,
   },
-  numHubType: {
-    fontFamily: [
-      'Europa',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(','),
+  sidebarItem: {
+    paddingLeft: theme.spacing.unit * 3,
+    paddingRight: theme.spacing.unit * 3,
   },
 });
 
 
 export class SideBar extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedIndex: 1,
-    };
-  }
-
   handleLevelChange = (idx) => {
-    console.warn('sdfgj')
     this.props.globalUpdate('siteLevelIdx', idx);
+    this.setState({ 'siteLevelIdx': idx });
     this.handleDrawerClose();
   }
 
@@ -112,7 +94,7 @@ export class SideBar extends Component {
   };
 
   render() {
-    const { classes, siteLevelItems, theme, sideBarOpen } = this.props;
+    const { classes, siteLevelItems, theme, sideBarOpen, siteLevelIdx } = this.props;
     return (
       <div className={classes.root}>
       <CssBaseline />
@@ -150,6 +132,8 @@ export class SideBar extends Component {
           {siteLevelItems.map((item, index) => (
             <ListItem 
               button
+              className={classes.sidebarItem}
+              selected={index === siteLevelIdx}
               key={item['label']}
               onClick={() => {this.handleLevelChange(index)}}
             >
@@ -170,6 +154,7 @@ SideBar.propTypes = {
   sideBarOpen: PropTypes.bool,
   globalUpdate: PropTypes.func,
   siteLevelItems: PropTypes.array,
+  siteLevelIdx: PropTypes.number,
 };
 
 export default withStyles(styles, { withTheme: true })(SideBar);

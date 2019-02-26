@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import classNames from 'classnames';
-import { withStyles, withTheme } from "@material-ui/core/styles";
+import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import './assets/style/europa.scss';
 import './assets/style/bell.scss';
 import 'katex/dist/katex.min.css';
-import './App.scss';
 import TaskBar from './components/TaskBar';
 import SideBar from './components/SideBar';
 import HomePage from './components/HomePage';
 import LoginPage from './components/LoginPage';
 import RegisterForm from './components/RegisterForm';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
+import PageBody from './components/PageBody';
 import Error404 from './components/Error404';
 import { 
   Filter1, 
@@ -25,17 +24,13 @@ import {
 import { MuiThemeProvider } from "@material-ui/core/styles"; 
 import { createMuiTheme } from "@material-ui/core/styles";
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { blue100 } from 'material-ui/styles/colors';
 
 export const sideBarDrawerWidth = 240;
 
-
 const theme = createMuiTheme({
-  typography: { useNextVariants: true },
-});
-/*
-const styles = theme => ({
-  numHubType: {
+  typography: {
+    useNextVariants: true,
+    // Use the system font instead of the default Roboto font.
     fontFamily: [
       'Europa',
       '-apple-system',
@@ -50,7 +45,13 @@ const styles = theme => ({
       '"Segoe UI Symbol"',
     ].join(','),
   },
-});*/
+});
+
+const styles = theme => ({
+  a: {
+    color: '#00B7FF',
+  },
+})
 
 class App extends Component {
 
@@ -73,32 +74,31 @@ class App extends Component {
 
   }
 
-  componentDidMount() {
-    
-  }
-
   createSiteLevelItem(label, icon) {
     let item = {label: label, icon: icon};
     return item;
   };
 
-
   updateState = (key, value) => {
-    this.setState({[key]: value})
+    this.setState({[key]: value});
   };
 
+  getState = (key) => {
+    return this.state[key];
+  }
+
   render() {
-    const { classes } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <div className={classNames("App", classes.numHubType)}>
+        <div className={"App"}>
           <TaskBar 
             sideBarOpen={this.state.sideBarOpen}
             globalUpdate={this.updateState}
             siteLevelName={this.siteLevelItems[this.state.siteLevelIdx].label}
           />
+          <PageBody>
           <Switch>
             <Route 
               path="/"
@@ -124,9 +124,11 @@ class App extends Component {
               component={Error404}
             />
           </Switch>
+          </PageBody>
           <SideBar
             sideBarOpen={this.state.sideBarOpen}
             siteLevelItems={this.siteLevelItems}
+            siteLevelIdx={this.state.siteLevelIdx}
             globalUpdate={this.updateState}
           />
         </div>
@@ -141,4 +143,4 @@ App.propTypes = {
   classes: PropTypes.object.isRequired,
 }
 
-export default withStyles({withTheme: true})(App);
+export default withStyles(styles, {withTheme: true})(App);
