@@ -19,7 +19,8 @@ audit: install
 	npm audit fix 
 
 install: package.json 
-	npm install --save
+	npm install
+	$(MAKE) -C frontend install
 
 frontend-dev: frontend/package.json .FORCE
 	$(MAKE) -C frontend dev
