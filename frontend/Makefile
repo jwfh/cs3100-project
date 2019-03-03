@@ -11,7 +11,7 @@ dev: install
 	npm start
 
 install: package.json 
-	npm install --save
+	npm install
 
 audit: install 
 	npm audit fix

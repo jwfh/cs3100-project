@@ -11,16 +11,14 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "@material-ui/core": "^3.9.1",
     "compression": "^1.7.3",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
+    "gm": "^1.23.1",
     "http-errors": "~1.6.2",
     "morgan": "~1.9.0",
     "pug": "^2.0.3",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
     "sqlite3": "^4.0.6"
   }
 }

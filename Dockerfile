@@ -8,7 +8,7 @@
 FROM node:10-alpine
 
 # Install make
-RUN apk update && apk add make
+RUN apk update && apk add --update --no-cache clang make
 
 # Set the working directory for the application
 WORKDIR /usr/src/app

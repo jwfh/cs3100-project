@@ -1,6 +1,4 @@
 const sqlite3 = require('sqlite3').verbose();
-const fs = require('fs');
-const spawn = require("child_process").spawn
 const crypto = require('crypto');
 const md5hash = crypto.createHash('md5');
 md5hash.setEncoding('hex');

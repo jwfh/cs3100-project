@@ -10,10 +10,19 @@
  * respectively.
  */
 
-import React, { Component } from 'react'
-import RegisterFormAccount from './RegisterFormAccount'
-import RegisterFormDetails from './RegisterFormDetails'
-import './RegisterForm.css';
+import React, { Component } from 'react';
+import RegisterFormAccount from './RegisterFormAccount';
+import RegisterFormDetails from './RegisterFormDetails';
+import { withStyles } from "@material-ui/core/styles";
+
+const styles = theme => ({
+  formBody: {
+    textAlign: 'center',
+  },
+  button: {
+    margin: 15
+  },
+})
 
 export class RegisterForm extends Component {
   state = {
@@ -46,6 +55,11 @@ export class RegisterForm extends Component {
     }
   }
 
+  // Do final validation and send form
+  submit = () => {
+    
+  }
+
   // Handle fields change
   handleChange = input => e => {
     this.setState({
@@ -59,8 +73,8 @@ export class RegisterForm extends Component {
       username,
       password,
       confirmPassword,
-      firstName, 
-      lastName, 
+      givenName, 
+      surname, 
       emailAddress, 
       securityQuestionID,
       securityAnswer
@@ -69,32 +83,40 @@ export class RegisterForm extends Component {
       username,
       password,
       confirmPassword,
-      firstName, 
-      lastName, 
+      givenName, 
+      surname, 
       emailAddress, 
       securityQuestionID,
       securityAnswer
     }
+    const { classes } = this.props;
 
     switch (step) {
       case 1:
         // Returning the RegisterFormAccount component 
         return (
-          <div className="RegisterForm">
-          <RegisterFormAccount
-          nextStep = { this.nextStep }
-          handleChange = { this.handleChange }
-          values = { values }
-          />
+          <div className={classes.formBody}>
+            <RegisterFormAccount
+              classes = { classes }
+              nextStep = { this.nextStep }
+              handleChange = { this.handleChange }
+              values = { values }
+            />
           </div>
         )
 
       case 2: 
         // Returning the RegisterFormDetails component
         return  (
-          <RegisterFormDetails
-            // Pass in props here 
-          />
+          <div className={classes.formBody}>
+            <RegisterFormDetails
+              classes = { classes }
+              prevStep = { this.prevStep }
+              nextStep = { this.submit }
+              handleChange = { this.handleChange }
+              values = { values }
+            />
+          </div>
         )
 
       default:
@@ -107,4 +129,4 @@ export class RegisterForm extends Component {
   }
 }
 
-export default RegisterForm
+export default withStyles(styles)(RegisterForm);
