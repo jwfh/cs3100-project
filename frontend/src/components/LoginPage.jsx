@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 export class LoginPage extends Component {
   render() {
@@ -6,8 +6,8 @@ export class LoginPage extends Component {
       <div>
         Login
       </div>
-    )
+    );
   }
 }
 
-export default LoginPage
+export default LoginPage;

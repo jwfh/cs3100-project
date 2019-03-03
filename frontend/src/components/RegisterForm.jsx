@@ -13,16 +13,16 @@
 import React, { Component } from 'react';
 import RegisterFormAccount from './RegisterFormAccount';
 import RegisterFormDetails from './RegisterFormDetails';
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from '@material-ui/core/styles';
 
-const styles = theme => ({
+const styles = (theme) => ({
   formBody: {
     textAlign: 'center',
   },
   button: {
-    margin: 15
+    margin: 15,
   },
-})
+});
 
 export class RegisterForm extends Component {
   state = {
@@ -34,38 +34,38 @@ export class RegisterForm extends Component {
     lastName: '',
     emailAddress: '',
     securityQuestionID: -1,
-    securityAnswer: ''
-  }
+    securityAnswer: '',
+  };
 
   // Advance to the next form step
   nextStep = () => {
     const { step } = this.state;
     this.setState({
-      step: step + 1
-    })
-  }
+      step: step + 1,
+    });
+  };
 
   // Return to the previous form step
   prevStep = () => {
     const { step } = this.state;
     if (step > 1) {
       this.setState({
-        step: step - 1
-      })
+        step: step - 1,
+      });
     }
-  }
+  };
 
   // Do final validation and send form
   submit = () => {
     
-  }
+  };
 
   // Handle fields change
   handleChange = input => e => {
     this.setState({
-      [input]: e.target.value
+      [input]: e.target.value,
     });
-  }
+  };
 
   render() {
     const { step } = this.state;
@@ -77,7 +77,7 @@ export class RegisterForm extends Component {
       surname, 
       emailAddress, 
       securityQuestionID,
-      securityAnswer
+      securityAnswer,
     } = this.state;
     const values = {
       username,
@@ -87,8 +87,8 @@ export class RegisterForm extends Component {
       surname, 
       emailAddress, 
       securityQuestionID,
-      securityAnswer
-    }
+      securityAnswer,
+    };
     const { classes } = this.props;
 
     switch (step) {
@@ -103,7 +103,7 @@ export class RegisterForm extends Component {
               values = { values }
             />
           </div>
-        )
+        );
 
       case 2: 
         // Returning the RegisterFormDetails component
@@ -117,14 +117,14 @@ export class RegisterForm extends Component {
               values = { values }
             />
           </div>
-        )
+        );
 
       default:
         return (
           <div>
             An error ocurred.
           </div>
-        )
+        );
     }
   }
 }

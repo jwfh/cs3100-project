@@ -1,20 +1,20 @@
-import React, { Component } from 'react'
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 
 export class RegisterFormDetails extends Component {
 
-  back = e => {
+  back = (e) => {
     e.preventDefault();
     this.props.prevStep();
-  }
+  };
 
-  continue = e => {
+  continue = (e) => {
     e.preventDefault();
     this.props.nextStep();
-  }
+  };
 
   render() {
     const { values, handleChange, classes } = this.props;
@@ -57,7 +57,7 @@ export class RegisterFormDetails extends Component {
           />
         </React.Fragment>
       </MuiThemeProvider>
-    )
+    );
   }
 }
 
@@ -67,6 +67,6 @@ RegisterFormDetails.propTypes = {
   nextStep: PropTypes.func.isRequired,
   handleChange: PropTypes.func.isRequired,
   values: PropTypes.object.isRequired,
-}
+};
 
-export default RegisterFormDetails
+export default RegisterFormDetails;

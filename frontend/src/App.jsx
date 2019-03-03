@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { withStyles } from "@material-ui/core/styles";
-import PropTypes from "prop-types";
+import { withStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 import './assets/style/europa.scss';
 import './assets/style/bell.scss';
 import 'katex/dist/katex.min.css';
@@ -21,7 +21,7 @@ import {
   Filter5, 
   Filter6,
 } from '@material-ui/icons';
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"; 
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'; 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 export const sideBarDrawerWidth = 240;
@@ -67,23 +67,23 @@ const theme = createMuiTheme({
   },
 });
 
-const styles = theme => ({
+const styles = (theme) => ({
   a: {
     color: '#00B7FF',
   },
-})
+});
 
 class App extends Component {
 
   constructor(props) {
-    super(props)
+    super(props);
     this.siteLevelItems = [
       this.createSiteLevelItem('Primary', <Filter1/>),
       this.createSiteLevelItem('Elementary', <Filter2/>),
       this.createSiteLevelItem('Intermediate', <Filter3/>),
       this.createSiteLevelItem('Secondary', <Filter4/>),
       this.createSiteLevelItem('Undergraduate', <Filter5/>),
-      this.createSiteLevelItem('Graduate', <Filter6/>)
+      this.createSiteLevelItem('Graduate', <Filter6/>),
     ];
     this.state = {
       sideBarOpen: false,
@@ -95,25 +95,28 @@ class App extends Component {
 
   }
 
-  createSiteLevelItem(label, icon) {
-    let item = {label: label, icon: icon};
+  createSiteLevelItem = (label, icon) => {
+    let item = {
+      label, 
+      icon,
+    };
     return item;
   };
 
   updateState = (key, value) => {
-    this.setState({[key]: value});
+    this.setState({ [key]: value });
   };
 
   getState = (key) => {
     return this.state[key];
-  }
+  };
 
   render() {
     return (
       <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <div className={"App"}>
+        <div className={'App'}>
           <TaskBar 
             sideBarOpen={this.state.sideBarOpen}
             globalUpdate={this.updateState}
@@ -162,6 +165,6 @@ class App extends Component {
 
 App.propTypes = {
   classes: PropTypes.object.isRequired,
-}
+};
 
-export default withStyles(styles, {withTheme: true})(App);
+export default withStyles(styles, { withTheme: true })(App);

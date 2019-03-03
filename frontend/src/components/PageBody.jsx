@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from '@material-ui/core/styles';
 
-const styles = theme => ({
+const styles = (theme) => ({
   main: {
-    margin: "1in",
+    margin: '1in',
   },
 });
 
@@ -14,7 +14,7 @@ export class PageBody extends Component {
       <main className={classes.main}>
         {children}
       </main>
-    )
+    );
   }
 }
 

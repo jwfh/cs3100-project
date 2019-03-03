@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import RegisterForm from './RegisterForm';
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 import {
   Paper,
   Typography,
 } from '@material-ui/core';
 
-const styles = theme => ({
+const styles = (theme) => ({
   container: {
     textAlign: 'center',
     marginTop: '15vh',
@@ -20,7 +20,7 @@ const styles = theme => ({
     display: 'inline-block',
     textAlign: 'left',
   },
-})
+});
 
 export class RegisterPage extends Component {
   render() {
@@ -44,6 +44,6 @@ export class RegisterPage extends Component {
 
 RegisterPage.propTypes = {
   classes: PropTypes.object.isRequired,
-}
+};
 
 export default withStyles(styles)(RegisterPage);

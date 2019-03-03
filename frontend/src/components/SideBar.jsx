@@ -17,11 +17,11 @@ import {
   ChevronRight as ChevronRightIcon,
 } from '@material-ui/icons';
 import {
-  sideBarDrawerWidth as drawerWidth
+  sideBarDrawerWidth as drawerWidth,
 } from '../App';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     display: 'flex',
     backgroundColor: theme.palette.background.paper,
@@ -83,7 +83,7 @@ export class SideBar extends Component {
     this.props.globalUpdate('siteLevelIdx', idx);
     this.setState({ 'siteLevelIdx': idx });
     this.handleDrawerClose();
-  }
+  };
 
   handleDrawerOpen = () => {
     this.props.globalUpdate('sideBarOpen', true);
@@ -97,8 +97,8 @@ export class SideBar extends Component {
     const { classes, siteLevelItems, theme, sideBarOpen, siteLevelIdx } = this.props;
     return (
       <div className={classes.root}>
-      <CssBaseline />
-      <Drawer
+        <CssBaseline />
+        <Drawer
           variant="permanent"
           className={classNames(classes.drawer, {
             [classes.drawerOpen]: sideBarOpen,
@@ -111,40 +111,42 @@ export class SideBar extends Component {
             }),
           }}
           open={sideBarOpen}
-      >
-        <div className={classes.toolbar}>
-          <IconButton onClick={this.handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-          </IconButton>
-        </div>
-        <Divider />
-        <List
-          component="nav"
-          subheader={
-            <ListSubheader 
-              component="div"
-              className={classNames(sideBarOpen || classes.hide)}
-            >
-              Question Levels
-            </ListSubheader>
-          }
         >
-          {siteLevelItems.map((item, index) => (
-            <ListItem 
-              button
-              className={classes.sidebarItem}
-              selected={index === siteLevelIdx}
-              key={item['label']}
-              onClick={() => {this.handleLevelChange(index)}}
-            >
-              <ListItemIcon>{item['icon']}</ListItemIcon>
-              <ListItemText className={classes.numHubType} primary={item['label']} />
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
+          <div className={classes.toolbar}>
+            <IconButton onClick={this.handleDrawerClose}>
+              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </IconButton>
+          </div>
+          <Divider />
+          <List
+            component="nav"
+            subheader={
+              <ListSubheader 
+                component="div"
+                className={classNames(sideBarOpen || classes.hide)}
+              >
+                Question Levels
+              </ListSubheader>
+            }
+          >
+            {siteLevelItems.map((item, index) => (
+              <ListItem 
+                button
+                className={classes.sidebarItem}
+                selected={index === siteLevelIdx}
+                key={item['label']}
+                onClick={() => {
+                  this.handleLevelChange(index);
+                }}
+              >
+                <ListItemIcon>{item['icon']}</ListItemIcon>
+                <ListItemText className={classes.numHubType} primary={item['label']} />
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
       </div>
-    )
+    );
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 export class ForgotPasswordForm extends Component {
   render() {
@@ -6,8 +6,8 @@ export class ForgotPasswordForm extends Component {
       <div>
         
       </div>
-    )
+    );
   }
 }
 
-export default ForgotPasswordForm
+export default ForgotPasswordForm;

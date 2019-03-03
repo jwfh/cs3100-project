@@ -1,18 +1,18 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 export class LoginForm extends Component {
   state = {
     emailAddress: '',
-    password: ''
-  }
+    password: '',
+  };
 
   render() {
     return (
       <div>
         
       </div>
-    )
+    );
   }
 }
 
-export default LoginForm
+export default LoginForm;
