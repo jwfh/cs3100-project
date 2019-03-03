@@ -7,15 +7,9 @@ export default class PostPreview extends Component {
   render() {
     return (
       <Fragment>
-        Inline math, <InlineMath>
-            \int_0^\infty x^2 \, dx
-        </InlineMath>, inline displayed math, <InlineMath>
-          \displaystyle\int_0^\infty x^2 \, dx
-        </InlineMath> and displayed math:
-        <BlockMath>
-            \int_0^\infty x^2 \, dx.
-        </BlockMath>
+        <p>Let <InlineMath>n</InlineMath> be a natural number with <InlineMath>6</InlineMath> dividing <InlineMath>n</InlineMath>. Show that <InlineMath>{String.raw`\phi(n)  \le \dfrac{n}{3}`}</InlineMath>.</p>
       </Fragment>
+
     )
   }
 }
