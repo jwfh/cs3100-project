@@ -19,6 +19,9 @@ const styles = theme => ({
   formBody: {
     textAlign: 'center',
   },
+  button: {
+    margin: 15
+  },
 })
 
 export class RegisterForm extends Component {
@@ -52,6 +55,11 @@ export class RegisterForm extends Component {
     }
   }
 
+  // Do final validation and send form
+  submit = () => {
+    
+  }
+
   // Handle fields change
   handleChange = input => e => {
     this.setState({
@@ -65,8 +73,8 @@ export class RegisterForm extends Component {
       username,
       password,
       confirmPassword,
-      firstName, 
-      lastName, 
+      givenName, 
+      surname, 
       emailAddress, 
       securityQuestionID,
       securityAnswer
@@ -75,8 +83,8 @@ export class RegisterForm extends Component {
       username,
       password,
       confirmPassword,
-      firstName, 
-      lastName, 
+      givenName, 
+      surname, 
       emailAddress, 
       securityQuestionID,
       securityAnswer
@@ -89,6 +97,7 @@ export class RegisterForm extends Component {
         return (
           <div className={classes.formBody}>
             <RegisterFormAccount
+              classes = { classes }
               nextStep = { this.nextStep }
               handleChange = { this.handleChange }
               values = { values }
@@ -101,7 +110,9 @@ export class RegisterForm extends Component {
         return  (
           <div className={classes.formBody}>
             <RegisterFormDetails
+              classes = { classes }
               prevStep = { this.prevStep }
+              nextStep = { this.submit }
               handleChange = { this.handleChange }
               values = { values }
             />

@@ -9,7 +9,7 @@ import TaskBar from './components/TaskBar';
 import SideBar from './components/SideBar';
 import HomePage from './components/HomePage';
 import LoginPage from './components/LoginPage';
-import RegisterForm from './components/RegisterForm';
+import RegisterPage from './components/RegisterPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import PageBody from './components/PageBody';
 import Error404 from './components/Error404';
@@ -21,11 +21,14 @@ import {
   Filter5, 
   Filter6,
 } from '@material-ui/icons';
-import { MuiThemeProvider } from "@material-ui/core/styles"; 
-import { createMuiTheme } from "@material-ui/core/styles";
+import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"; 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 export const sideBarDrawerWidth = 240;
+
+// function getContrastText(color) {
+//   return (getLuminance(color) <= 0.5) ? dark.text.primary : light.text.primary;
+// }
 
 const theme = createMuiTheme({
   typography: {
@@ -44,6 +47,23 @@ const theme = createMuiTheme({
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"',
     ].join(','),
+  },
+  palette: {
+    primary: {
+      light: '#1565c0',
+      main: '#0d47a1',
+      dark: '#002171',
+    },
+    accent: {
+      light: '#ff5983',
+      main: '#f50057',
+      dark: '#bb002f',
+    },
+    error: {
+      light: '#ff6659',
+      main: '#d32f2f',
+      dark: '#9a0007',
+    },
   },
 });
 
@@ -68,6 +88,7 @@ class App extends Component {
     this.state = {
       sideBarOpen: false,
       siteLevelIdx: 0,
+      showBrand: true,
     };
 
     this.createSiteLevelItem = this.createSiteLevelItem.bind(this);
@@ -107,7 +128,7 @@ class App extends Component {
             />
             <Route 
               path="/register"
-              component={RegisterForm}
+              component={RegisterPage}
               exact
             />
             <Route 

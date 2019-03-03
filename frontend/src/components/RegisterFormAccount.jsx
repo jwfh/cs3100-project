@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from "prop-types";
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -10,7 +11,7 @@ export class RegisterFormAccount extends Component {
   }
 
   render() {
-    const { values, handleChange } = this.props;
+    const { values, handleChange, classes } = this.props;
     return (
       <MuiThemeProvider>
         <React.Fragment>
@@ -40,7 +41,7 @@ export class RegisterFormAccount extends Component {
           <RaisedButton 
             label="Continue"
             primary={ true }
-            style={ styles.button }
+            className={ classes.button }
             onClick={ this.continue }
           />
         </React.Fragment>
@@ -49,10 +50,11 @@ export class RegisterFormAccount extends Component {
   }
 }
 
-const styles = {
-  button: {
-    margin: 15
-  }
+RegisterFormAccount.propTypes = {
+  classes: PropTypes.object.isRequired,
+  nextStep: PropTypes.func.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  values: PropTypes.object.isRequired,
 }
 
-export default RegisterFormAccount
+export default RegisterFormAccount;
