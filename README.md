@@ -1,5 +1,7 @@
 _**This GitHub repository contains the Num Hub site, a NodeJS-built website to satisfy the course project requirement of Computer Science 3100 at Memorial University. Technical documentation may be found in the**_ **docs** _**folder.**_
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c7c992d8183a42dca5d39f65c2ed41d8)](https://www.codacy.com/app/jwfh/cs3100-project?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jwfh/cs3100-project&amp;utm_campaign=Badge_Grade) [![CodeFactor](https://www.codefactor.io/repository/github/jwfh/cs3100-project/badge)](https://www.codefactor.io/repository/github/jwfh/cs3100-project)
+
 # NUM HUB
 _Num Hub_ is a website targeted to teachers and professors of mathematics and is used to share math problems. Our aim is to help educators collaborate to create new and engaging math problems for student practice and homework sheets, as well as formal examinations. 
 
