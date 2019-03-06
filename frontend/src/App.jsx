@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import './assets/style/europa.scss';
-import './assets/style/bell.scss';
+import './assets/style/Europa.scss';
+import './assets/style/BellSlim.scss';
 import 'katex/dist/katex.min.css';
 import TaskBar from './components/TaskBar';
 import SideBar from './components/SideBar';
 import HomePage from './components/HomePage';
+import PostCreatePage from './components/PostCreatePage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
@@ -25,10 +26,6 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 export const sideBarDrawerWidth = 240;
-
-// function getContrastText(color) {
-//   return (getLuminance(color) <= 0.5) ? dark.text.primary : light.text.primary;
-// }
 
 const theme = createMuiTheme({
   typography: {
@@ -127,6 +124,11 @@ class App extends Component {
             <Route 
               path="/"
               component={HomePage}
+              exact
+            />
+            <Route 
+              path="/new"
+              component={PostCreatePage}
               exact
             />
             <Route 
