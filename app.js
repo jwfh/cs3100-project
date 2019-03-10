@@ -4,9 +4,19 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const compression = require('compression');
+const helmet = require('helmet');
+const rateLimit = require("express-rate-limit");
 
 const app = express();
+app.use(helmet());
 app.use(compression());
+
+// https://www.npmjs.com/package/express-rate-limit
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 
 // Configure Express
 // app.set('view engine', 'pug');
