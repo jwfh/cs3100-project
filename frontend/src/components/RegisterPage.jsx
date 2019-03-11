@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Paper,
-  Typography,
 } from '@material-ui/core';
+import PageTitle from './PageTitle';
 
 const styles = (theme) => ({
   container: {
@@ -32,9 +32,9 @@ export class RegisterPage extends Component {
           className={classes.root}
           elevation={4}
         >
-          <Typography variant="h5" component="h2">
+          <PageTitle>
             Create your NumHub Account
-          </Typography>
+          </PageTitle>
           <RegisterForm />
         </Paper>
       </div>
