@@ -4,7 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 class LoginPage extends Component {
-    this.state={
+    state = {
       username:'',
       password:'',
       loginpage:[],
@@ -29,7 +29,7 @@ class LoginPage extends Component {
             {this.state.loginmessage}
             <MuiThemeProvider>
               <div>
-                <RaisedButton label={this.state.buttonLabel} primary={true} style={style} onClick={(event) => this.handleClick(event)}/>
+                <RaisedButton label={this.state.buttonLabel} primary={true} onClick={(event) => this.handleClick(event)}/>
               </div>
             </MuiThemeProvider>
           </div>
