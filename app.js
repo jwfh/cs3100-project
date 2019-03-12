@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const compression = require('compression');
 const helmet = require('helmet');
-const rateLimit = require("express-rate-limit");
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(helmet());
@@ -13,8 +13,10 @@ app.use(compression());
 
 // https://www.npmjs.com/package/express-rate-limit
 const limiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 100 // limit each IP to 100 requests per windowMs
+  // 1 minute
+  windowMs: 60 * 1000, 
+  // limit each IP to 100 requests per windowMs
+  max: 100,
 });
 app.use(limiter);
 
@@ -24,6 +26,9 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+const robots = require('./backend/robots');
+app.use('/robots.txt', robots.txt);
 
 // API routes to backend logic
 const apiRouter = require('./backend/api');
