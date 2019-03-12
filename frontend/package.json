@@ -15,7 +15,7 @@
     "react-dom": "^16.7.0",
     "react-katex": "^2.0.2",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "^2.1.5",
+    "react-scripts": "^2.1.8",
     "remarkable-react": "^1.4.1"
   },
   "scripts": {

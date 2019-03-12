@@ -4,7 +4,7 @@ EXECUTABLES = \
 FOUND := $(foreach exec,$(EXECUTABLES),\
         $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
 
-build: audit
+build: install
 	npm run-script build
 
 dev: install
