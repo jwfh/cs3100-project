@@ -1,0 +1,12 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm, parskip}
+\everymath{\displaystyle}
+\begin{document}
+{\bfseries Question.} Solve the system of congruences \( 5x \equiv 9 \pmod{16} \), \( 3x \equiv 1 \pmod{13} \), and \( x \equiv 4 \pmod 3 \).
+
+{\itshape Solution.} First reduce each of the congruences to the form \( x \equiv a \pmod m \). Clearly \( 5 \cdot 5 = 25 \equiv  9 \pmod{16} \) so \( x \equiv 5 \pmod{16} \). The second congruence gives \( x \equiv 9 \pmod{13} \) since \( 3 \cdot 9 = 27 = 1+2 \cdot 13 \). The third congruence simplifies to \( x \equiv 4 \equiv 1 \pmod{3} \).
+
+By the Chinese Remainder Theorem, there exists a unique solution \( x \) modulo \( M := 13 \cdot 16 \cdot 3 =  624 \) of the form \( x = M_1b_1a_1 + M_2b_2a_2 + M_3b_3a_3 \) where \( M_ib_i \equiv 1\pmod{m_i} \) and \( M_1 = m_2m_3 = 39 \), \( M_2 = m_1m_3 = 48 \), and \( M_3 = m_1m_2 = 208 \). We compute \( b_1 = 7 \) as \( 39 \cdot 7 = 16 \cdot 17 + 1 \) and similarly compute \( b_2 = 3 \) and \( b_3 = 1 \).
+		
+Then \( x = (39)(7)(5) + (48)(3)(9) + (208)(1)(1) = 2869 \equiv 373 \pmod{624} \).
+\end{document}
