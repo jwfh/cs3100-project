@@ -3,6 +3,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
+import { withStyles } from '@material-ui/core/styles'; 
 class LoginPage extends Component {
     state = {
       username:'',
