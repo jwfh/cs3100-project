@@ -43,7 +43,7 @@ export class LoginForm extends Component {
     );
   }
 }
-handleClick(event){
+handleClick(event); {
   var apiBaseUrl = "http://localhost:3000/api/";
   var self = this;
   var payload={

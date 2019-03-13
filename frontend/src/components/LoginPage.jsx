@@ -37,7 +37,7 @@ class LoginPage extends Component {
       );
     }
 }
-handleClick(event){
+handleClick(event); {
   // console.log("event",event);
   var loginmessage;
   if(this.state.isLogin){
