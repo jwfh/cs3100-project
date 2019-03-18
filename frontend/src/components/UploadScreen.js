@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+
 /*
 Page:LoginPage
 Loginpaeg is the main page which the user is shown on first visit to page and after
@@ -17,13 +17,24 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import FontIcon from 'material-ui/FontIcon';
 import {blue500, red500, greenA200} from 'material-ui/styles/colors';
+import { withStyles } from '@material-ui/core/styles';
+import Dropzone from 'react-dropzone';
+
+const styles = (theme) => ({
+  formBody: {
+    textAlign: 'center',
+  },
+  button: {
+    margin: 15,
+  },
+});
 
 var apiBaseUrl = "http://localhost:3000/api/";
 /*
 Module:Dropzone
 Dropzone is used for local file selection
 */
-import Dropzone from 'react-dropzone';
+
 /*
 Module:superagent
 superagent is used to handle post/get requests to server
@@ -202,19 +213,12 @@ handleLogout(event){
           {this.state.printingmessage}
           </div>
       <MuiThemeProvider>
-           <RaisedButton disabled={this.state.printButtonDisabled} label="Print Files" primary={true} style={style} onClick={(event) => this.handleClick(event)}/>
+           <RaisedButton disabled={this.state.printButtonDisabled} label="Print Files" primary={true} style={styles} onClick={(event) => this.handleClick(event)}/>
       </MuiThemeProvider>
           </div>
           </div>
     );
   }
 }
-const styles = (theme) => ({
-    formBody: {
-      textAlign: 'center',
-    },
-    button: {
-      margin: 15,
-    },
-  });
+
 export default withStyles(styles)(UploadPage);  

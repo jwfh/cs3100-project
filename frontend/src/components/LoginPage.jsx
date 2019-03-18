@@ -3,7 +3,29 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
-import { withStyles } from '@material-ui/core/styles'; 
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import {
+  Paper,
+  Typography,
+} from '@material-ui/core';
+
+const styles = (theme) => ({
+  container: {
+    textAlign: 'center',
+    marginTop: '15vh',
+  },
+  root: {
+    ...theme.mixins.gutters(),
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2,
+    width: '75%',
+    display: 'inline-block',
+    textAlign: 'left',
+  },
+});
+
+
 class LoginPage extends Component {
     state = {
       username:'',
@@ -23,45 +45,25 @@ class LoginPage extends Component {
       })
     }
     render() {
+      const { classes } = this.props;
       return (
-        <div className="loginpage">
-          {this.state.loginpage}
-          <div>
-            {this.state.loginmessage}
-            <MuiThemeProvider>
-              <div>
-                <RaisedButton label={this.state.buttonLabel} primary={true} onClick={(event) => this.handleClick(event)}/>
-              </div>
-            </MuiThemeProvider>
-          </div>
-        </div>
-      );
-    }
-}
-handleClick(event); {
-  // console.log("event",event);
-  var loginmessage;
-  if(this.state.isLogin){
-    var loginscreen=[];
-    loginscreen.push(<Register parentContext={this}/>);
-    loginmessage = "Already registered.Go to Login";
-    this.setState({
-                   loginscreen:loginscreen,
-                   loginmessage:loginmessage,
-                   buttonLabel:"Login",
-                   isLogin:false
-                 })
-  }
-  else{
-    var loginscreen=[];
-    loginscreen.push(<Login parentContext={this}/>);
-    loginmessage = "Not Registered yet.Go to registration";
-    this.setState({
-                   loginscreen:loginscreen,
-                   loginmessage:loginmessage,
-                   buttonLabel:"Register",
-                   isLogin:true
-                 })
+        <div className={classes.container}>
+        <Paper
+          className={classes.root}
+          elevation={4}
+        >
+          <Typography variant="h5" component="h2">
+            Login to your NumHub Account
+          </Typography>
+          <LoginForm />
+        </Paper>
+      </div>
+    );
   }
 }
-export default withStyles(styles) (LoginPage);
+
+LoginPage.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(LoginPage);
