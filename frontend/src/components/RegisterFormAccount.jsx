@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import TextField from 'material-ui/TextField';
@@ -14,7 +14,7 @@ export class RegisterFormAccount extends Component {
     const { values, handleChange, classes } = this.props;
     return (
       <MuiThemeProvider>
-        <React.Fragment>
+        <Fragment>
           <TextField 
             hintText="Enter Your Username"
             floatingLabelText="Username"
@@ -44,7 +44,7 @@ export class RegisterFormAccount extends Component {
             className={ classes.button }
             onClick={ this.continue }
           />
-        </React.Fragment>
+        </Fragment>
       </MuiThemeProvider>
     );
   }
