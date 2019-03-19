@@ -12,6 +12,9 @@ import PageTitle from './PageTitle';
 import PostCreateFormContent from './PostCreateFormContent';
 import PostCreateFormTag from './PostCreateFormTag';
 import PostCreateFormConfirm from './PostCreateFormConfirm';
+import axios from 'axios';
+
+const settings = require('../settings');
 
 const styles = (theme) => ({
   container: {
@@ -50,6 +53,7 @@ export class PostCreatePage extends Component {
     title: '',
     content: '',
     tags: [],
+    availableTags: [],
     contentSyntaxErrorMsg: '',
     showValid: [false, false, false],
     isValid: [
@@ -105,7 +109,7 @@ export class PostCreatePage extends Component {
         break;
       case 1:
         // Tags
-        isValid[1].hasTags = tags !== [];
+        isValid[1].hasTags = tags.length > 0;
         break;
       default:
         break;
@@ -169,6 +173,7 @@ export class PostCreatePage extends Component {
       title,
       content,
       tags,
+      availableTags,
       showValid,
       isValid,
       contentSyntaxErrorMsg,
@@ -196,6 +201,7 @@ export class PostCreatePage extends Component {
         label: 'Tag Your Problem',
         content: <PostCreateFormTag 
           // classes = { classes }
+          availableTags={availableTags}
           handleChange = { this.handleChangeTags }
           values = { values }
         />,
@@ -211,6 +217,28 @@ export class PostCreatePage extends Component {
     ]
 
     return steps;
+  }
+
+  retrieveTags = () => {
+    const uri = '//' + settings.backend + '/api/fetch/all';
+    const data = {
+      type: 'tag',
+    };
+    axios.post(uri, data).then(
+      (response) => {
+        this.setState({
+          availableTags: response.data,
+        })
+      }
+    ).catch(
+      (error) => {
+        console.log('Unable to retrieve tags:', error);
+      }
+    );
+  };
+
+  componentDidMount() {
+    this.retrieveTags();
   }
 
   render() {

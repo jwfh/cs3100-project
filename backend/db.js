@@ -55,19 +55,12 @@ module.exports.init = () => {
     )`);
     console.log('Created passwords table...');
     db.run(`\
-    /* Question categories (i.e., Geometry, Number Theory, etc.). */
-    CREATE TABLE IF NOT EXISTS \`Q_CATS\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`category\` VARCHAR(64)
-    )`);
-    console.log('Created question categories...');
-    db.run(`\
     /* Question levels (i.e., Elementary, High School, Undergraduate, 
      * Graduate, etc.). 
      */
     CREATE TABLE IF NOT EXISTS \`Q_LEVELS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`category\` VARCHAR(64)
+      \`level\` VARCHAR(64)
     )`);
     console.log('Created question levels...');
     db.run(`\
@@ -78,11 +71,9 @@ module.exports.init = () => {
       \`q_id\` INT NOT NULL,
       \`q_rev_id\` INT NOT NULL DEFAULT 0,
       \`q_text\` TEXT NOT NULL,
-      \`q_cat_id\` INT NOT NULL,
       \`q_level_id\` INT NOT NULL,
       \`post_time\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (\`author_id\`) REFERENCES \`USERS\`(\`id\`),
-      FOREIGN KEY (\`q_cat_id\`) REFERENCES \`Q_CATS\`(\`id\`),
       FOREIGN KEY (\`q_level_id\`) REFERENCES \`Q_LEVELS\`(\`id\`)
     )`);
     console.log('Created question table...');
@@ -102,7 +93,7 @@ module.exports.init = () => {
     /* List of possible question tags (i.e., #homework, #power-series,
      * #wave-equation, etc.). */
     CREATE TABLE IF NOT EXISTS \`TAGS\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
+      \`id\` INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
       \`tag\` VARCHAR(32)
     )`);
     console.log('Created tags table...');
@@ -126,9 +117,79 @@ module.exports.init = () => {
     )`);
     console.log('Created URL shortener table...');
   });
+
+  [
+    {
+      table: 'TAGS',
+      field: 'tag',
+      values: [
+        'Geometry',
+        'Number Theory',
+        'Algebra',
+        'Calculus',
+        'Analysis',
+      ],
+    },
+    {
+      table: 'Q_LEVELS',
+      field: 'level',
+      values: [
+        'Primary',
+        'Elementary',
+        'Intermediate',
+        'Secondary',
+        'Undergraduate',
+        'Graduate',
+      ],
+    },
+  ].map((data, i) =>{
+    data.values.map((text, index) => {
+      db.serialize(() => {
+        db.all(`SELECT * FROM \`` + data.table + `\` WHERE \`` + data.field + `\`=?`, [text], (err, rows) => {
+          if (err) {
+            console.log('[' + __filename + ']', 'Error searching', data.field, 'in', data.table, 'for', text, err);
+          } else if (rows.length === 0) {
+            console.log('Adding', text, 'to', data.table);
+            db.run(`INSERT INTO \`` + data.table + `\` (\`id\`, \`` + data.field + `\`) VALUES (?, ?)`, [index, text], (err) => {
+              if (err) {
+                console.log('[' + __filename + ']', 'Error adding new', data.field, 'to', data.table, 'with value', text, err);
+              }
+            });
+          }
+        });
+      });
+    });
+  });
 };
 
-module.exports.demo = function () {
+module.exports.all = (type, cb) => {
+  switch (type) {
+    case 'tag':
+      db.all(`SELECT \`id\`,\`tag\` from \`TAGS\``, (err, rows) => {
+        if (err) {
+          console.log('[' + __filename + ']', 'Error retrieving tags:', err);
+          cb(err);
+        } else {
+          cb(rows);
+        }
+      });
+      break;
+    case 'level':
+      db.all(`SELECT \`id\`,\`level\` from \`Q_LEVELS\``, (err, rows) => {
+        if (err) {
+          console.log('[' + __filename + ']', 'Error retrieving levels:', err);
+          cb(err);
+        } else {
+          cb(rows);
+        }
+      });
+      break;
+    default:
+      return null;
+  }
+};
+
+module.exports.demo = () => {
   module.exports.init();
   console.log('Add demo rows here...');
 };

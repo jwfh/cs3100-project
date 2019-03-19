@@ -58,15 +58,13 @@ const styles = (theme) => ({
   divider: {
     height: theme.spacing.unit * 2,
   },
+  hidden: {
+    display: 'none',
+  },
+  textDanger: {
+    color: '#d32f2f',
+  },
 });
-
-const suggestions = [
-  { label: 'Tag 1' },
-  { label: 'Tag 2' },
-].map((suggestion) => ({
-  value: suggestion.label,
-  label: suggestion.label,
-}));
 
 function NoOptionsMessage(props) {
   return (
@@ -177,9 +175,11 @@ const components = {
 
 export class PostCreateFormTag extends Component {
   render() {
-
-    const { tags } = this.props.values;
-    const { classes, theme, handleChange } = this.props;
+    const { classes, theme, handleChange, values } = this.props;
+    const availableTags = this.props.availableTags.map((tag) => ({
+      value: tag.id,
+      label: tag.tag,
+    }));
 
     const selectStyles = {
       input: base => ({
@@ -203,11 +203,15 @@ export class PostCreateFormTag extends Component {
                 shrink: true,
               },
             }}
-            options={ suggestions }
+            options={ availableTags }
             components={ components }
-            value={ tags }
+            value={ values.tags }
             onChange={ handleChange('tags') }
-            placeholder="Select one or more tags"
+            placeholder={
+              values.showValid[1] && !values.isValid[1].hasTags 
+              ? <span className={classes.textDanger}>Select one or more tags</span> 
+              : "Select one or more tags"
+            }
             isMulti
           />
         </NoSsr>
@@ -219,6 +223,7 @@ export class PostCreateFormTag extends Component {
 PostCreateFormTag.propTypes = {
     classes: PropTypes.object.isRequired,
     // theme: PropTypes.object.isRequired,
+    availableTags: PropTypes.array.isRequired,
     handleChange: PropTypes.func.isRequired,
     values: PropTypes.object.isRequired,
   }
