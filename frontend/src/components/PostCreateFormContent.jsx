@@ -1,32 +1,25 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 export class PostCreateFormContent extends Component {
-  state = {
-    contentHasSyntaxError: false,
-    contentErrorMsg: '',
-  };
-
   render() {
     const { values, handleChange, classes } = this.props;
-    const { contentHasSyntaxError, contentErrorMsg } = this.state;
     return (
-      <MuiThemeProvider>
         <Fragment>
           <TextField 
             label="Problem Title"
             placeholder="Name Your Problem"
-            className={ classes.titleField }
-            fullWidth={ true }
-            onChange={ handleChange('title') }
-            defaultValue={ values.title }
+            className={classes.titleField}
+            fullWidth={true}
+            onChange={handleChange('title')}
+            defaultValue={values.title}
+            error={values.showValid[0] && !values.isValid[0].titleNotEmpty}
           />
           <TextField
             label="Problem Content"
             placeholder="Enter Your Problem"
-            helperText={ contentHasSyntaxError ? contentErrorMsg : "You can use Markdown and LaTeX to style your question." }
+            helperText={values.isValid[0].contentSyntaxErrorFree ? "You can use Markdown and LaTeX to style your question." : values.contentSyntaxErrorMsg }
             multiline
             fullWidth
             rows="8"
@@ -34,9 +27,9 @@ export class PostCreateFormContent extends Component {
             onChange={handleChange('content')}
             margin="normal"
             variant="outlined"
+            error={(values.showValid[0] && !values.isValid[0].contentNotEmpty) || !values.isValid[0].contentSyntaxErrorFree}
           />
         </Fragment>
-      </MuiThemeProvider>
     );
   }
 }

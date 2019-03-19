@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import RaisedButton from 'material-ui/RaisedButton';
 import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import {

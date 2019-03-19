@@ -50,15 +50,33 @@ export class PostCreatePage extends Component {
     title: '',
     content: '',
     tags: [],
+    contentSyntaxErrorMsg: '',
+    showValid: [false, false, false],
+    isValid: [
+      {
+        titleNotEmpty: false,
+        contentNotEmpty: false,
+        contentSyntaxErrorFree: true,
+      },
+      { 
+        hasTags: false,
+      }
+    ],
   };
 
   // Advance to the next form step
   nextStep = () => {
-    const { activeStep } = this.state;
-    console.log(this.state.tags);
+    const { activeStep, showValid } = this.state;
+    showValid[activeStep] = true;
     this.setState({
-      activeStep: activeStep + 1,
+      showValid: showValid,
     });
+    let stepIsValid = this.isValid(activeStep);
+    if (stepIsValid) {
+      this.setState({
+        activeStep: activeStep + 1,
+      });
+    }
   };
 
   // Return to the previous form step
@@ -76,16 +94,73 @@ export class PostCreatePage extends Component {
     
   };
 
+  validate = (step) => {
+    const { content, title, tags, isValid } = this.state;
+    switch (step) {
+      case 0:
+        // Content
+        isValid[0].contentNotEmpty = content !== '';
+        isValid[0].titleNotEmpty = title !== '';
+        isValid[0].contentSyntaxErrorFree = this.isContentSyntaxErrorFree();
+        break;
+      case 1:
+        // Tags
+        isValid[1].hasTags = tags !== [];
+        break;
+      default:
+        break;
+    }
+    this.setState({ isValid: isValid });
+  };
+
+  isContentSyntaxErrorFree = () => {
+    const { content } = this.state;
+    let inlineMathValid = (content.match(/\(/g) || []).length === (content.match(/\)/g) || []).length;
+    if (!inlineMathValid) {
+      this.setState({
+        contentSyntaxErrorMsg: 'Unbalanced inline math',
+      })
+      return false;
+    }
+    let displayMathValid = (content.match(/\[/g) || []).length === (content.match(/\]/g) || []).length;
+    if (!displayMathValid) {
+      this.setState({
+        contentSyntaxErrorMsg: 'Unbalanced display math',
+      })
+      return false;
+    }
+    this.setState({
+      contentSyntaxErrorMsg: '',
+    })
+    return true;
+  };
+
+  isValid = (step) => {
+    this.validate(step);
+    const { isValid } = this.state;
+    for (let val in isValid[step]) {
+      if (!isValid[step][val]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   handleChangeText = input => e => {
+    const { activeStep } = this.state;
     this.setState({
       [input]: e.target.value,
+    }, () => {
+      this.validate(activeStep);
     });
   };
 
   handleChangeTags = name => value => {
+    const { activeStep } = this.state;
     this.setState({
       [name]: value,
     });
+    this.validate(activeStep);
   };
 
 
@@ -94,11 +169,17 @@ export class PostCreatePage extends Component {
       title,
       content,
       tags,
+      showValid,
+      isValid,
+      contentSyntaxErrorMsg,
     } = this.state;
     const values = {
       title,
       content,
       tags,
+      showValid,
+      isValid,
+      contentSyntaxErrorMsg,
     };
     const { classes } = this.props;
 
@@ -170,7 +251,7 @@ export class PostCreatePage extends Component {
                   </div>
                 </StepContent>
               </Step>
-            ))} 
+            ))}
           </Stepper>
           {activeStep === steps.length && (
             <Paper square elevation={0} className={classes.resetContainer}>
