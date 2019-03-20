@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -93,11 +94,6 @@ export class PostCreatePage extends Component {
     }
   };
 
-  // Do final validation and send form
-  submit = () => {
-    
-  };
-
   validate = (step) => {
     const { content, title, tags, isValid } = this.state;
     switch (step) {
@@ -166,7 +162,6 @@ export class PostCreatePage extends Component {
     });
     this.validate(activeStep);
   };
-
 
   getSteps = () => {
     const {
@@ -237,6 +232,38 @@ export class PostCreatePage extends Component {
     );
   };
 
+  submit = () => {
+    console.log('Submitting');
+    const { title, content, tags, steps } = this.state;
+    const { level } = this.props;
+    const uri = '//' + settings.backend + '/api/post/create';
+    const data = {
+      title: title,
+      content: content,
+      tags: tags,
+      level: level,
+    };
+    let pageIsValid = true;
+    for (let i = 0; i < 3 && pageIsValid; i++) {
+      if (!this.isValid(i)) {
+        pageIsValid = false;
+        this.setState({
+          activeStep: i,
+        })
+      }
+    }
+    if (pageIsValid) {
+
+    }
+  };
+
+  componentWillMount() {
+    const steps = this.getSteps();
+    this.setState({
+      steps: steps,
+    });
+  }
+
   componentDidMount() {
     this.retrieveTags();
   }
@@ -270,7 +297,7 @@ export class PostCreatePage extends Component {
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.nextStep}
+                        onClick={index === steps.length - 1 ? this.submit : this.nextStep}
                         className={classes.button}
                       >
                         {index === steps.length - 1 ? 'Publish' : 'Next'}

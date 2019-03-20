@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import { withStyles } from '@material-ui/core/styles';
-import { 
-  withRouter
-} from 'react-router-dom';
+import LinkButton from './LinkButton';
 
 const styles = (theme) => ({
     formBody: {
@@ -15,13 +12,6 @@ const styles = (theme) => ({
       margin: 15,
     },
 });
-
-const SubmitButton = withRouter(({ history, ...props }) => (
-  <RaisedButton  label="Submit" primary={true} onClick={() => {
-    props.handleError('test');
-    // history.push('/');
-  }}/>
-));
 
 class Login extends Component {
 
@@ -57,7 +47,7 @@ class Login extends Component {
                 onChange={this.handleChange('password')}
             />
             <br/> 
-            <SubmitButton handleError={(errMsg) => {this.setState( { errMsg: errMsg })}} />
+            <LinkButton next="/" label="Submit" primary={true} handleError={(errMsg) => {this.setState( { errMsg: errMsg })}} />
           </div>
         </MuiThemeProvider>
       </div>
