@@ -23,6 +23,7 @@ import {
   Filter6,
 } from '@material-ui/icons';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'; 
+import { SnackbarProvider, withSnackbar } from 'notistack';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 export const sideBarDrawerWidth = 240;
@@ -70,7 +71,7 @@ const styles = (theme) => ({
   },
 });
 
-class App extends Component {
+class AppBody extends Component {
 
   constructor(props) {
     super(props);
@@ -109,6 +110,7 @@ class App extends Component {
   };
 
   render() {
+    const { enqueueSnackbar } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
       <CssBaseline />
@@ -123,31 +125,31 @@ class App extends Component {
           <Switch>
             <Route 
               path="/"
-              component={HomePage}
+              render={(props) => <HomePage {...props} enqueueSnackbar={enqueueSnackbar} />}
               exact
             />
             <Route 
               path="/new"
-              component={PostCreatePage}
+              render={(props) => <PostCreatePage {...props} enqueueSnackbar={enqueueSnackbar} level={this.siteLevelItems[this.state.siteLevelIdx]} />}
               exact
             />
             <Route 
               path="/register"
-              component={RegisterPage}
+              render={(props) => <RegisterPage {...props} enqueueSnackbar={enqueueSnackbar} />}
               exact
             />
             <Route 
               path="/login"
-              component={LoginPage}
+              render={(props) => <LoginPage {...props} enqueueSnackbar={enqueueSnackbar} />}
               exact
             />
             <Route
               path="/forgot"
-              component={ForgotPasswordPage}
+              render={(props) => <ForgotPasswordPage {...props} enqueueSnackbar={enqueueSnackbar} />}
               exact
             />
             <Route
-              component={Error404}
+              render={(props) => <Error404 {...props} enqueueSnackbar={enqueueSnackbar} />}
             />
           </Switch>
           </PageBody>
@@ -164,9 +166,21 @@ class App extends Component {
   }
 }
 
-
-App.propTypes = {
+AppBody.propTypes = {
   classes: PropTypes.object.isRequired,
+  enqueueSnackbar: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(App);
+const AppWithStyles = withStyles(styles, { withTheme: true })(AppBody);
+
+const AppWithSnackBar = withSnackbar(AppWithStyles);
+
+const App = () => {
+  return (
+    <SnackbarProvider maxSnack={3}>
+      <AppWithSnackBar />
+    </SnackbarProvider>
+  );
+};
+
+export default App;
