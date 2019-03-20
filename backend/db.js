@@ -185,7 +185,45 @@ module.exports.all = (type, cb) => {
       });
       break;
     default:
-      return null;
+      break;
+  }
+};
+
+module.exports.create = (type, params, cb) => {
+  switch(type) {
+    case 'question':
+
+      break;
+    case 'answer':
+
+      break;
+    case 'user':
+
+      break;
+    case 'tag':
+
+      break;
+    default:
+      break;
+  }
+};
+
+module.exports.delete = (type, params, cb) => {
+  switch(type) {
+    case 'question':
+
+      break;
+    case 'answer':
+
+      break;
+    case 'user':
+
+      break;
+    case 'tag':
+
+      break;
+    default:
+      break;
   }
 };
 

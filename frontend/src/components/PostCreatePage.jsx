@@ -238,6 +238,7 @@ export class PostCreatePage extends Component {
     const { level } = this.props;
     const uri = '//' + settings.backend + '/api/post/create';
     const data = {
+      type: 'question',
       title: title,
       content: content,
       tags: tags,
@@ -249,7 +250,7 @@ export class PostCreatePage extends Component {
         pageIsValid = false;
         this.setState({
           activeStep: i,
-        })
+        });
       }
     }
     if (pageIsValid) {
