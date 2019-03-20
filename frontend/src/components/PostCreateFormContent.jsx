@@ -19,7 +19,7 @@ export class PostCreateFormContent extends Component {
           <TextField
             label="Problem Content"
             placeholder="Enter Your Problem"
-            helperText={values.isValid[0].contentSyntaxErrorFree ? "You can use Markdown and LaTeX to style your question." : values.contentSyntaxErrorMsg }
+            helperText={values.isValid[0].contentSyntaxErrorFree ? 'You can use Markdown and LaTeX to style your question.' : values.contentSyntaxErrorMsg }
             multiline
             fullWidth
             rows="8"
@@ -38,6 +38,6 @@ PostCreateFormContent.propTypes = {
   classes: PropTypes.object.isRequired,
   handleChange: PropTypes.func.isRequired,
   values: PropTypes.object.isRequired,
-}
+};
 
 export default PostCreateFormContent;

@@ -67,6 +67,8 @@ export class PostCreatePage extends Component {
         hasTags: false,
       }
     ],
+    postSuccessful: false,
+    postRoute: '',
   };
 
   // Advance to the next form step
@@ -74,7 +76,7 @@ export class PostCreatePage extends Component {
     const { activeStep, showValid } = this.state;
     showValid[activeStep] = true;
     this.setState({
-      showValid: showValid,
+      showValid,
     });
     let stepIsValid = this.isValid(activeStep);
     if (stepIsValid) {
@@ -110,7 +112,9 @@ export class PostCreatePage extends Component {
       default:
         break;
     }
-    this.setState({ isValid: isValid });
+    this.setState({ 
+      isValid,
+    });
   };
 
   isContentSyntaxErrorFree = () => {
@@ -208,8 +212,8 @@ export class PostCreatePage extends Component {
           handleChange = { this.handleChangeText }
           values = { values }
         />,
-      }
-    ]
+      },
+    ];
 
     return steps;
   }
@@ -223,7 +227,7 @@ export class PostCreatePage extends Component {
       (response) => {
         this.setState({
           availableTags: response.data,
-        })
+        });
       }
     ).catch(
       (error) => {
@@ -239,12 +243,13 @@ export class PostCreatePage extends Component {
     const uri = '//' + settings.backend + '/api/post/create';
     const data = {
       type: 'question',
-      title: title,
-      content: content,
-      tags: tags,
-      level: level,
+      title,
+      content,
+      tags,
+      level,
     };
     let pageIsValid = true;
+    // TODO loop through this.state.isValid instead of 3 constant 
     for (let i = 0; i < 3 && pageIsValid; i++) {
       if (!this.isValid(i)) {
         pageIsValid = false;
@@ -256,8 +261,11 @@ export class PostCreatePage extends Component {
     if (pageIsValid) {
       axios.post(uri, data).then(
         (response) => {
-          if (response.status === 200) {
+          if (response.status === 200 && response.data.route) {
+            console.log(response.data);
             this.setState({
+              postSuccessful: true,
+              postRoute: response.data.route,
               activeStep: activeStep + 1,
             });
           } else {
@@ -275,7 +283,7 @@ export class PostCreatePage extends Component {
   componentWillMount() {
     const steps = this.getSteps();
     this.setState({
-      steps: steps,
+      steps,
     });
   }
 
@@ -286,7 +294,7 @@ export class PostCreatePage extends Component {
   render() {
     const { classes } = this.props;
     const steps = this.getSteps();
-    const { activeStep } = this.state;
+    const { activeStep, postSuccessful } = this.state;
 
     return (
       <div className={classes.container}>
@@ -325,7 +333,7 @@ export class PostCreatePage extends Component {
           </Stepper>
           {activeStep === steps.length && (
             <Paper square elevation={0} className={classes.resetContainer}>
-              <Typography>Your question has been published!</Typography>
+              <Typography>{postSuccessful ? "Your question has been published!" : "There was an error submitting your post. Please try again later."}</Typography>
               <Button 
                 onClick={this.handleReset} 
                 className={classes.button}

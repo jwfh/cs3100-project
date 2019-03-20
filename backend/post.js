@@ -1,21 +1,21 @@
 const db = require('./db');
 
-module.exports.create = (req, res) => {
+module.exports.create = (req, res, next) => {
   console.log(req.path, req.body);
-  switch(req.body.tyle) {
+  switch(req.body.type) {
     case 'question':
       if (req.body.title && req.body.content && req.body.tags && req.body.level) {
         db.create('question', {
-                    q_title: req.body.title, 
-                    q_content: req.body.content, 
-                    q_tags: req.body.tags, 
-                    q_level: req.body.level, 
+                    title: req.body.title, 
+                    content: req.body.content, 
+                    tags: req.body.tags, 
+                    level: req.body.level, 
                   }, 
-                  (error, newRoute) => {
+                  (error, route) => {
           if (!error) {
             res.status(200);
             res.send({
-              route: newRoute,
+              route,
             });
           } else {
             res.status(500);
@@ -32,7 +32,7 @@ module.exports.create = (req, res) => {
 
       break;
     default:
-
+      next();
       break;
   }
   

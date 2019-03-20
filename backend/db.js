@@ -142,15 +142,15 @@ module.exports.init = () => {
         'Graduate',
       ],
     },
-  ].map((data, i) =>{
+  ].map((data, i) => {
     data.values.map((text, index) => {
       db.serialize(() => {
-        db.all(`SELECT * FROM \`` + data.table + `\` WHERE \`` + data.field + `\`=?`, [text], (err, rows) => {
+        db.all('SELECT * FROM `' + data.table + '` WHERE `' + data.field + '`=?', [text], (err, rows) => {
           if (err) {
             console.log('[' + __filename + ']', 'Error searching', data.field, 'in', data.table, 'for', text, err);
           } else if (rows.length === 0) {
             console.log('Adding', text, 'to', data.table);
-            db.run(`INSERT INTO \`` + data.table + `\` (\`id\`, \`` + data.field + `\`) VALUES (?, ?)`, [index, text], (err) => {
+            db.run('INSERT INTO `' + data.table + '` (`id`, `' + data.field + '`) VALUES (?, ?)', [index, text], (err) => {
               if (err) {
                 console.log('[' + __filename + ']', 'Error adding new', data.field, 'to', data.table, 'with value', text, err);
               }
@@ -162,26 +162,22 @@ module.exports.init = () => {
   });
 };
 
-module.exports.all = (type, cb) => {
+module.exports.all = (type, callback) => {
   switch (type) {
     case 'tag':
-      db.all(`SELECT \`id\`,\`tag\` from \`TAGS\``, (err, rows) => {
-        if (err) {
-          console.log('[' + __filename + ']', 'Error retrieving tags:', err);
-          cb(err);
-        } else {
-          cb(rows);
+      db.all('SELECT `id`,`tag` from `TAGS`', (error, rows) => {
+        if (error) {
+          console.log('[' + __filename + ']', 'Error retrieving tags:', error);
         }
+        callback(error, rows);
       });
       break;
     case 'level':
-      db.all(`SELECT \`id\`,\`level\` from \`Q_LEVELS\``, (err, rows) => {
-        if (err) {
-          console.log('[' + __filename + ']', 'Error retrieving levels:', err);
-          cb(err);
-        } else {
-          cb(rows);
+      db.all('SELECT `id`,`level` from `Q_LEVELS`', (error, rows) => {
+        if (error) {
+          console.log('[' + __filename + ']', 'Error retrieving levels:', error);
         }
+        callback(error, rows);
       });
       break;
     default:
@@ -189,7 +185,7 @@ module.exports.all = (type, cb) => {
   }
 };
 
-module.exports.create = (type, params, cb) => {
+module.exports.create = (type, params, callback) => {
   switch(type) {
     case 'question':
 
@@ -208,7 +204,7 @@ module.exports.create = (type, params, cb) => {
   }
 };
 
-module.exports.delete = (type, params, cb) => {
+module.exports.delete = (type, params, callback) => {
   switch(type) {
     case 'question':
 

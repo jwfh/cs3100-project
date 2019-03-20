@@ -1,36 +1,32 @@
 const db = require('./db');
 
-module.exports.fetch = (req, res) => {
+module.exports.fetch = (req, res, next) => {
   console.log(req.path, req.body);
   switch (req.body.type) {
     default:
-      res.status(404);
-      res.type('text');
-      res.send('404 Not Found');
+      next();
       break;
   }
 };
 
-module.exports.all = (req, res) => {
+module.exports.all = (req, res, next) => {
   console.log(req.path, req.body);
-  if (req.body.type) {
-    switch (req.body.type) {
-      case 'tag':
-      case 'level':
-        db.all(req.body.type, (rows) => {
-            res.status(200);
-            res.send(rows);
-        });
-        break;
-      default:
-        res.status(404);
-        res.type('text');
-        res.send('404 Not Found');
-        break;
-    }
-  } else {
-    res.status(404);
-    res.type('text');
-    res.send('404 Not Found');
+  switch (req.body.type) {
+    case 'tag':
+    case 'level':
+      db.all(req.body.type, (error, rows) => {
+        if (!error) {
+          res.status(200);
+          res.send(rows);
+        } else {
+          res.status(500);
+          res.type('text');
+          res.send('Unable to retrieve ' + req.body.type + 's from database:', error);
+        }
+      });
+      break;
+    default:
+      next();
+      break;
   }
 };
