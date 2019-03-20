@@ -234,7 +234,7 @@ export class PostCreatePage extends Component {
 
   submit = () => {
     console.log('Submitting');
-    const { title, content, tags, steps } = this.state;
+    const { title, content, tags, activeStep } = this.state;
     const { level } = this.props;
     const uri = '//' + settings.backend + '/api/post/create';
     const data = {
@@ -253,7 +253,21 @@ export class PostCreatePage extends Component {
       }
     }
     if (pageIsValid) {
-
+      axios.post(uri, data).then(
+        (response) => {
+          if (response.status === 200) {
+            this.setState({
+              activeStep: activeStep + 1,
+            });
+          } else {
+            console.log(response.status, 'Unable to post new question');
+          }
+        }
+      ).catch(
+        (error) =>  {
+          console.log('Unable to post new question:', error);
+        }
+      );
     }
   };
 
