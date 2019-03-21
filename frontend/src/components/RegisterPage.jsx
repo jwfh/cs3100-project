@@ -1,37 +1,100 @@
-/*
- * This will be the main component for the registration form. There are two 
- * steps:
- *    1. Provide a username and password (and confirm password). 
- *       Here we will need to check that the username is unique from the database and that
- *       the password is complex enough. 
- * 
- *    2. Provide personal information such as email, location, bio, security question/answer. 
- * This will be done using the RegisterFormAccount and RegisterFormDetails components,
- * respectively.
- */
-
-import React, { Component } from 'react';
-import RegisterFormAccount from './RegisterFormAccount';
-import RegisterFormDetails from './RegisterFormDetails';
+import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Paper,
-} from '@material-ui/core';
+import classNames from 'classnames';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 import PageTitle from './PageTitle';
+
+const RegisterFormAccount = (props) => {
+  const { values, handleChange } = props;
+  return (
+    <Fragment>
+      <TextField 
+        hintText="Enter Your Username"
+        floatingLabelText="Username"
+        onChange={ handleChange('username') }
+        defaultValue={ values.username }
+      />
+      <br/>
+      <TextField 
+        hintText="Enter Your Password"
+        type="password"
+        floatingLabelText="Password"
+        onChange={ handleChange('password') }
+        defaultValue={ values.password }
+      />
+      <br/>
+      <TextField 
+        hintText="Confirm your password"
+        type="password"
+        floatingLabelText="Confirm Password"
+        onChange={ handleChange('confirmPassword') }
+        defaultValue={ values.confirmPassword }
+      />
+    </Fragment>
+  );
+};
+
+RegisterFormAccount.propTypes = {
+  handleChange: PropTypes.func.isRequired,
+  values: PropTypes.object.isRequired,
+};
+
+const RegisterFormDetails = (props) => {
+  const { values, handleChange } = props;
+  return (
+    <Fragment>
+      <TextField 
+        hintText="Enter Your Given Name"
+        floatingLabelText="Given Name"
+        onChange={ handleChange('givenName') }
+        defaultValue={ values.givenName }
+      />
+      <br/>
+      <TextField 
+        hintText="Enter Your Surname"
+        floatingLabelText="Surname"
+        onChange={ handleChange('surname') }
+        defaultValue={ values.surname }
+      />
+      <br/>
+      <TextField 
+        hintText="Enter Your Email Address"
+        color="accent"
+        floatingLabelText="Email Address"
+        onChange={ handleChange('emailAddress') }
+        defaultValue={ values.emailAddress }
+      />
+    </Fragment>
+  );
+}; 
+
+RegisterFormDetails.propTypes = {
+  handleChange: PropTypes.func.isRequired,
+  values: PropTypes.object.isRequired,
+};
 
 const styles = (theme) => ({
   formBody: {
     textAlign: 'center',
   },
   button: {
-    margin: 15,
+    marginTop: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+  },
+  hidden: {
+    display: 'none',
   },
   container: {
     textAlign: 'center',
     marginTop: '15vh',
   },
   root: {
-    ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
     width: '75%',
@@ -42,7 +105,7 @@ const styles = (theme) => ({
 
 export class RegisterPage extends Component {
   state = {
-    step: 1,
+    activeStep: 0,
     username: '',
     password: '',
     confirmPassword: '',
@@ -51,40 +114,94 @@ export class RegisterPage extends Component {
     emailAddress: '',
     securityQuestionID: -1,
     securityAnswer: '',
+    showValid: [false, false],
+    isValid: [
+      {
+        usernameLength: false,
+        usernameNotTaken: false,
+        passwordComplex: false,
+        passwordsMatch: true,
+      },
+      { 
+        givenNameNotEmpty: false,
+        surnameNotEmpty: false,
+        emailNotEmpty: false,
+        emailValid: false,
+      },
+    ],
+    postSuccessful: false,
   };
+
 
   // Advance to the next form step
   nextStep = () => {
-    const { step } = this.state;
+    const { activeStep, showValid } = this.state;
+    showValid[activeStep] = true;
     this.setState({
-      step: step + 1,
+      showValid,
     });
+    let stepIsValid = this.isValid(activeStep);
+    if (stepIsValid) {
+      this.setState({
+        activeStep: activeStep + 1,
+      });
+    }
   };
 
   // Return to the previous form step
   prevStep = () => {
-    const { step } = this.state;
-    if (step > 1) {
+    const { activeStep } = this.state;
+    if (activeStep > 0) {
       this.setState({
-        step: step - 1,
+        activeStep: activeStep - 1,
       });
     }
   };
+
+
+  handleChange = input => e => {
+    const { activeStep } = this.state;
+    this.setState({
+      [input]: e.target.value,
+    }, () => {
+      this.validate(activeStep);
+    });
+  };
+
+  validate = (step) => {
+    const { isValid } = this.state;
+    switch (step) {
+      case 0:
+        // Login info
+        break;
+      case 1:
+        // Personal info
+        break;
+      default:
+        break;
+    }
+    this.setState({ 
+      isValid,
+    });
+  };
+
+  isValid = (step) => {
+    this.validate(step);
+    const { isValid } = this.state;
+    for (let val in isValid[step]) {
+      if (!isValid[step][val]) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   // Do final validation and send form
   submit = () => {
     
   };
 
-  // Handle fields change
-  handleChange = input => e => {
-    this.setState({
-      [input]: e.target.value,
-    });
-  };
-
-  formBody = () => {
-    const { step } = this.state;
+  getSteps = () => {
     const {
       username,
       password,
@@ -107,56 +224,74 @@ export class RegisterPage extends Component {
     };
     const { classes } = this.props;
 
-    switch (step) {
-      case 1:
-        // Returning the RegisterFormAccount component 
-        return (
-          <div className={classes.formBody}>
-            <RegisterFormAccount
-              classes = { classes }
-              nextStep = { this.nextStep }
-              handleChange = { this.handleChange }
-              values = { values }
-            />
-          </div>
-        );
+    const steps = [
+      {
+        label: 'Enter Login Information',
+        content:
+          <RegisterFormAccount
+            classes = { classes }
+            nextStep = { this.nextStep }
+            handleChange = { this.handleChange }
+            values = { values }
+          />,
+      },
+      {
+        label: 'Enter Personal Information',
+        content:
+          <RegisterFormDetails 
+            classes = { classes }
+            prevStep = { this.prevStep }
+            nextStep = { this.submit }
+            handleChange = { this.handleChange }
+            values = { values }
+          />,
+      },
+    ];
 
-      case 2: 
-        // Returning the RegisterFormDetails component
-        return  (
-          <div className={classes.formBody}>
-            <RegisterFormDetails
-              classes = { classes }
-              prevStep = { this.prevStep }
-              nextStep = { this.submit }
-              handleChange = { this.handleChange }
-              values = { values }
-            />
-          </div>
-        );
-
-      default:
-        return (
-          <div>
-            An error ocurred.
-          </div>
-        );
-      }
+    return steps;
   }
 
   render() {
     const { classes } = this.props;
+    const { activeStep } = this.state;
+    const steps = this.getSteps();
+
     return (
       <div className={classes.container}>
-        <Paper
-          className={classes.root}
-          elevation={4}
-        >
+        <div className={classes.root}>
           <PageTitle>
             Create your NumHub Account
           </PageTitle>
-          {this.formBody()}
-        </Paper>
+          <Stepper activeStep={activeStep} orientation="vertical">
+            {steps.map((step, index) => (
+              <Step key={step.label}>
+                <StepLabel>{step.label}</StepLabel>
+                <StepContent>
+                  {step.content}
+                  <div className={classes.actionsContainer}>
+                    <div>
+                      <Button
+                        disabled={index === 0}
+                        onClick={this.prevStep}
+                        className={classNames(classes.button, index === 0 && classes.hidden )}
+                      >
+                        Back
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={index === steps.length - 1 ? this.submit : this.nextStep}
+                        className={classes.button}
+                      >
+                        {index === steps.length - 1 ? 'Register' : 'Next'}
+                      </Button>
+                    </div>
+                  </div>
+                </StepContent>
+              </Step>
+            ))}
+          </Stepper>
+        </div>
       </div>
     );
   }

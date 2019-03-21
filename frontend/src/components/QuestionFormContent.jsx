@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 
-export class PostCreateFormContent extends Component {
+export class QuestionFormContent extends Component {
   render() {
     const { values, handleChange, classes } = this.props;
     return (
@@ -34,10 +34,10 @@ export class PostCreateFormContent extends Component {
   }
 }
 
-PostCreateFormContent.propTypes = {
+QuestionFormContent.propTypes = {
   classes: PropTypes.object.isRequired,
   handleChange: PropTypes.func.isRequired,
   values: PropTypes.object.isRequired,
 };
 
-export default PostCreateFormContent;
+export default QuestionFormContent;

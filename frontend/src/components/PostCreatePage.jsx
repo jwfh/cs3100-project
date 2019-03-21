@@ -10,9 +10,9 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import PageTitle from './PageTitle';
-import PostCreateFormContent from './PostCreateFormContent';
-import PostCreateFormTag from './PostCreateFormTag';
-import PostCreateFormConfirm from './PostCreateFormConfirm';
+import QuestionFormContent from './QuestionFormContent';
+import QuestionFormTag from './QuestionFormTag';
+import QuestionFormConfirm from './QuestionFormConfirm';
 import axios from 'axios';
 
 const settings = require('../settings');
@@ -65,7 +65,7 @@ export class PostCreatePage extends Component {
       },
       { 
         hasTags: false,
-      }
+      },
     ],
     postSuccessful: false,
     postRoute: '',
@@ -190,7 +190,7 @@ export class PostCreatePage extends Component {
     const steps = [
       {
         label: 'Create Your Problem',
-        content: <PostCreateFormContent 
+        content: <QuestionFormContent 
           classes = { classes }
           handleChange = { this.handleChangeText }
           values = { values }
@@ -198,7 +198,7 @@ export class PostCreatePage extends Component {
       },
       {
         label: 'Tag Your Problem',
-        content: <PostCreateFormTag 
+        content: <QuestionFormTag 
           // classes = { classes }
           availableTags={availableTags}
           handleChange = { this.handleChangeTags }
@@ -207,7 +207,7 @@ export class PostCreatePage extends Component {
       },
       {
         label: 'Publish Your Problem',
-        content: <PostCreateFormConfirm 
+        content: <QuestionFormConfirm 
           // classes = { classes }
           handleChange = { this.handleChangeText }
           values = { values }
@@ -228,16 +228,18 @@ export class PostCreatePage extends Component {
         this.setState({
           availableTags: response.data,
         });
+        console.log('Successfully retrieved tags from API');
       }
     ).catch(
       (error) => {
-        console.log('Unable to retrieve tags:', error);
+        if (settings.debug) {
+          console.log('Unable to retrieve tags:', error);
+        }
       }
     );
   };
 
   submit = () => {
-    console.log('Submitting');
     const { title, content, tags, activeStep } = this.state;
     const { level } = this.props;
     const uri = '//' + settings.backend + '/api/post/create';
@@ -355,5 +357,10 @@ export class PostCreatePage extends Component {
     );
   }
 }
+
+PostCreatePage.propTypes = {
+  classes: PropTypes.object.isRequired,
+  enqueueSnackbar: PropTypes.func.isRequired,
+};
 
 export default withStyles(styles)(PostCreatePage);

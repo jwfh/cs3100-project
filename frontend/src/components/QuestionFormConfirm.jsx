@@ -19,7 +19,7 @@ const styles = (theme) => ({
   },
 });
 
-export class PostCreateFormConfirm extends Component {
+export class QuestionFormConfirm extends Component {
   render() {
     const { classes, values } = this.props;
 
@@ -51,11 +51,11 @@ export class PostCreateFormConfirm extends Component {
   }
 }
 
-PostCreateFormConfirm.propTypes = {
+QuestionFormConfirm.propTypes = {
   classes: PropTypes.object.isRequired,
   handleChange: PropTypes.func.isRequired,
   values: PropTypes.object.isRequired,
 }
 
 
-export default withStyles(styles)(PostCreateFormConfirm);
+export default withStyles(styles)(QuestionFormConfirm);

@@ -173,7 +173,7 @@ const components = {
   ValueContainer,
 };
 
-export class PostCreateFormTag extends Component {
+export class QuestionFormTag extends Component {
   render() {
     const { classes, theme, handleChange, values } = this.props;
     const availableTags = this.props.availableTags.map((tag) => ({
@@ -220,13 +220,12 @@ export class PostCreateFormTag extends Component {
   }
 }
 
-PostCreateFormTag.propTypes = {
+QuestionFormTag.propTypes = {
     classes: PropTypes.object.isRequired,
-    // theme: PropTypes.object.isRequired,
     availableTags: PropTypes.array.isRequired,
     handleChange: PropTypes.func.isRequired,
     values: PropTypes.object.isRequired,
   }
   
 
-export default withStyles(styles, { withTheme: true })(PostCreateFormTag);
+export default withStyles(styles, { withTheme: true })(QuestionFormTag);
