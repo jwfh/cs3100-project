@@ -24,6 +24,7 @@ import {
 } from '@material-ui/icons';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'; 
 import { SnackbarProvider, withSnackbar } from 'notistack';
+import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 export const sideBarDrawerWidth = 240;
@@ -68,6 +69,9 @@ const theme = createMuiTheme({
 const styles = (theme) => ({
   a: {
     color: '#00B7FF',
+  },
+  dismissSnackbarText: {
+    color: 'white',
   },
 });
 
@@ -125,31 +129,62 @@ class AppBody extends Component {
           <Switch>
             <Route 
               path="/"
-              render={(props) => <HomePage {...props} enqueueSnackbar={enqueueSnackbar} />}
+              render={(props) => (
+                <HomePage 
+                  {...props} 
+                  enqueueSnackbar={enqueueSnackbar} 
+                />
+              )}
               exact
             />
             <Route 
               path="/new"
-              render={(props) => <PostCreatePage {...props} enqueueSnackbar={enqueueSnackbar} level={this.siteLevelItems[this.state.siteLevelIdx]} />}
+              render={(props) => (
+                <PostCreatePage 
+                  {...props} 
+                  enqueueSnackbar={enqueueSnackbar} 
+                  level={this.siteLevelItems[this.state.siteLevelIdx].label} 
+                />
+              )}
               exact
             />
             <Route 
               path="/register"
-              render={(props) => <RegisterPage {...props} enqueueSnackbar={enqueueSnackbar} />}
+              render={(props) => (
+                <RegisterPage 
+                  {...props} 
+                  enqueueSnackbar={enqueueSnackbar} 
+                />
+              )}
               exact
             />
             <Route 
               path="/login"
-              render={(props) => <LoginPage {...props} enqueueSnackbar={enqueueSnackbar} />}
+              render={(props) => (
+                <LoginPage 
+                  {...props} 
+                  enqueueSnackbar={enqueueSnackbar} 
+                />
+              )}
               exact
             />
             <Route
               path="/forgot"
-              render={(props) => <ForgotPasswordPage {...props} enqueueSnackbar={enqueueSnackbar} />}
+              render={(props) => (
+                <ForgotPasswordPage 
+                  {...props} 
+                  enqueueSnackbar={enqueueSnackbar} 
+                />
+              )}
               exact
             />
             <Route
-              render={(props) => <Error404 {...props} enqueueSnackbar={enqueueSnackbar} />}
+              render={(props) => (
+                <Error404 
+                  {...props} 
+                  enqueueSnackbar={enqueueSnackbar} 
+                />
+              )}
             />
           </Switch>
           </PageBody>
@@ -175,12 +210,37 @@ const AppWithStyles = withStyles(styles, { withTheme: true })(AppBody);
 
 const AppWithSnackBar = withSnackbar(AppWithStyles);
 
-const App = () => {
+const App = (props) => {
+  const { classes } = props;
   return (
-    <SnackbarProvider maxSnack={3}>
+    <SnackbarProvider 
+      maxSnack={3} 
+      hideIconVariant={true} 
+      preventDuplicate
+      action={[
+        <Button className={classes.dismissSnackbarText} size="small">
+            {'GOT IT'}
+        </Button>
+      ]}
+    >
       <AppWithSnackBar />
     </SnackbarProvider>
   );
 };
 
-export default App;
+/*
+ * Snack bars can have any of the following in their `options` argument:
+ * 
+ * options =  {
+ *   variant: 'default', // one of 'default', 'error', 'success', 'warning', and 'info'
+ *   persist: false, // either true or false
+ *   preventDuplicate: true, // either true or false
+ *   autoHideDuration: 1000, // time in milliseconds before dismissal
+ * };
+ * 
+ * this.props.enqueueSnackbar(message, options) returns a unique key. This key can be passed as 
+ * an argument to this.props.closeSnackbar(key) to close a particular snackbar.
+ */
+
+
+export default withStyles(styles)(App);
