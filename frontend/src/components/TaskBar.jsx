@@ -20,7 +20,7 @@ import {
 import classNames from 'classnames';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import { withStyles } from '@material-ui/core/styles';
-import Logo2 from '../assets/images/logo-02.svg';
+import WhiteLogo from '../assets/images/logo-02.svg';
 import {
   sideBarDrawerWidth as drawerWidth,
 } from '../App';
@@ -240,7 +240,7 @@ class TaskBar extends React.Component {
             <div className={classes.brand}>
               <img 
                 className={classes.logo}
-                src={Logo2} 
+                src={WhiteLogo} 
                 alt="NumHub"
               ></img>
             <Typography

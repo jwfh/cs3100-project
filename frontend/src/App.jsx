@@ -11,7 +11,6 @@ import HomePage from './components/HomePage';
 import PostCreatePage from './components/PostCreatePage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
-import ForgotPasswordPage from './components/ForgotPasswordPage';
 import PageBody from './components/PageBody';
 import Error404 from './components/Error404';
 import { 
@@ -162,16 +161,6 @@ class AppBody extends Component {
               path="/login"
               render={(props) => (
                 <LoginPage 
-                  {...props} 
-                  enqueueSnackbar={enqueueSnackbar} 
-                />
-              )}
-              exact
-            />
-            <Route
-              path="/forgot"
-              render={(props) => (
-                <ForgotPasswordPage 
                   {...props} 
                   enqueueSnackbar={enqueueSnackbar} 
                 />

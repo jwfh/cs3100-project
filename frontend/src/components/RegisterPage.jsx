@@ -158,7 +158,6 @@ export class RegisterPage extends Component {
     }
   };
 
-
   handleChange = input => e => {
     const { activeStep } = this.state;
     this.setState({

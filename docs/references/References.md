@@ -9,4 +9,5 @@
 7. [React Functional or Class Components: Everything you need to know](https://programmingwithmosh.com/react/react-functional-components/)
 8. [Pass props to a component rendered by React Router](https://www.youtube.com/watch?v=By7vJuSPaYo)
 9. [notistack](https://iamhosseindhv.com/notistack)
+10. [Can react state be tampered with to bypass security measures?](https://stackoverflow.com/questions/52417001/can-react-state-be-tampered-with-to-bypass-security-measures)
 

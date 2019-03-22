@@ -22,9 +22,6 @@ const styles = (theme) => ({
     textAlign: 'center',
     marginTop: '15vh',
   },
-  titleField: {
-    width: '100%',
-  },
   hidden: {
     display: 'none',
   },
@@ -185,13 +182,11 @@ export class PostCreatePage extends Component {
       isValid,
       contentSyntaxErrorMsg,
     };
-    const { classes } = this.props;
 
     const steps = [
       {
         label: 'Create Your Problem',
         content: <QuestionFormContent 
-          classes = { classes }
           handleChange = { this.handleChangeText }
           values = { values }
         />,       
@@ -199,7 +194,6 @@ export class PostCreatePage extends Component {
       {
         label: 'Tag Your Problem',
         content: <QuestionFormTag 
-          // classes = { classes }
           availableTags={availableTags}
           handleChange = { this.handleChangeTags }
           values = { values }
@@ -208,7 +202,6 @@ export class PostCreatePage extends Component {
       {
         label: 'Publish Your Problem',
         content: <QuestionFormConfirm 
-          // classes = { classes }
           handleChange = { this.handleChangeText }
           values = { values }
         />,

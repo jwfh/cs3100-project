@@ -1,6 +1,37 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = (theme) => ({
+  container: {
+    textAlign: 'center',
+    marginTop: '15vh',
+  },
+  titleField: {
+    width: '100%',
+  },
+  hidden: {
+    display: 'none',
+  },
+  root: {
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2,
+    width: '75%',
+    display: 'inline-block',
+    textAlign: 'left',
+  },
+  button: {
+    marginTop: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+  },
+  actionsContainer: {
+    marginBottom: theme.spacing.unit * 2,
+  },
+  resetContainer: {
+    padding: theme.spacing.unit * 3,
+  },
+});
 
 export class QuestionFormContent extends Component {
   render() {
@@ -40,4 +71,4 @@ QuestionFormContent.propTypes = {
   values: PropTypes.object.isRequired,
 };
 
-export default QuestionFormContent;
+export default withStyles(styles, { withTheme: true })(QuestionFormContent);
