@@ -14,8 +14,7 @@ import QuestionFormContent from './QuestionFormContent';
 import QuestionFormTag from './QuestionFormTag';
 import QuestionFormConfirm from './QuestionFormConfirm';
 import axios from 'axios';
-
-const settings = require('../settings');
+import { backend, debug } from '../settings';
 
 const styles = (theme) => ({
   container: {
@@ -212,7 +211,7 @@ export class PostCreatePage extends Component {
   }
 
   retrieveTags = () => {
-    const uri = '//' + settings.backend + '/api/fetch/all';
+    const uri = '//' + backend + '/api/fetch/all';
     const data = {
       type: 'tag',
     };
@@ -225,7 +224,7 @@ export class PostCreatePage extends Component {
       }
     ).catch(
       (error) => {
-        if (settings.debug) {
+        if (debug) {
           console.log('Unable to retrieve tags:', error);
         }
       }
@@ -235,7 +234,7 @@ export class PostCreatePage extends Component {
   submit = () => {
     const { title, content, tags, activeStep } = this.state;
     const { level } = this.props;
-    const uri = '//' + settings.backend + '/api/post/create';
+    const uri = '//' + backend + '/api/post/create';
     const data = {
       type: 'question',
       title,
@@ -354,6 +353,7 @@ export class PostCreatePage extends Component {
 PostCreatePage.propTypes = {
   classes: PropTypes.object.isRequired,
   enqueueSnackbar: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(PostCreatePage);

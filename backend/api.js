@@ -5,6 +5,7 @@ const router = express.Router();
 const fetch = require('./fetch');
 const post = require('./post');
 const gatekeeper = require('./gatekeeper');
+const validate = require('./validate');
 
 /* GET should never give any data. All API requests should be POST. */
 router.get('/*', (req, res) => {
@@ -19,9 +20,9 @@ router.post('/fetch/all', fetch.all);
 router.post('/post/create', post.create);
 router.post('/post/delete', post.delete);
 
-router.post('/register', gatekeeper.register);
-router.post('/sign-in', gatekeeper.signIn);
-router.post('/sign-out', gatekeeper.signOut);
+router.post('/gatekeeper', gatekeeper.gatekeeper);
+
+router.post('/validate', validate.validate);
 
 module.exports = router;
 

@@ -1,5 +1,6 @@
 EXECUTABLES = \
 		npm \
+		node \
 
 FOUND := $(foreach exec,$(EXECUTABLES),\
         $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
@@ -27,5 +28,9 @@ frontend-dev: frontend/package.json .FORCE
 
 frontend: frontend/package.json .FORCE
 	$(MAKE) -C frontend build
+
+clean:
+	rm -rf node_modules
+	$(MAKE) -C frontend clean 
 
 .FORCE: 

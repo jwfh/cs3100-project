@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import './assets/style/Europa.scss';
@@ -74,6 +74,8 @@ const styles = (theme) => ({
   },
 });
 
+const TaskBarWithRouter = withRouter(TaskBar);
+
 class AppBody extends Component {
 
   constructor(props) {
@@ -119,7 +121,7 @@ class AppBody extends Component {
       <CssBaseline />
       <BrowserRouter>
         <div className={'App'}>
-          <TaskBar 
+          <TaskBarWithRouter 
             sideBarOpen={this.state.sideBarOpen}
             globalUpdate={this.updateState}
             siteLevelName={this.siteLevelItems[this.state.siteLevelIdx].label}
@@ -128,52 +130,52 @@ class AppBody extends Component {
           <Switch>
             <Route 
               path="/"
-              render={(props) => (
+              render={withRouter((props) => (
                 <HomePage 
                   {...props} 
                   enqueueSnackbar={enqueueSnackbar} 
                 />
-              )}
+              ))}
               exact
             />
             <Route 
               path="/new"
-              render={(props) => (
+              render={withRouter((props) => (
                 <PostCreatePage 
                   {...props} 
                   enqueueSnackbar={enqueueSnackbar} 
                   level={this.siteLevelItems[this.state.siteLevelIdx].label} 
                 />
-              )}
+              ))}
               exact
             />
             <Route 
               path="/register"
-              render={(props) => (
+              render={withRouter((props) => (
                 <RegisterPage 
                   {...props} 
                   enqueueSnackbar={enqueueSnackbar} 
                 />
-              )}
+              ))}
               exact
             />
             <Route 
               path="/login"
-              render={(props) => (
+              render={withRouter((props) => (
                 <LoginPage 
                   {...props} 
                   enqueueSnackbar={enqueueSnackbar} 
                 />
-              )}
+              ))}
               exact
             />
             <Route
-              render={(props) => (
+              render={withRouter((props) => (
                 <Error404 
                   {...props} 
                   enqueueSnackbar={enqueueSnackbar} 
                 />
-              )}
+              ))}
             />
           </Switch>
           </PageBody>

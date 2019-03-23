@@ -12,6 +12,12 @@ import {
   TextField,
 } from '@material-ui/core';
 import BlackLogo from '../assets/images/logo-01.svg';
+import { debug, backend } from '../settings';
+import axios from 'axios';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 const styles = (theme) => ({
   container: {
@@ -22,10 +28,21 @@ const styles = (theme) => ({
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
-    // TODO: Change based on breakpoint
-    width: '50%',
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '75%',
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: '50%',
+    },
+    [theme.breakpoints.up('xl')]: {
+      width: '33%',
+    },
     display: 'inline-block',
     textAlign: 'center',
+  },
+  formContent: {
+    paddingBottom: '1vh',
   },
   boldFace: {
     fontWeight: 'bold',
@@ -39,23 +56,28 @@ const styles = (theme) => ({
     textAlign: 'center',
   },
   actionsContainer: {
+    flexGrow: 1,
+    textAlign: 'right',
     marginBottom: theme.spacing.unit * 2,
   },
+  formFooter: {
+    display: 'flex',
+    alignItems: 'baseline',
+  },
   button: {
-    margin: 15,
+    marginLeft: 15,
   },
   logo: {
     width: theme.spacing.unit * 12,
     height: '100%',
     pointerEvents: 'none',
-    display: 'none',
     textAlign: 'center',
     alignItems: 'center',
     verticalAlign: 'middle',
     justifyContent: 'center',
     margin: theme.spacing.unit * 1,
     [theme.breakpoints.up('xs')]: {
-      display: 'block',
+      display: 'inline-block',
     },
   },
 });
@@ -63,9 +85,8 @@ const styles = (theme) => ({
 const UsernameForm = (props) => (
   <TextField 
     label="Username"
-    placeholder="Enter Your Username"
     value={props.value}
-    onChange={props.handleChange('username')}
+    onChange={props.handleChange}
     margin="normal"
     variant="outlined"
     fullWidth
@@ -80,36 +101,64 @@ UsernameForm.propTypes = {
 const PasswordForm = (props) => (
   <TextField 
     label="Password"
-    placeholder="Enter Your Password"
+    type={props.hide ? 'password' : 'text'}
     value={props.value}
-    onChange={props.handleChange('password')}
+    onChange={props.handleChange}
     margin="normal"
     variant="outlined"
-    fullwidth
+    fullWidth
+    InputProps={{
+      endAdornment: (
+        <InputAdornment position="end">
+          <IconButton
+            aria-label="Toggle password visibility"
+            onClick={props.toggleShowPassword}
+          >
+            {props.hide ? <Visibility /> : <VisibilityOff />}
+          </IconButton>
+        </InputAdornment>
+      ),
+    }}
   />
 );
 
 PasswordForm.propTypes = {
   handleChange: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
-}
+  hide: PropTypes.bool.isRequired,
+  toggleShowPassword: PropTypes.func.isRequired,
+};
 
 const ForgotPasswordForm = (props) => (
   <TextField 
     label="Security Answer"
-    placeholder="Enter Your Answer"
+    type={props.hide ? 'password' : 'text'}
     value={props.value}
-    onChange={props.handleChange('secAnswer')}
+    onChange={props.handleChange}
     margin="normal"
     variant="outlined"
-    fullwidth
+    fullWidth
+    InputProps={{
+      endAdornment: (
+        <InputAdornment position="end">
+          <IconButton
+            aria-label="Toggle password visibility"
+            onClick={props.toggleShowSecA}
+          >
+            {props.hide ? <Visibility /> : <VisibilityOff />}
+          </IconButton>
+        </InputAdornment>
+      ),
+    }}
   />
 );
 
 ForgotPasswordForm.propTypes = {
   handleChange: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
-}
+  hide: PropTypes.bool.isRequired,
+  toggleShowSecA: PropTypes.func.isRequired,
+};
 
 class LoginPage extends Component {
   constructor(props) {
@@ -119,40 +168,199 @@ class LoginPage extends Component {
       passwordAttempts: 0,
       username: '',
       password: '',
-      secAnswer: '',
+      hidePassword: true,
+      secQ: '',
+      secA: '',
+      hideSecA: true,
       errorMessage: '',
-      isValid: [],
+      showValid: [false, false, false],
+      isValid: [
+        {
+          usernameExists: false,
+        },
+        { 
+          passwordCorrect: false,
+        },
+      ],
     };
   } 
 
-  validate = (component) => {
-    const { isValid } = this.state;
-    switch (component) {
+  toggleHide = () => {
+    const { activeComponent } = this.state;
+    switch (activeComponent) {
+      case 1:
+        const { hidePassword } = this.state;
+        this.setState({
+          hidePassword: !hidePassword,
+        });
+        break;
+      case 2:
+        const { hideSecA } = this.state;
+        this.setState({
+          hideSecA: !hideSecA,
+        });
+        break;
       default:
         break;
     }
-    this.setState({ 
+  }
+
+  validate = (componentIdx) => {
+    let uri = '//' + backend + '/api/validate';
+    let data;
+    const { 
+      username,
+      secA,
       isValid,
-    });
+    } = this.state;
+    switch (componentIdx) {
+      case 0:
+        data = {
+          type: 'username',
+          value: {
+            username,
+          },
+        };
+        break;
+      case 2:
+        data =  {
+          type: 'secA',
+          value:  {
+            username, 
+            secA,
+          },
+        };
+        break;
+      default:
+        break;
+    }
+    if (data) {
+      axios.post(uri, data).then(
+        (response) => {
+          if (response.status === 202) {
+            isValid[componentIdx] = true;
+          } else {
+            isValid[componentIdx] = false;
+          }
+        }
+      ).catch(
+        (error) => {
+          if (debug) {
+            console.log('Error in validation:', error);
+          }
+          isValid[componentIdx] = false;
+        }
+      );
+      this.setState({ 
+        isValid,
+      });
+    }
   };
 
-  handleChange = input => e => {
-    const { activeComponent } = this.state;
+  handleChange = (input) => ((e) => {
     this.setState({
       [input]: e.target.value,
-    }, () => {
-      this.validate(activeComponent);
     });
-  };
+  });
     
+  nextStep = (validateFirst) => (() => {
+    const { activeComponent, isValid, showValid } = this.state;
+    showValid[activeComponent] = true;
+    this.setState({
+      showValid,
+    });
+    this.validate(activeComponent);
+    let componentIsValid = isValid[activeComponent];
+    if (!validateFirst || componentIsValid) {
+      this.fetchAssets(activeComponent + 1);
+      this.setState({
+        activeComponent: activeComponent + 1,
+      });
+    }
+  });
+
+  attemptSignIn = () => {
+    const { history } = this.props;
+    const { username, password, isValid } = this.state;
+    const uri = '//' + backend + '/api/gatekeeper';
+    const data = {
+      action: 'sign-in',
+      value: {
+        username,
+        password,
+      },
+    }
+    axios.post(uri, data).then(
+      (response) => {
+        if (response.status === 202) {
+          history.push('/');
+        } else {
+          isValid[1] = false;
+        }
+      }
+    ).catch(
+      (error) => {
+        if (debug) {
+          console.log('Error validating username and password:', error);
+        }  
+        isValid[1] = false;
+      }
+    );
+    this.setState({
+      isValid,
+    });
+  }
+
+  prevStep = () => {
+    const { activeComponent } = this.state;
+    if (activeComponent > 0) {
+      this.setState({
+        activeComponent: activeComponent - 1,
+      });
+    }
+  };
+
+  fetchAssets = (componentIdx) => (() => {
+    const { username } = this.state;
+    const uri = '//' + backend +  '/api/fetch';
+    let data =  {};
+    switch (componentIdx) {
+      case 2:
+        // Fetching security question before advance to #2 (ForgotPasswordForm)
+        data = {
+          type: 'secQ',
+          value: {
+            username,
+          },
+        };
+        axios.post(uri, data).then(
+          (response) => {
+            console.log(response);
+          }
+        ).catch(
+          (error) => {
+
+          }
+        );
+        break;
+      default:
+        break;
+    }
+  });
+
   getDisplayedComponents = () => {
     const { classes } = this.props;
     const { 
       username,
       password,
-      secAnswer,
+      hidePassword,
+      secQ,
+      secA,
+      hideSecA,
       passwordAttempts,
       errorMessage,
+      showValid,
+      isValid,
       activeComponent,
     } = this.state;
     const values = {
@@ -165,35 +373,62 @@ class LoginPage extends Component {
       {
         content: <UsernameForm 
           value={username}
-          handleChange={this.handleChange}
+          handleChange={this.handleChange('username')}
         />,
-        footer: <Link to="/register">Create An Account</Link>,
+        header: <Fragment>
+          <Typography variant="h4" component="p">
+            Sign in
+          </Typography>
+          <Typography variant="h6" component="p">
+            with your NumHub Account
+          </Typography>
+        </Fragment>,
+        footer: <Button 
+          component={Link} 
+          to="/register"
+        >
+          <Typography>
+            Create An Account
+          </Typography>
+        </Button>,
         nextButton: {
           label: 'Next',
-          action() {},
+          action: this.nextStep(true),
         },
       },
       {
         content: <PasswordForm 
+          toggleShowPassword={this.toggleHide}
+          hide={hidePassword}
           value={password}
-          handleChange={this.handleChange}
+          handleChange={this.handleChange('password')}
         />,
         header: <Typography variant="body1">
           Enter the password for <span className={classes.boldFace}>{username}</span>.
         </Typography>,
+        footer: <Button 
+          onClick={this.nextStep(false)}
+          to="/register"
+        >
+          <Typography>
+            Forgot password?
+          </Typography>
+        </Button>,
         nextButton: {
           label: 'Sign In',
-          action() {},
+          action: this.attemptSignIn,
         },
         backButton: {
           label: 'Back',
-          action() {},
+          action: this.prevStep,
         },
       },
       {
         content: <ForgotPasswordForm
-          value={secAnswer}
-          handleChange={this.handleChange}
+          toggleShowSecA={this.toggleHide}
+          hide={hideSecA}
+          value={secA}
+          handleChange={this.handleChange('secA')}
         />,
         nextButton: {
           label: 'Reset',
@@ -201,7 +436,7 @@ class LoginPage extends Component {
         },
         backButton: {
           label: 'Back',
-          action() {},
+          action: this.prevStep,
         },
       },
     ];
@@ -217,40 +452,47 @@ class LoginPage extends Component {
     return (
       <div className={classes.container}>
         <div className={classes.root}>
-          <PageTitle>
+          {/* <PageTitle>
             Sign In to NumHub
-          </PageTitle>
+          </PageTitle> */}
           <Paper
             className={classes.formBody}
             elevation={4}
           >
-            <img 
-              className={classes.logo}
-              src={BlackLogo} 
-              alt="NumHub"
-            />
-            {components.map((component, index) => (index == activeComponent && (
+            {components.map((component, index) => (index === activeComponent && (
               <Fragment key={index}>
-                
-                {component.header && (<Typography>{component.header}</Typography>)}
-                {component.content}
-                <div className={classes.actionsContainer}>
-                  {component.backButton && (<Button
-                    disabled={index === 0}
-                    onClick={component.backButton.action}
-                    className={classes.button}
-                  >
-                    {component.backButton.label}
-                  </Button>)}
-                  {component.nextButton && (<Button
-                    variant="contained"
-                    color="primary"
-                    onClick={component.nextButton.action}
-                    className={classes.button}
-                  >
-                    {component.nextButton.label}
-                  </Button>)}
-                  {component.footer && (<Typography>{component.footer}</Typography>)}
+                <div className={classes.formHeader}>
+                  <img 
+                    className={classes.logo}
+                    src={BlackLogo} 
+                    alt="NumHub"
+                  />
+                  {component.header && (component.header)}
+                </div>
+                <div className={classes.formContent}>
+                  {component.content}
+                </div>
+                <div className={classes.formFooter}>
+                  <div >
+                    {component.footer && (component.footer)}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    {component.backButton && (<Button
+                      disabled={index === 0}
+                      onClick={component.backButton.action}
+                      className={classes.button}
+                    >
+                      {component.backButton.label}
+                    </Button>)}
+                    {component.nextButton && (<Button
+                      variant="contained"
+                      color="primary"
+                      onClick={component.nextButton.action}
+                      className={classes.button}
+                    >
+                      {component.nextButton.label}
+                    </Button>)}
+                  </div>
                 </div>
               </Fragment>
             )))}
@@ -263,6 +505,8 @@ class LoginPage extends Component {
 
 LoginPage.propTypes = {
   classes: PropTypes.object.isRequired,
+  enqueueSnackbar: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(LoginPage);

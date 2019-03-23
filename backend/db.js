@@ -188,7 +188,17 @@ module.exports.all = (type, callback) => {
 module.exports.create = (type, params, callback) => {
   switch(type) {
     case 'question':
-
+      console.log('params', params);
+      if (params.title && params.content && params.tags && params.level && params.author) {
+        db.serialize(() => {
+          // TODO
+          db.run('', (error) => {
+            callback('Error adding new question: ' +  error, null);
+          });
+        });
+      } else {
+        callback('Required parameters missing to add new question', null);
+      }
       break;
     case 'answer':
 

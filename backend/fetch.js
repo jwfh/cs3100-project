@@ -3,6 +3,17 @@ const db = require('./db');
 module.exports.fetch = (req, res, next) => {
   console.log(req.path, req.body);
   switch (req.body.type) {
+    case 'secQ':
+      if (req.body.value && req.body.value.username) {
+        db.get('secQ', req.body.username, (error, row) => {
+          
+        });
+      } else {
+        res.status(400);
+        res.type('text');
+        res.send('Bad Request');
+      }
+      break;
     default:
       next();
       break;
@@ -26,7 +37,9 @@ module.exports.all = (req, res, next) => {
       });
       break;
     default:
-      next();
+      res.status(400);
+      res.type('text');
+      res.send('Bad Request');
       break;
   }
 };

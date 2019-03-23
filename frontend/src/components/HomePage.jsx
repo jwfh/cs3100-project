@@ -80,6 +80,8 @@ export class HomePage extends Component {
 
 HomePage.propTypes = {
   classes: PropTypes.object.isRequired,
+  enqueueSnackbar: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(HomePage);
