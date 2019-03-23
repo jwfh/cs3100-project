@@ -10,4 +10,8 @@
 8. [Pass props to a component rendered by React Router](https://www.youtube.com/watch?v=By7vJuSPaYo)
 9. [notistack](https://iamhosseindhv.com/notistack)
 10. [Can react state be tampered with to bypass security measures?](https://stackoverflow.com/questions/52417001/can-react-state-be-tampered-with-to-bypass-security-measures)
-
+11. [WebSockets (using Socket.io) Tutorial #3 - Using Socket.io](https://www.youtube.com/watch?v=UwS3wJoi7fY&list=PL4cUxeGkcC9i4V-_ZVwLmOusj8YAUhj_9&index=3)
+12. [WebSockets (using Socket.io) Tutorial #4 - Emitting Messages](https://www.youtube.com/watch?v=KNqVpESuyQo&list=PL4cUxeGkcC9i4V-_ZVwLmOusj8YAUhj_9&index=4)
+13. [WebSockets (using Socket.io) Tutorial #5 - Broadcasting Messages](https://www.youtube.com/watch?v=FvArk8-qgCk&list=PL4cUxeGkcC9i4V-_ZVwLmOusj8YAUhj_9&index=5)
+14. [Making Reactjs real time with WebSockets](https://www.youtube.com/watch?v=82GDkSFmEJc)
+15. [Combining React with Socket.io for real-time goodness](https://medium.com/dailyjs/combining-react-with-socket-io-for-real-time-goodness-d26168429a34)
