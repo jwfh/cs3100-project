@@ -95,18 +95,18 @@ export class PostCreatePage extends Component {
   validate = (step) => {
     const { content, title, tags, isValid } = this.state;
     switch (step) {
-      case 0:
-        // Content
-        isValid[0].contentNotEmpty = content !== '';
-        isValid[0].titleNotEmpty = title !== '';
-        isValid[0].contentSyntaxErrorFree = this.isContentSyntaxErrorFree();
-        break;
-      case 1:
-        // Tags
-        isValid[1].hasTags = tags.length > 0;
-        break;
-      default:
-        break;
+    case 0:
+      // Content
+      isValid[0].contentNotEmpty = content !== '';
+      isValid[0].titleNotEmpty = title !== '';
+      isValid[0].contentSyntaxErrorFree = this.isContentSyntaxErrorFree();
+      break;
+    case 1:
+      // Tags
+      isValid[1].hasTags = tags.length > 0;
+      break;
+    default:
+      break;
     }
     this.setState({ 
       isValid,
@@ -119,19 +119,19 @@ export class PostCreatePage extends Component {
     if (!inlineMathValid) {
       this.setState({
         contentSyntaxErrorMsg: 'Unbalanced inline math',
-      })
+      });
       return false;
     }
     let displayMathValid = (content.match(/\[/g) || []).length === (content.match(/\]/g) || []).length;
     if (!displayMathValid) {
       this.setState({
         contentSyntaxErrorMsg: 'Unbalanced display math',
-      })
+      });
       return false;
     }
     this.setState({
       contentSyntaxErrorMsg: '',
-    })
+    });
     return true;
   };
 
@@ -146,22 +146,22 @@ export class PostCreatePage extends Component {
     return true;
   }
 
-  handleChangeText = input => e => {
+  handleChangeText = (input) => ((e) => {
     const { activeStep } = this.state;
     this.setState({
       [input]: e.target.value,
     }, () => {
       this.validate(activeStep);
     });
-  };
+  });
 
-  handleChangeTags = name => value => {
+  handleChangeTags = (name) => ((value) => {
     const { activeStep } = this.state;
     this.setState({
       [name]: value,
     });
     this.validate(activeStep);
-  };
+  });
 
   getSteps = () => {
     const {
@@ -327,7 +327,7 @@ export class PostCreatePage extends Component {
           </Stepper>
           {activeStep === steps.length && (
             <Paper square elevation={0} className={classes.resetContainer}>
-              <Typography>{postSuccessful ? "Your question has been published!" : "There was an error submitting your post. Please try again later."}</Typography>
+              <Typography>{postSuccessful ? 'Your question has been published!' : 'There was an error submitting your post. Please try again later.'}</Typography>
               <Button 
                 onClick={this.handleReset} 
                 className={classes.button}

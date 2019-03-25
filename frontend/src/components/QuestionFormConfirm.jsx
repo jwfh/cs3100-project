@@ -55,7 +55,7 @@ QuestionFormConfirm.propTypes = {
   classes: PropTypes.object.isRequired,
   handleChange: PropTypes.func.isRequired,
   values: PropTypes.object.isRequired,
-}
+};
 
 
 export default withStyles(styles)(QuestionFormConfirm);

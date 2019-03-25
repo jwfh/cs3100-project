@@ -243,14 +243,14 @@ class TaskBar extends React.Component {
                 src={WhiteLogo} 
                 alt="NumHub"
               ></img>
-            <Typography
-              className={classes.siteVariant}
-              variant="h5"
-              color="inherit"
-              noWrap
-            >
-              {siteLevelName}
-            </Typography>
+              <Typography
+                className={classes.siteVariant}
+                variant="h5"
+                color="inherit"
+                noWrap
+              >
+                {siteLevelName}
+              </Typography>
             </div>
             <div className={classes.search}>
               <div className={classes.searchIcon}>

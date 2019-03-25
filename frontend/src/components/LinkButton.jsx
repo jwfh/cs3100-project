@@ -25,7 +25,7 @@ const LinkButton = ({ history, ...props }) => {
 LinkButton.defaultProps = {
   onClick() {},
   handleError(error) {
-    console.log('Error', error)
+    console.log('Error', error);
   },
   label: 'Submit',
   color: 'default',

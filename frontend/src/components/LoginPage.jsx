@@ -90,12 +90,16 @@ const UsernameForm = (props) => (
     margin="normal"
     variant="outlined"
     fullWidth
+    helperText={!props.showValid || props.isValid ?  '' : 'We can\'t find that username.'}
+    error={props.showValid && !props.isValid}
   />
 );
 
 UsernameForm.propTypes = {
   handleChange: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
+  isValid: PropTypes.bool.isRequired,
+  showValid: PropTypes.bool.isRequired,
 };
 
 const PasswordForm = (props) => (
@@ -107,6 +111,8 @@ const PasswordForm = (props) => (
     margin="normal"
     variant="outlined"
     fullWidth
+    helperText={!props.showValid || props.isValid ?  '' : 'Incorrect password.'}
+    error={props.showValid && !props.isValid}
     InputProps={{
       endAdornment: (
         <InputAdornment position="end">
@@ -127,6 +133,8 @@ PasswordForm.propTypes = {
   value: PropTypes.string.isRequired,
   hide: PropTypes.bool.isRequired,
   toggleShowPassword: PropTypes.func.isRequired,
+  isValid: PropTypes.bool.isRequired,
+  showValid: PropTypes.bool.isRequired,
 };
 
 const ForgotPasswordForm = (props) => (
@@ -138,6 +146,8 @@ const ForgotPasswordForm = (props) => (
     margin="normal"
     variant="outlined"
     fullWidth
+    helperText={!props.showValid || props.isValid ?  '' : 'Incorrect security answer.'}
+    error={props.showValid && !props.isValid}
     InputProps={{
       endAdornment: (
         <InputAdornment position="end">
@@ -158,6 +168,8 @@ ForgotPasswordForm.propTypes = {
   value: PropTypes.string.isRequired,
   hide: PropTypes.bool.isRequired,
   toggleShowSecA: PropTypes.func.isRequired,
+  isValid: PropTypes.bool.isRequired,
+  showValid: PropTypes.bool.isRequired,
 };
 
 class LoginPage extends Component {
@@ -174,38 +186,29 @@ class LoginPage extends Component {
       hideSecA: true,
       errorMessage: '',
       showValid: [false, false, false],
-      isValid: [
-        {
-          usernameExists: false,
-        },
-        { 
-          passwordCorrect: false,
-        },
-      ],
+      isValid: [false, false],
     };
   } 
 
   toggleHide = () => {
-    const { activeComponent } = this.state;
+    const { activeComponent, hidePassword, hideSecA } = this.state;
     switch (activeComponent) {
-      case 1:
-        const { hidePassword } = this.state;
-        this.setState({
-          hidePassword: !hidePassword,
-        });
-        break;
-      case 2:
-        const { hideSecA } = this.state;
-        this.setState({
-          hideSecA: !hideSecA,
-        });
-        break;
-      default:
-        break;
+    case 1: 
+      this.setState({
+        hidePassword: !hidePassword,
+      });
+      break;
+    case 2:
+      this.setState({
+        hideSecA: !hideSecA,
+      });
+      break;
+    default:
+      break;
     }
-  }
+  };
 
-  validate = (componentIdx) => {
+  validate = (componentIdx, callback) => {
     let uri = '//' + backend + '/api/validate';
     let data;
     const { 
@@ -214,25 +217,25 @@ class LoginPage extends Component {
       isValid,
     } = this.state;
     switch (componentIdx) {
-      case 0:
-        data = {
-          type: 'username',
-          value: {
-            username,
-          },
-        };
-        break;
-      case 2:
-        data =  {
-          type: 'secA',
-          value:  {
-            username, 
-            secA,
-          },
-        };
-        break;
-      default:
-        break;
+    case 0:
+      data = {
+        type: 'username',
+        value: {
+          username,
+        },
+      };
+      break;
+    case 2:
+      data =  {
+        type: 'secA',
+        value:  {
+          username, 
+          secA,
+        },
+      };
+      break;
+    default:
+      break;
     }
     if (data) {
       axios.post(uri, data).then(
@@ -242,6 +245,9 @@ class LoginPage extends Component {
           } else {
             isValid[componentIdx] = false;
           }
+          this.setState({ 
+            isValid,
+          }, callback);
         }
       ).catch(
         (error) => {
@@ -249,11 +255,11 @@ class LoginPage extends Component {
             console.log('Error in validation:', error);
           }
           isValid[componentIdx] = false;
+          this.setState({ 
+            isValid,
+          }, callback);
         }
       );
-      this.setState({ 
-        isValid,
-      });
     }
   };
 
@@ -265,19 +271,30 @@ class LoginPage extends Component {
     
   nextStep = (validateFirst) => (() => {
     const { activeComponent, isValid, showValid } = this.state;
-    showValid[activeComponent] = true;
-    this.setState({
-      showValid,
-    });
-    this.validate(activeComponent);
-    let componentIsValid = isValid[activeComponent];
-    if (!validateFirst || componentIsValid) {
-      this.fetchAssets(activeComponent + 1);
+    this.validate(activeComponent, () => {
+      let componentIsValid = isValid[activeComponent];
+      if (!validateFirst || componentIsValid) {
+        this.fetchAssets(activeComponent + 1, () => {
+          this.setState({
+            activeComponent: activeComponent + 1,
+          });
+        });
+      }
+      showValid[activeComponent] = true;
       this.setState({
-        activeComponent: activeComponent + 1,
+        showValid,
+      });
+    });
+  });
+
+  prevStep = () => {
+    const { activeComponent } = this.state;
+    if (activeComponent > 0) {
+      this.setState({
+        activeComponent: activeComponent - 1,
       });
     }
-  });
+  };
 
   attemptSignIn = () => {
     const { history } = this.props;
@@ -289,7 +306,7 @@ class LoginPage extends Component {
         username,
         password,
       },
-    }
+    };
     axios.post(uri, data).then(
       (response) => {
         if (response.status === 202) {
@@ -311,42 +328,40 @@ class LoginPage extends Component {
     });
   }
 
-  prevStep = () => {
-    const { activeComponent } = this.state;
-    if (activeComponent > 0) {
-      this.setState({
-        activeComponent: activeComponent - 1,
-      });
-    }
-  };
-
-  fetchAssets = (componentIdx) => (() => {
+  fetchAssets = (componentIdx, callback) => {
     const { username } = this.state;
     const uri = '//' + backend +  '/api/fetch';
     let data =  {};
     switch (componentIdx) {
-      case 2:
-        // Fetching security question before advance to #2 (ForgotPasswordForm)
-        data = {
-          type: 'secQ',
-          value: {
-            username,
-          },
-        };
-        axios.post(uri, data).then(
-          (response) => {
-            console.log(response);
+    case 2:
+      // Fetching security question before advance to #2 (ForgotPasswordForm)
+      data = {
+        type: 'secQ',
+        value: {
+          username,
+        },
+      };
+      axios.post(uri, data).then(
+        (response) => {
+          console.log(response);
+          if (response.status === 200)  {
+            // Valid response
           }
-        ).catch(
-          (error) => {
-
+          callback();
+        }
+      ).catch(
+        (error) => {
+          if (debug) {
+            console.log('Error fetching assets:', error);
           }
-        );
-        break;
-      default:
-        break;
+          callback();
+        }
+      );
+      break;
+    default:
+      callback();
     }
-  });
+  };
 
   getDisplayedComponents = () => {
     const { classes } = this.props;
@@ -373,6 +388,8 @@ class LoginPage extends Component {
       {
         content: <UsernameForm 
           value={username}
+          showValid={showValid[0]}
+          isValid={isValid[0]}
           handleChange={this.handleChange('username')}
         />,
         header: <Fragment>
@@ -400,6 +417,8 @@ class LoginPage extends Component {
         content: <PasswordForm 
           toggleShowPassword={this.toggleHide}
           hide={hidePassword}
+          showValid={showValid[1]}
+          isValid={isValid[1]}
           value={password}
           handleChange={this.handleChange('password')}
         />,
@@ -427,6 +446,8 @@ class LoginPage extends Component {
         content: <ForgotPasswordForm
           toggleShowSecA={this.toggleHide}
           hide={hideSecA}
+          showValid={showValid[2]}
+          isValid={isValid[2]}
           value={secA}
           handleChange={this.handleChange('secA')}
         />,
@@ -452,9 +473,6 @@ class LoginPage extends Component {
     return (
       <div className={classes.container}>
         <div className={classes.root}>
-          {/* <PageTitle>
-            Sign In to NumHub
-          </PageTitle> */}
           <Paper
             className={classes.formBody}
             elevation={4}

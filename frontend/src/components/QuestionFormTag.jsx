@@ -182,7 +182,7 @@ export class QuestionFormTag extends Component {
     }));
 
     const selectStyles = {
-      input: base => ({
+      input: (base) => ({
         ...base,
         color: theme.palette.text.primary,
         '& input': {
@@ -209,8 +209,8 @@ export class QuestionFormTag extends Component {
             onChange={ handleChange('tags') }
             placeholder={
               values.showValid[1] && !values.isValid[1].hasTags 
-              ? <span className={classes.textDanger}>Select one or more tags</span> 
-              : "Select one or more tags"
+                ? <span className={classes.textDanger}>Select one or more tags</span> 
+                : 'Select one or more tags'
             }
             isMulti
           />
@@ -221,11 +221,11 @@ export class QuestionFormTag extends Component {
 }
 
 QuestionFormTag.propTypes = {
-    classes: PropTypes.object.isRequired,
-    availableTags: PropTypes.array.isRequired,
-    handleChange: PropTypes.func.isRequired,
-    values: PropTypes.object.isRequired,
-  }
+  classes: PropTypes.object.isRequired,
+  availableTags: PropTypes.array.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  values: PropTypes.object.isRequired,
+};
   
 
 export default withStyles(styles, { withTheme: true })(QuestionFormTag);

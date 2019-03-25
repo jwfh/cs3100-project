@@ -15,7 +15,7 @@ const styles = (theme) => ({
 });
 
 export class HomePage extends Component {
-
+  
   fetchPosts = () => {
     return [
       {
@@ -34,7 +34,7 @@ export class HomePage extends Component {
         title: 'Some Post 2',
         body: 'Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body',
         link: '/questions/abcd',
-        id: 3
+        id: 3,
       },
       {
         title: 'Some Post 2',
@@ -48,8 +48,8 @@ export class HomePage extends Component {
         link: '/questions/abcd',
         id: 5,
       },
-    ]
-  }
+    ];
+  };
 
   createPostPreviews = (posts) => {
     let previews = posts.map((post, index) => {

@@ -8,7 +8,7 @@ const gatekeeper = require('./gatekeeper');
 const validate = require('./validate');
 
 /* GET should never give any data. All API requests should be POST. */
-router.get('/*', (req, res) => {
+router.get('/*', (_req, res) => {
   res.status(404);
   res.type('text');
   res.send('404 Not Found');

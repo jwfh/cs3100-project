@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-
-const styles = (theme) => ({
-
-});
 
 export class Error404 extends Component {
   render() {
@@ -22,4 +17,4 @@ Error404.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Error404);
+export default Error404;

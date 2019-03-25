@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -158,26 +159,26 @@ export class RegisterPage extends Component {
     }
   };
 
-  handleChange = input => e => {
+  handleChange = (input) => ((e) => {
     const { activeStep } = this.state;
     this.setState({
       [input]: e.target.value,
     }, () => {
       this.validate(activeStep);
     });
-  };
+  });
 
   validate = (step) => {
     const { isValid } = this.state;
     switch (step) {
-      case 0:
-        // Login info
-        break;
-      case 1:
-        // Personal info
-        break;
-      default:
-        break;
+    case 0:
+      // Login info
+      break;
+    case 1:
+      // Personal info
+      break;
+    default:
+      break;
     }
     this.setState({ 
       isValid,

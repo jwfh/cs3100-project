@@ -1,37 +1,34 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import { Typography } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import { classExpression } from 'babel-types';
 
- const styles = (theme) => ({
-   block: {
-     display: 'block',
-   },
- });
+const inlineMath = (mathContent) => (
+  <InlineMath>
+    \displaystyle {mathContent}
+  </InlineMath>
+);
 
-export class PostDisplay extends Component {
+const displayMath = (mathContent) => (
+  <BlockMath>
+    {mathContent}
+  </BlockMath>
+);
 
-  renderMath = (content) => {
-    return (
-      <Typography>
-        {content}
-      </Typography>
-    );
-  };
+const renderMath = (content) => {
+  return (
+    <Typography>
+      {content}
+    </Typography>
+  );
+};
 
-  render() {
-    const { classes, title, content } = this.props;
+const PostDisplay = (props) => (
+  <Fragment>
+    <Typography>
+      {props.title}
+    </Typography>
+    {renderMath(props.content)}
+  </Fragment>
+);
 
-    return (
-      <div className={classes.block}>
-          <Typography>
-            {title}
-          </Typography>
-          {this.renderMath(content)}
-      </div>
-    );
-  }
-}
-
-export default withStyles(styles)(PostDisplay);
+export default PostDisplay;

@@ -142,7 +142,7 @@ module.exports.init = () => {
         'Graduate',
       ],
     },
-  ].map((data, i) => {
+  ].map((data) => {
     data.values.map((text, index) => {
       db.serialize(() => {
         db.all('SELECT * FROM `' + data.table + '` WHERE `' + data.field + '`=?', [text], (err, rows) => {
@@ -164,72 +164,72 @@ module.exports.init = () => {
 
 module.exports.all = (type, callback) => {
   switch (type) {
-    case 'tag':
-      db.all('SELECT `id`,`tag` from `TAGS`', (error, rows) => {
-        if (error) {
-          console.log('[' + __filename + ']', 'Error retrieving tags:', error);
-        }
-        callback(error, rows);
-      });
-      break;
-    case 'level':
-      db.all('SELECT `id`,`level` from `Q_LEVELS`', (error, rows) => {
-        if (error) {
-          console.log('[' + __filename + ']', 'Error retrieving levels:', error);
-        }
-        callback(error, rows);
-      });
-      break;
-    default:
-      break;
+  case 'tag':
+    db.all('SELECT `id`,`tag` from `TAGS`', (error, rows) => {
+      if (error) {
+        console.log('[' + __filename + ']', 'Error retrieving tags:', error);
+      }
+      callback(error, rows);
+    });
+    break;
+  case 'level':
+    db.all('SELECT `id`,`level` from `Q_LEVELS`', (error, rows) => {
+      if (error) {
+        console.log('[' + __filename + ']', 'Error retrieving levels:', error);
+      }
+      callback(error, rows);
+    });
+    break;
+  default:
+    break;
   }
 };
 
 module.exports.create = (type, params, callback) => {
   switch(type) {
-    case 'question':
-      console.log('params', params);
-      if (params.title && params.content && params.tags && params.level && params.author) {
-        db.serialize(() => {
-          // TODO
-          db.run('', (error) => {
-            callback('Error adding new question: ' +  error, null);
-          });
+  case 'question':
+    console.log('params', params);
+    if (params.title && params.content && params.tags && params.level && params.author) {
+      db.serialize(() => {
+        // TODO
+        db.run('', (error) => {
+          callback('Error adding new question: ' +  error, null);
         });
-      } else {
-        callback('Required parameters missing to add new question', null);
-      }
-      break;
-    case 'answer':
+      });
+    } else {
+      callback('Required parameters missing to add new question', null);
+    }
+    break;
+  case 'answer':
 
-      break;
-    case 'user':
+    break;
+  case 'user':
 
-      break;
-    case 'tag':
+    break;
+  case 'tag':
 
-      break;
-    default:
-      break;
+    break;
+  default:
+    break;
   }
 };
 
 module.exports.delete = (type, params, callback) => {
   switch(type) {
-    case 'question':
+  case 'question':
 
-      break;
-    case 'answer':
+    break;
+  case 'answer':
 
-      break;
-    case 'user':
+    break;
+  case 'user':
 
-      break;
-    case 'tag':
+    break;
+  case 'tag':
 
-      break;
-    default:
-      break;
+    break;
+  default:
+    break;
   }
 };
 
