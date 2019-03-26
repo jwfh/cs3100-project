@@ -6,6 +6,7 @@ extends: 'eslint:recommended'
 globals:
   Atomics: readonly
   SharedArrayBuffer: readonly
+parser: babel-eslint
 parserOptions:
   ecmaFeatures:
     jsx: true
@@ -140,3 +141,9 @@ rules:
     - error
   constructor-super:
     - error
+  react/jsx-uses-vars:
+    - error
+  react/jsx-uses-react:
+    - error
+  no-unused-vars:
+    - warn

@@ -145,3 +145,5 @@ rules:
     - error
   react/jsx-uses-react:
     - error
+  no-unused-vars:
+    - warn
