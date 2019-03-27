@@ -274,6 +274,7 @@ class TaskBar extends React.Component {
                 </Badge>
               </IconButton>
               <IconButton
+                // eslint-disable-next-line no-undefined
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}
                 aria-haspopup="true"
                 onClick={this.handleProfileMenuOpen}

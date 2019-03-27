@@ -44,7 +44,6 @@ const styles = (theme) => ({
 });
 
 export class PostCreatePage extends Component {
-
   state = {
     activeStep: 0,
     title: '',
@@ -59,7 +58,7 @@ export class PostCreatePage extends Component {
         contentNotEmpty: false,
         contentSyntaxErrorFree: true,
       },
-      { 
+      {
         hasTags: false,
       },
     ],
@@ -108,21 +107,25 @@ export class PostCreatePage extends Component {
     default:
       break;
     }
-    this.setState({ 
+    this.setState({
       isValid,
     });
   };
 
   isContentSyntaxErrorFree = () => {
     const { content } = this.state;
-    let inlineMathValid = (content.match(/\(/g) || []).length === (content.match(/\)/g) || []).length;
+    let inlineMathValid =
+      (content.match(/\(/g) || []).length ===
+      (content.match(/\)/g) || []).length;
     if (!inlineMathValid) {
       this.setState({
         contentSyntaxErrorMsg: 'Unbalanced inline math',
       });
       return false;
     }
-    let displayMathValid = (content.match(/\[/g) || []).length === (content.match(/\]/g) || []).length;
+    let displayMathValid =
+      (content.match(/\[/g) || []).length ===
+      (content.match(/\]/g) || []).length;
     if (!displayMathValid) {
       this.setState({
         contentSyntaxErrorMsg: 'Unbalanced display math',
@@ -144,24 +147,27 @@ export class PostCreatePage extends Component {
       }
     }
     return true;
-  }
+  };
 
-  handleChangeText = (input) => ((e) => {
+  handleChangeText = (input) => (e) => {
     const { activeStep } = this.state;
-    this.setState({
-      [input]: e.target.value,
-    }, () => {
-      this.validate(activeStep);
-    });
-  });
+    this.setState(
+      {
+        [input]: e.target.value,
+      },
+      () => {
+        this.validate(activeStep);
+      }
+    );
+  };
 
-  handleChangeTags = (name) => ((value) => {
+  handleChangeTags = (name) => (value) => {
     const { activeStep } = this.state;
     this.setState({
       [name]: value,
     });
     this.validate(activeStep);
-  });
+  };
 
   getSteps = () => {
     const {
@@ -185,50 +191,55 @@ export class PostCreatePage extends Component {
     const steps = [
       {
         label: 'Create Your Problem',
-        content: <QuestionFormContent 
-          handleChange = { this.handleChangeText }
-          values = { values }
-        />,       
+        content: (
+          <QuestionFormContent
+            handleChange={this.handleChangeText}
+            values={values}
+          />
+        ),
       },
       {
         label: 'Tag Your Problem',
-        content: <QuestionFormTag 
-          availableTags={availableTags}
-          handleChange = { this.handleChangeTags }
-          values = { values }
-        />,
+        content: (
+          <QuestionFormTag
+            availableTags={availableTags}
+            handleChange={this.handleChangeTags}
+            values={values}
+          />
+        ),
       },
       {
         label: 'Publish Your Problem',
-        content: <QuestionFormConfirm 
-          handleChange = { this.handleChangeText }
-          values = { values }
-        />,
+        content: (
+          <QuestionFormConfirm
+            handleChange={this.handleChangeText}
+            values={values}
+          />
+        ),
       },
     ];
 
     return steps;
-  }
+  };
 
   retrieveTags = () => {
     const uri = '//' + backend + '/api/fetch/all';
     const data = {
       type: 'tag',
     };
-    axios.post(uri, data).then(
-      (response) => {
+    axios
+      .post(uri, data)
+      .then((response) => {
         this.setState({
           availableTags: response.data,
         });
         console.log('Successfully retrieved tags from API');
-      }
-    ).catch(
-      (error) => {
+      })
+      .catch((error) => {
         if (debug) {
           console.log('Unable to retrieve tags:', error);
         }
-      }
-    );
+      });
   };
 
   submit = () => {
@@ -243,7 +254,7 @@ export class PostCreatePage extends Component {
       level,
     };
     let pageIsValid = true;
-    // TODO loop through this.state.isValid instead of 3 constant 
+    // TODO loop through this.state.isValid instead of 3 constant
     for (let i = 0; i < 3 && pageIsValid; i++) {
       if (!this.isValid(i)) {
         pageIsValid = false;
@@ -253,8 +264,9 @@ export class PostCreatePage extends Component {
       }
     }
     if (pageIsValid) {
-      axios.post(uri, data).then(
-        (response) => {
+      axios
+        .post(uri, data)
+        .then((response) => {
           if (response.status === 200 && response.data.route) {
             console.log(response.data);
             this.setState({
@@ -265,12 +277,10 @@ export class PostCreatePage extends Component {
           } else {
             console.log(response.status, 'Unable to post new question');
           }
-        }
-      ).catch(
-        (error) =>  {
+        })
+        .catch((error) => {
           console.log('Unable to post new question:', error);
-        }
-      );
+        });
     }
   };
 
@@ -293,9 +303,7 @@ export class PostCreatePage extends Component {
     return (
       <div className={classes.container}>
         <div className={classes.root}>
-          <PageTitle>
-            Post an Exercise
-          </PageTitle>
+          <PageTitle>Post an Exercise</PageTitle>
           <Stepper activeStep={activeStep} orientation="vertical">
             {steps.map((step, index) => (
               <Step key={step.label}>
@@ -307,14 +315,21 @@ export class PostCreatePage extends Component {
                       <Button
                         disabled={index === 0}
                         onClick={this.prevStep}
-                        className={classNames(classes.button, index === 0 && classes.hidden )}
+                        className={classNames(
+                          classes.button,
+                          index === 0 && classes.hidden
+                        )}
                       >
                         Back
                       </Button>
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={index === steps.length - 1 ? this.submit : this.nextStep}
+                        onClick={
+                          index === steps.length - 1
+                            ? this.submit
+                            : this.nextStep
+                        }
                         className={classes.button}
                       >
                         {index === steps.length - 1 ? 'Publish' : 'Next'}
@@ -327,15 +342,16 @@ export class PostCreatePage extends Component {
           </Stepper>
           {activeStep === steps.length && (
             <Paper square elevation={0} className={classes.resetContainer}>
-              <Typography>{postSuccessful ? 'Your question has been published!' : 'There was an error submitting your post. Please try again later.'}</Typography>
-              <Button 
-                onClick={this.handleReset} 
-                className={classes.button}
-              >
+              <Typography>
+                {postSuccessful
+                  ? 'Your question has been published!'
+                  : 'There was an error submitting your post. Please try again later.'}
+              </Typography>
+              <Button onClick={this.handleReset} className={classes.button}>
                 Go to homepage
               </Button>
-              <Button 
-                onClick={this.handleReset} 
+              <Button
+                onClick={this.handleReset}
                 className={classes.button}
                 color="primary"
                 variant="contained"

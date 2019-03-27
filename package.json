@@ -22,6 +22,7 @@
     "http-errors": "~1.6.2",
     "morgan": "^1.9.1",
     "pug": "^2.0.3",
+    "sha-256-js": "^1.0.3",
     "sqlite3": "^4.0.6"
   },
   "devDependencies": {

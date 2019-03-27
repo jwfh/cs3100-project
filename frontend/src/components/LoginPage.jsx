@@ -5,12 +5,7 @@ import classNames from 'classnames';
 import PageTitle from './PageTitle';
 import { Link } from 'react-router-dom';
 import LinkButton from './LinkButton';
-import {
-  Paper,
-  Typography,
-  Button,
-  TextField,
-} from '@material-ui/core';
+import { Paper, Typography, Button, TextField } from '@material-ui/core';
 import BlackLogo from '../assets/images/logo-01.svg';
 import { debug, backend } from '../settings';
 import axios from 'axios';
@@ -83,14 +78,16 @@ const styles = (theme) => ({
 });
 
 const UsernameForm = (props) => (
-  <TextField 
+  <TextField
     label="Username"
     value={props.value}
     onChange={props.handleChange}
     margin="normal"
     variant="outlined"
     fullWidth
-    helperText={!props.showValid || props.isValid ?  '' : 'We can\'t find that username.'}
+    helperText={
+      !props.showValid || props.isValid ? '' : 'We can\'t find that username.'
+    }
     error={props.showValid && !props.isValid}
   />
 );
@@ -103,7 +100,7 @@ UsernameForm.propTypes = {
 };
 
 const PasswordForm = (props) => (
-  <TextField 
+  <TextField
     label="Password"
     type={props.hide ? 'password' : 'text'}
     value={props.value}
@@ -111,7 +108,7 @@ const PasswordForm = (props) => (
     margin="normal"
     variant="outlined"
     fullWidth
-    helperText={!props.showValid || props.isValid ?  '' : 'Incorrect password.'}
+    helperText={!props.showValid || props.isValid ? '' : props.errorMessage}
     error={props.showValid && !props.isValid}
     InputProps={{
       endAdornment: (
@@ -134,11 +131,12 @@ PasswordForm.propTypes = {
   hide: PropTypes.bool.isRequired,
   toggleShowPassword: PropTypes.func.isRequired,
   isValid: PropTypes.bool.isRequired,
+  errorMessage: PropTypes.string.isRequired,
   showValid: PropTypes.bool.isRequired,
 };
 
 const ForgotPasswordForm = (props) => (
-  <TextField 
+  <TextField
     label="Security Answer"
     type={props.hide ? 'password' : 'text'}
     value={props.value}
@@ -146,7 +144,9 @@ const ForgotPasswordForm = (props) => (
     margin="normal"
     variant="outlined"
     fullWidth
-    helperText={!props.showValid || props.isValid ?  '' : 'Incorrect security answer.'}
+    helperText={
+      !props.showValid || props.isValid ? '' : 'Incorrect security answer.'
+    }
     error={props.showValid && !props.isValid}
     InputProps={{
       endAdornment: (
@@ -181,6 +181,7 @@ class LoginPage extends Component {
       username: '',
       password: '',
       hidePassword: true,
+      passwordErrorMessage: '',
       secQ: '',
       secA: '',
       hideSecA: true,
@@ -188,12 +189,12 @@ class LoginPage extends Component {
       showValid: [false, false, false],
       isValid: [false, false],
     };
-  } 
+  }
 
   toggleHide = () => {
     const { activeComponent, hidePassword, hideSecA } = this.state;
     switch (activeComponent) {
-    case 1: 
+    case 1:
       this.setState({
         hidePassword: !hidePassword,
       });
@@ -211,11 +212,7 @@ class LoginPage extends Component {
   validate = (componentIdx, callback) => {
     let uri = '//' + backend + '/api/validate';
     let data;
-    const { 
-      username,
-      secA,
-      isValid,
-    } = this.state;
+    const { username, secA, isValid } = this.state;
     switch (componentIdx) {
     case 0:
       data = {
@@ -226,10 +223,10 @@ class LoginPage extends Component {
       };
       break;
     case 2:
-      data =  {
+      data = {
         type: 'secA',
-        value:  {
-          username, 
+        value: {
+          username,
           secA,
         },
       };
@@ -238,38 +235,43 @@ class LoginPage extends Component {
       break;
     }
     if (data) {
-      axios.post(uri, data).then(
-        (response) => {
+      axios
+        .post(uri, data)
+        .then((response) => {
           if (response.status === 202) {
             isValid[componentIdx] = true;
           } else {
             isValid[componentIdx] = false;
           }
-          this.setState({ 
-            isValid,
-          }, callback);
-        }
-      ).catch(
-        (error) => {
+          this.setState(
+            {
+              isValid,
+            },
+            callback
+          );
+        })
+        .catch((error) => {
           if (debug) {
             console.log('Error in validation:', error);
           }
           isValid[componentIdx] = false;
-          this.setState({ 
-            isValid,
-          }, callback);
-        }
-      );
+          this.setState(
+            {
+              isValid,
+            },
+            callback
+          );
+        });
     }
   };
 
-  handleChange = (input) => ((e) => {
+  handleChange = (input) => (e) => {
     this.setState({
       [input]: e.target.value,
     });
-  });
-    
-  nextStep = (validateFirst) => (() => {
+  };
+
+  nextStep = (validateFirst) => () => {
     const { activeComponent, isValid, showValid } = this.state;
     this.validate(activeComponent, () => {
       let componentIsValid = isValid[activeComponent];
@@ -285,7 +287,7 @@ class LoginPage extends Component {
         showValid,
       });
     });
-  });
+  };
 
   prevStep = () => {
     const { activeComponent } = this.state;
@@ -307,31 +309,63 @@ class LoginPage extends Component {
         password,
       },
     };
-    axios.post(uri, data).then(
-      (response) => {
-        if (response.status === 202) {
-          history.push('/');
+    axios
+      .post(uri, data)
+      .then((response) => {
+        if (response.status === 200) {
+          if (response.body) {
+            if (response.body.ok === true) {
+              isValid[1] = true;
+              this.setState(
+                {
+                  isValid,
+                },
+                () => {
+                  history.push('/');
+                }
+              );
+            } else {
+              isValid[1] = false;
+              this.setState({
+                isValid,
+                passwordErrorMessage: response.body.message
+                  ? response.body.message
+                  : 'The request failed but the server didn\'t tell us why.',
+              });
+            }
+          } else {
+            isValid[1] = false;
+            this.setState({
+              passwordErrorMessage: 'Recieved bodyless response from server.',
+            });
+            if (debug) {
+              console.log('Bodyless response:', response);
+            }
+          }
         } else {
           isValid[1] = false;
+          this.setState({
+            passwordErrorMessage: `Recieved invalid response from server: ${
+              response.status
+            }`,
+          });
         }
-      }
-    ).catch(
-      (error) => {
+      })
+      .catch((error) => {
         if (debug) {
           console.log('Error validating username and password:', error);
-        }  
+        }
         isValid[1] = false;
-      }
-    );
+      });
     this.setState({
       isValid,
     });
-  }
+  };
 
   fetchAssets = (componentIdx, callback) => {
     const { username } = this.state;
-    const uri = '//' + backend +  '/api/fetch';
-    let data =  {};
+    const uri = '//' + backend + '/api/fetch';
+    let data = {};
     switch (componentIdx) {
     case 2:
       // Fetching security question before advance to #2 (ForgotPasswordForm)
@@ -341,22 +375,21 @@ class LoginPage extends Component {
           username,
         },
       };
-      axios.post(uri, data).then(
-        (response) => {
+      axios
+        .post(uri, data)
+        .then((response) => {
           console.log(response);
-          if (response.status === 200)  {
+          if (response.status === 200) {
             // Valid response
           }
           callback();
-        }
-      ).catch(
-        (error) => {
+        })
+        .catch((error) => {
           if (debug) {
             console.log('Error fetching assets:', error);
           }
           callback();
-        }
-      );
+        });
       break;
     default:
       callback();
@@ -365,13 +398,14 @@ class LoginPage extends Component {
 
   getDisplayedComponents = () => {
     const { classes } = this.props;
-    const { 
+    const {
       username,
       password,
       hidePassword,
       secQ,
       secA,
       hideSecA,
+      passwordErrorMessage,
       passwordAttempts,
       errorMessage,
       showValid,
@@ -386,53 +420,57 @@ class LoginPage extends Component {
 
     const components = [
       {
-        content: <UsernameForm 
-          value={username}
-          showValid={showValid[0]}
-          isValid={isValid[0]}
-          handleChange={this.handleChange('username')}
-        />,
-        header: <Fragment>
-          <Typography variant="h4" component="p">
-            Sign in
-          </Typography>
-          <Typography variant="h6" component="p">
-            with your NumHub Account
-          </Typography>
-        </Fragment>,
-        footer: <Button 
-          component={Link} 
-          to="/register"
-        >
-          <Typography>
-            Create An Account
-          </Typography>
-        </Button>,
+        content: (
+          <UsernameForm
+            value={username}
+            showValid={showValid[0]}
+            isValid={isValid[0]}
+            handleChange={this.handleChange('username')}
+          />
+        ),
+        header: (
+          <Fragment>
+            <Typography variant="h4" component="p">
+              Sign in
+            </Typography>
+            <Typography variant="h6" component="p">
+              with your NumHub Account
+            </Typography>
+          </Fragment>
+        ),
+        footer: (
+          <Button component={Link} to="/register">
+            <Typography>Create An Account</Typography>
+          </Button>
+        ),
         nextButton: {
           label: 'Next',
           action: this.nextStep(true),
         },
       },
       {
-        content: <PasswordForm 
-          toggleShowPassword={this.toggleHide}
-          hide={hidePassword}
-          showValid={showValid[1]}
-          isValid={isValid[1]}
-          value={password}
-          handleChange={this.handleChange('password')}
-        />,
-        header: <Typography variant="body1">
-          Enter the password for <span className={classes.boldFace}>{username}</span>.
-        </Typography>,
-        footer: <Button 
-          onClick={this.nextStep(false)}
-          to="/register"
-        >
-          <Typography>
-            Forgot password?
+        content: (
+          <PasswordForm
+            toggleShowPassword={this.toggleHide}
+            hide={hidePassword}
+            erorMessage={passwordErrorMessage}
+            showValid={showValid[1]}
+            isValid={isValid[1]}
+            value={password}
+            handleChange={this.handleChange('password')}
+          />
+        ),
+        header: (
+          <Typography variant="body1">
+            Enter the password for{' '}
+            <span className={classes.boldFace}>{username}</span>.
           </Typography>
-        </Button>,
+        ),
+        footer: (
+          <Button onClick={this.nextStep(false)} to="/register">
+            <Typography>Forgot password?</Typography>
+          </Button>
+        ),
         nextButton: {
           label: 'Sign In',
           action: this.attemptSignIn,
@@ -443,14 +481,16 @@ class LoginPage extends Component {
         },
       },
       {
-        content: <ForgotPasswordForm
-          toggleShowSecA={this.toggleHide}
-          hide={hideSecA}
-          showValid={showValid[2]}
-          isValid={isValid[2]}
-          value={secA}
-          handleChange={this.handleChange('secA')}
-        />,
+        content: (
+          <ForgotPasswordForm
+            toggleShowSecA={this.toggleHide}
+            hide={hideSecA}
+            showValid={showValid[2]}
+            isValid={isValid[2]}
+            value={secA}
+            handleChange={this.handleChange('secA')}
+          />
+        ),
         nextButton: {
           label: 'Reset',
           action() {},
@@ -463,7 +503,7 @@ class LoginPage extends Component {
     ];
 
     return components;
-  }
+  };
 
   render() {
     const { classes } = this.props;
@@ -473,47 +513,49 @@ class LoginPage extends Component {
     return (
       <div className={classes.container}>
         <div className={classes.root}>
-          <Paper
-            className={classes.formBody}
-            elevation={4}
-          >
-            {components.map((component, index) => (index === activeComponent && (
-              <Fragment key={index}>
-                <div className={classes.formHeader}>
-                  <img 
-                    className={classes.logo}
-                    src={BlackLogo} 
-                    alt="NumHub"
-                  />
-                  {component.header && (component.header)}
-                </div>
-                <div className={classes.formContent}>
-                  {component.content}
-                </div>
-                <div className={classes.formFooter}>
-                  <div >
-                    {component.footer && (component.footer)}
-                  </div>
-                  <div className={classes.actionsContainer}>
-                    {component.backButton && (<Button
-                      disabled={index === 0}
-                      onClick={component.backButton.action}
-                      className={classes.button}
-                    >
-                      {component.backButton.label}
-                    </Button>)}
-                    {component.nextButton && (<Button
-                      variant="contained"
-                      color="primary"
-                      onClick={component.nextButton.action}
-                      className={classes.button}
-                    >
-                      {component.nextButton.label}
-                    </Button>)}
-                  </div>
-                </div>
-              </Fragment>
-            )))}
+          <Paper className={classes.formBody} elevation={4}>
+            {components.map(
+              (component, index) =>
+                index === activeComponent && (
+                  <Fragment key={index}>
+                    <div className={classes.formHeader}>
+                      <img
+                        className={classes.logo}
+                        src={BlackLogo}
+                        alt="NumHub"
+                      />
+                      {component.header && component.header}
+                    </div>
+                    <div className={classes.formContent}>
+                      {component.content}
+                    </div>
+                    <div className={classes.formFooter}>
+                      <div>{component.footer && component.footer}</div>
+                      <div className={classes.actionsContainer}>
+                        {component.backButton && (
+                          <Button
+                            disabled={index === 0}
+                            onClick={component.backButton.action}
+                            className={classes.button}
+                          >
+                            {component.backButton.label}
+                          </Button>
+                        )}
+                        {component.nextButton && (
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={component.nextButton.action}
+                            className={classes.button}
+                          >
+                            {component.nextButton.label}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </Fragment>
+                )
+            )}
           </Paper>
         </div>
       </div>
