@@ -34,14 +34,14 @@ module.exports.init = () => {
     CREATE TABLE IF NOT EXISTS \`USERS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
       \`username\` VARCHAR(32) NOT NULL,
-      \`password\` VARCHAR(32) NOT NULL,
+      \`name\` VARCHAR(256) NOT NULL,
+      \`email\` VARCHAR(256) NOT NULL,
+      \`password\` VARCHAR(256) NOT NULL,
       \`admin\` INT NOT NULL DEFAULT 0,
-      \`active\` INT NOT NULL DEFAULT 1,
       \`lockoutCount\` INT DEFAULT 0,
-      \`secQ1\` INT NOT NULL,
-      \`secA1\` VARCHAR(255) NOT NULL,
-      UNIQUE(\`username\`),
-      FOREIGN KEY (\`sec_q1\`) REFERENCES \`SEC_Q\`(\`id\`)
+      \`secQ\` INT NOT NULL,
+      \`secA\` VARCHAR(255) NOT NULL,
+      UNIQUE(\`username\`)
     )`);
     console.log('Created user table...');
     db.run(`\
@@ -124,6 +124,19 @@ module.exports.init = () => {
         'Secondary',
         'Undergraduate',
         'Graduate',
+      ],
+    },
+    {
+      table: 'SEC_Q',
+      field: 'question',
+      values: [
+        'What town does your grandmother live in?',
+        'What was your favourite childhood toy called?',
+        'What was your favourite childhood book?',
+        'What is your father\'s birthday?',
+        'What is your favourite country outside North America?',
+        'What was your childhood dream job?',
+        'When did you begin dating your first girlfriend/boyfriend?',
       ],
     },
   ].map((data) => {
@@ -231,12 +244,24 @@ module.exports.get = (type, params, callback) => {
 };
 
 // TODO
-module.exports.update = () => {};
+module.exports.update = (table, attribute, value, id, callback) => {
+  switch (table) {
+  case 'USERS':
+    db.run(
+      'UPDATE `USERS` SET ?=? WHERE `id`=?',
+      [attribute, value, id],
+      callback
+    );
+    break;
+  default:
+    callback('No table given.');
+    break;
+  }
+};
 
 module.exports.create = (type, params, callback) => {
   switch (type) {
   case 'question':
-    console.log('params', params);
     if (
       params.title &&
         params.content &&
@@ -257,6 +282,41 @@ module.exports.create = (type, params, callback) => {
   case 'answer':
     break;
   case 'user':
+    if (
+      params.name &&
+        params.username &&
+        params.secQ &&
+        params.secA &&
+        params.password &&
+        params.email
+    ) {
+      db.get(
+        'SELECT COUNT(`id`) AS count, MAX(`id`) AS max FROM `USERS`',
+        (error, row) => {
+          if (!error) {
+            const newUID = row.count < 1 ? 1 : row.max + 1;
+            db.run(
+              'INSERT INTO `USERS` (`id`, `name`, `username`, `password`, `secQ`, `secA`,' +
+                  ' `email`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+              [
+                newUID,
+                params.name,
+                params.username,
+                params.password,
+                params.secQ,
+                params.secA,
+                params.email,
+              ],
+              callback
+            );
+          } else {
+            if (settings.debug) {
+              console.log('Error getting user ID count and max:', error);
+            }
+          }
+        }
+      );
+    }
     break;
   case 'tag':
     break;
