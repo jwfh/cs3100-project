@@ -33,7 +33,7 @@ rules:
     - error
     - smart
   no-unsafe-negation:
-    - error 
+    - error
   operator-assignment:
     - error
     - always
@@ -42,7 +42,7 @@ rules:
     - 1tbs
   curly:
     - error
-    - all 
+    - all
   comma-dangle:
     - error
     - always-multiline
@@ -98,7 +98,7 @@ rules:
   no-ex-assign:
     - error
   no-constant-condition:
-    - warn 
+    - warn
   no-dupe-args:
     - error
   no-dupe-class-members:
@@ -147,3 +147,6 @@ rules:
     - error
   no-unused-vars:
     - warn
+  object-curly-spacing:
+    - error
+    - never
