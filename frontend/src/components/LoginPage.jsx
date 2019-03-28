@@ -80,13 +80,13 @@ const styles = (theme) => ({
 const UsernameForm = (props) => (
   <TextField
     label="Username"
-    value={props.value}
-    onChange={props.handleChange}
+    value={props.username}
+    onChange={props.handleChange('username')}
     margin="normal"
     variant="outlined"
     fullWidth
     helperText={
-      !props.showValid || props.isValid ? '' : 'We can\'t find that username.'
+      !props.showValid || props.isValid ? '' : "We can't find that username."
     }
     error={props.showValid && !props.isValid}
   />
@@ -94,7 +94,7 @@ const UsernameForm = (props) => (
 
 UsernameForm.propTypes = {
   handleChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
   isValid: PropTypes.bool.isRequired,
   showValid: PropTypes.bool.isRequired,
 };
@@ -103,8 +103,8 @@ const PasswordForm = (props) => (
   <TextField
     label="Password"
     type={props.hide ? 'password' : 'text'}
-    value={props.value}
-    onChange={props.handleChange}
+    value={props.password}
+    onChange={props.handleChange('password')}
     margin="normal"
     variant="outlined"
     fullWidth
@@ -127,7 +127,7 @@ const PasswordForm = (props) => (
 
 PasswordForm.propTypes = {
   handleChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  password: PropTypes.string.isRequired,
   hide: PropTypes.bool.isRequired,
   toggleShowPassword: PropTypes.func.isRequired,
   isValid: PropTypes.bool.isRequired,
@@ -139,8 +139,8 @@ const ForgotPasswordForm = (props) => (
   <TextField
     label="Security Answer"
     type={props.hide ? 'password' : 'text'}
-    value={props.value}
-    onChange={props.handleChange}
+    value={props.secA}
+    onChange={props.handleChange('secA')}
     margin="normal"
     variant="outlined"
     fullWidth
@@ -165,7 +165,7 @@ const ForgotPasswordForm = (props) => (
 
 ForgotPasswordForm.propTypes = {
   handleChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  secA: PropTypes.string.isRequired,
   hide: PropTypes.bool.isRequired,
   toggleShowSecA: PropTypes.func.isRequired,
   isValid: PropTypes.bool.isRequired,
@@ -177,7 +177,6 @@ class LoginPage extends Component {
     super(props);
     this.state = {
       activeComponent: 0,
-      passwordAttempts: 0,
       username: '',
       password: '',
       hidePassword: true,
@@ -194,18 +193,18 @@ class LoginPage extends Component {
   toggleHide = () => {
     const { activeComponent, hidePassword, hideSecA } = this.state;
     switch (activeComponent) {
-    case 1:
-      this.setState({
-        hidePassword: !hidePassword,
-      });
-      break;
-    case 2:
-      this.setState({
-        hideSecA: !hideSecA,
-      });
-      break;
-    default:
-      break;
+      case 1:
+        this.setState({
+          hidePassword: !hidePassword,
+        });
+        break;
+      case 2:
+        this.setState({
+          hideSecA: !hideSecA,
+        });
+        break;
+      default:
+        break;
     }
   };
 
@@ -214,25 +213,25 @@ class LoginPage extends Component {
     let data;
     const { username, secA, isValid } = this.state;
     switch (componentIdx) {
-    case 0:
-      data = {
-        type: 'username',
-        value: {
-          username,
-        },
-      };
-      break;
-    case 2:
-      data = {
-        type: 'secA',
-        value: {
-          username,
-          secA,
-        },
-      };
-      break;
-    default:
-      break;
+      case 0:
+        data = {
+          type: 'username',
+          value: {
+            username,
+          },
+        };
+        break;
+      case 2:
+        data = {
+          type: 'secA',
+          value: {
+            username,
+            secA,
+          },
+        };
+        break;
+      default:
+        break;
     }
     if (data) {
       axios
@@ -247,7 +246,7 @@ class LoginPage extends Component {
             {
               isValid,
             },
-            callback
+            callback,
           );
         })
         .catch((error) => {
@@ -259,7 +258,7 @@ class LoginPage extends Component {
             {
               isValid,
             },
-            callback
+            callback,
           );
         });
     }
@@ -322,7 +321,7 @@ class LoginPage extends Component {
                 },
                 () => {
                   history.push('/');
-                }
+                },
               );
             } else {
               isValid[1] = false;
@@ -330,7 +329,7 @@ class LoginPage extends Component {
                 isValid,
                 passwordErrorMessage: response.body.message
                   ? response.body.message
-                  : 'The request failed but the server didn\'t tell us why.',
+                  : "The request failed but the server didn't tell us why.",
               });
             }
           } else {
@@ -364,35 +363,36 @@ class LoginPage extends Component {
 
   fetchAssets = (componentIdx, callback) => {
     const { username } = this.state;
-    const uri = '//' + backend + '/api/fetch';
+    const uri = `//${backend}/api/fetch`;
     let data = {};
     switch (componentIdx) {
-    case 2:
-      // Fetching security question before advance to #2 (ForgotPasswordForm)
-      data = {
-        type: 'secQ',
-        value: {
-          username,
-        },
-      };
-      axios
-        .post(uri, data)
-        .then((response) => {
-          console.log(response);
-          if (response.status === 200) {
-            // Valid response
-          }
-          callback();
-        })
-        .catch((error) => {
-          if (debug) {
-            console.log('Error fetching assets:', error);
-          }
-          callback();
-        });
-      break;
-    default:
-      callback();
+      case 2:
+        // Fetching security question before advance to #2 (ForgotPasswordForm)
+        data = {
+          type: 'secQ',
+          value: {
+            username,
+          },
+        };
+        axios
+          .post(uri, data)
+          .then((response) => {
+            console.log(response);
+            if (response.status === 200) {
+              // Valid response
+            }
+            callback();
+          })
+          .catch((error) => {
+            if (debug) {
+              console.log('Error fetching assets:', error);
+            }
+            callback();
+          });
+        break;
+      default:
+        callback();
+        break;
     }
   };
 
@@ -407,25 +407,18 @@ class LoginPage extends Component {
       hideSecA,
       passwordErrorMessage,
       passwordAttempts,
-      errorMessage,
       showValid,
       isValid,
-      activeComponent,
     } = this.state;
-    const values = {
-      username,
-      password,
-      passwordAttempts,
-    };
 
     const components = [
       {
         content: (
           <UsernameForm
-            value={username}
+            username={username}
             showValid={showValid[0]}
             isValid={isValid[0]}
-            handleChange={this.handleChange('username')}
+            handleChange={this.handleChange}
           />
         ),
         header: (
@@ -456,8 +449,8 @@ class LoginPage extends Component {
             erorMessage={passwordErrorMessage}
             showValid={showValid[1]}
             isValid={isValid[1]}
-            value={password}
-            handleChange={this.handleChange('password')}
+            password={password}
+            handleChange={this.handleChange}
           />
         ),
         header: (
@@ -487,8 +480,8 @@ class LoginPage extends Component {
             hide={hideSecA}
             showValid={showValid[2]}
             isValid={isValid[2]}
-            value={secA}
-            handleChange={this.handleChange('secA')}
+            secA={secA}
+            handleChange={this.handleChange}
           />
         ),
         nextButton: {
@@ -554,7 +547,7 @@ class LoginPage extends Component {
                       </div>
                     </div>
                   </Fragment>
-                )
+                ),
             )}
           </Paper>
         </div>

@@ -15,11 +15,6 @@ const styles = (theme) => ({
 });
 
 export class PostPreview extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const { classes } = this.props;
     const { title, bodyPreview } = this.props;
@@ -29,9 +24,7 @@ export class PostPreview extends Component {
           <Typography className={classes.heading}>{title}</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-          <Typography>
-            {bodyPreview}
-          </Typography>
+          <Typography>{bodyPreview}</Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );

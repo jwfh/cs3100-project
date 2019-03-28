@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { Typography } from '@material-ui/core';
 import PostDisplay from './PostDisplay';
 import Paper from '@material-ui/core/Paper';
@@ -24,29 +23,26 @@ export class QuestionFormConfirm extends Component {
     const { classes, values } = this.props;
 
     return (
-      <MuiThemeProvider>
-        <Fragment>
-          <Typography>
-            Please ensure that your problem contains no errors or omissions, and that the tags you included reflect the purpose and subject of the question.
-          </Typography>
-          <Paper className={classes.root}>
-            <PostDisplay 
-              title = { values.title }
-              content = { values.content }
-            />
-            {values.tags.map((tag) => {
-              return (
-                <Chip
-                  key={tag.label}
-                  variant="outlined"
-                  label={tag.label}
-                  className={classes.chip}
-                />
-              );
-            })}
-          </Paper>
-        </Fragment>
-      </MuiThemeProvider>
+      <Fragment>
+        <Typography>
+          Please ensure that your problem contains no errors or omissions, and
+          that the tags you included reflect the purpose and subject of the
+          question.
+        </Typography>
+        <Paper className={classes.root} elevation={1}>
+          <PostDisplay title={values.title} content={values.content} />
+          {values.tags.map((tag) => {
+            return (
+              <Chip
+                key={tag.label}
+                variant="outlined"
+                label={tag.label}
+                className={classes.chip}
+              />
+            );
+          })}
+        </Paper>
+      </Fragment>
     );
   }
 }
@@ -56,6 +52,5 @@ QuestionFormConfirm.propTypes = {
   handleChange: PropTypes.func.isRequired,
   values: PropTypes.object.isRequired,
 };
-
 
 export default withStyles(styles)(QuestionFormConfirm);
