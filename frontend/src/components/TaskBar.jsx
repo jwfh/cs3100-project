@@ -21,6 +21,7 @@ import classNames from 'classnames';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import { withStyles } from '@material-ui/core/styles';
 import WhiteLogo from '../assets/images/logo-02.svg';
+import NotificationsApp from './NotificationItem';
 import {
   sideBarDrawerWidth as drawerWidth,
 } from '../App';
@@ -198,7 +199,7 @@ class TaskBar extends React.Component {
         <MenuItem onClick={this.handleMobileMenuClose}>
           <IconButton color="inherit">
             <Badge badgeContent={11} color="secondary">
-              <NotificationsIcon />
+              <NotificationsIcon/>
             </Badge>
           </IconButton>
           <p>Notifications</p>
@@ -270,7 +271,7 @@ class TaskBar extends React.Component {
             <div className={classes.sectionDesktop}>
               <IconButton color="inherit">
                 <Badge badgeContent={17} color="secondary">
-                  <NotificationsIcon />
+                  <NotificationsIcon/>
                 </Badge>
               </IconButton>
               <IconButton

@@ -13,6 +13,7 @@ import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import PageBody from './components/PageBody';
 import Error404 from './components/Error404';
+import socketIOClient from 'socket.io-client'
 import { 
   Filter1, 
   Filter2, 
