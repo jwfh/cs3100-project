@@ -15,8 +15,14 @@ router.ws('/notify', (ws, req) => {
   notifyConnected.add(ws);
 
   // Perform clean-up for when a WS closes
-  ws.on('close', () => {});
+  ws.on('close', function () {
+    console.log('socket closed: ' + ws.sequence);
+  });
 
   // Perform action when the WS `ws` sends a message
-  ws.on('message', () => {});
-});
+  ws.on('message', function (msg) {
+    let m = ws.sequence + ' ' + msg;
+    console.log(m);
+    ws.send(m);
+  });
+  console.log('socket open: ', ws.sequence);

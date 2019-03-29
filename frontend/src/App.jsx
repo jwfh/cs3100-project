@@ -13,16 +13,15 @@ import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import PageBody from './components/PageBody';
 import Error404 from './components/Error404';
-import socketIOClient from 'socket.io-client'
-import { 
-  Filter1, 
-  Filter2, 
-  Filter3, 
-  Filter4, 
-  Filter5, 
+import {
+  Filter1,
+  Filter2,
+  Filter3,
+  Filter4,
+  Filter5,
   Filter6,
 } from '@material-ui/icons';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'; 
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { SnackbarProvider, withSnackbar } from 'notistack';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -83,12 +82,12 @@ class AppBody extends Component {
   constructor(props) {
     super(props);
     this.siteLevelItems = [
-      this.createSiteLevelItem('Primary', <Filter1/>),
-      this.createSiteLevelItem('Elementary', <Filter2/>),
-      this.createSiteLevelItem('Intermediate', <Filter3/>),
-      this.createSiteLevelItem('Secondary', <Filter4/>),
-      this.createSiteLevelItem('Undergraduate', <Filter5/>),
-      this.createSiteLevelItem('Graduate', <Filter6/>),
+      this.createSiteLevelItem('Primary', <Filter1 />),
+      this.createSiteLevelItem('Elementary', <Filter2 />),
+      this.createSiteLevelItem('Intermediate', <Filter3 />),
+      this.createSiteLevelItem('Secondary', <Filter4 />),
+      this.createSiteLevelItem('Undergraduate', <Filter5 />),
+      this.createSiteLevelItem('Graduate', <Filter6 />),
     ];
     this.state = {
       sideBarOpen: false,
@@ -102,7 +101,7 @@ class AppBody extends Component {
 
   createSiteLevelItem = (label, icon) => {
     let item = {
-      label, 
+      label,
       icon,
     };
     return item;
@@ -123,59 +122,59 @@ class AppBody extends Component {
         <CssBaseline />
         <BrowserRouter>
           <div className={'App'}>
-            <TaskBarWithRouter 
+            <TaskBarWithRouter
               sideBarOpen={this.state.sideBarOpen}
               globalUpdate={this.updateState}
               siteLevelName={this.siteLevelItems[this.state.siteLevelIdx].label}
             />
             <PageBody>
               <Switch>
-                <Route 
+                <Route
                   path="/"
                   render={withRouter((props) => (
-                    <HomePage 
-                      {...props} 
-                      enqueueSnackbar={enqueueSnackbar} 
+                    <HomePage
+                      {...props}
+                      enqueueSnackbar={enqueueSnackbar}
                     />
                   ))}
                   exact
                 />
-                <Route 
+                <Route
                   path="/new"
                   render={withRouter((props) => (
-                    <PostCreatePage 
-                      {...props} 
-                      enqueueSnackbar={enqueueSnackbar} 
-                      level={this.siteLevelItems[this.state.siteLevelIdx].label} 
+                    <PostCreatePage
+                      {...props}
+                      enqueueSnackbar={enqueueSnackbar}
+                      level={this.siteLevelItems[this.state.siteLevelIdx].label}
                     />
                   ))}
                   exact
                 />
-                <Route 
+                <Route
                   path="/register"
                   render={withRouter((props) => (
-                    <RegisterPage 
-                      {...props} 
-                      enqueueSnackbar={enqueueSnackbar} 
+                    <RegisterPage
+                      {...props}
+                      enqueueSnackbar={enqueueSnackbar}
                     />
                   ))}
                   exact
                 />
-                <Route 
+                <Route
                   path="/login"
                   render={withRouter((props) => (
-                    <LoginPage 
-                      {...props} 
-                      enqueueSnackbar={enqueueSnackbar} 
+                    <LoginPage
+                      {...props}
+                      enqueueSnackbar={enqueueSnackbar}
                     />
                   ))}
                   exact
                 />
                 <Route
                   render={withRouter((props) => (
-                    <Error404 
-                      {...props} 
-                      enqueueSnackbar={enqueueSnackbar} 
+                    <Error404
+                      {...props}
+                      enqueueSnackbar={enqueueSnackbar}
                     />
                   ))}
                 />
@@ -206,9 +205,9 @@ const AppWithSnackBar = withSnackbar(AppWithStyles);
 const App = (props) => {
   const { classes } = props;
   return (
-    <SnackbarProvider 
-      maxSnack={3} 
-      hideIconVariant={true} 
+    <SnackbarProvider
+      maxSnack={3}
+      hideIconVariant={true}
       preventDuplicate
       action={[
         <Button className={classes.dismissSnackbarText} size="small">
