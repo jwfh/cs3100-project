@@ -15,11 +15,13 @@ module.exports.validate = (req, res) => {
               res.send({
                 ok: true,
                 exists: false,
+                message: 'We can\'t find that username.',
               });
             } else {
               res.send({
                 ok: true,
                 exists: true,
+                message: 'Username exists.',
               });
             }
           } else {
@@ -92,14 +94,14 @@ module.exports.validate = (req, res) => {
           ok: false,
           message: `Passwords must be at least ${
             settings.passwordPolicy.pMinLength
-          } characters`,
+          } characters.`,
         });
       } else if (candPass.length > settings.passwordPolicy.pMaxLength) {
         res.send({
           ok: false,
           message: `Passwords must be no more than ${
             settings.passwordPolicy.pMaxLength
-          } characters`,
+          } characters.`,
         });
       } else if (
         settings.passwordPolicy.pLetters &&
@@ -107,7 +109,7 @@ module.exports.validate = (req, res) => {
       ) {
         res.send({
           ok: false,
-          message: 'Passwords must contain letters',
+          message: 'Passwords must contain letters.',
         });
       } else if (
         settings.passwordPolicy.pLowercase &&
@@ -115,7 +117,7 @@ module.exports.validate = (req, res) => {
       ) {
         res.send({
           ok: false,
-          message: 'Passwords must contain lowercase letters',
+          message: 'Passwords must contain lowercase letters.',
         });
       } else if (
         settings.passwordPolicy.pUppercase &&
@@ -123,17 +125,17 @@ module.exports.validate = (req, res) => {
       ) {
         res.send({
           ok: false,
-          message: 'Passwords must contain capital letters',
+          message: 'Passwords must contain capital letters.',
         });
       } else if (settings.passwordPolicy.pDigits && !/[0-9]/.test(candPass)) {
         res.send({
           ok: false,
-          message: 'Passwords must contain numbers',
+          message: 'Passwords must contain numbers.',
         });
       } else {
         res.send({
           ok: true,
-          message: 'Password meets complexity requirements',
+          message: 'Password meets complexity requirements.',
         });
       }
     } else {

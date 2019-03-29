@@ -1,10 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import classNames from 'classnames';
-import PageTitle from './PageTitle';
 import { Link } from 'react-router-dom';
-import LinkButton from './LinkButton';
 import { Paper, Typography, Button, TextField } from '@material-ui/core';
 import BlackLogo from '../assets/images/logo-01.svg';
 import { debug, backend } from '../settings';
@@ -13,6 +10,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import FormFunc from './FormFunc';
 
 const styles = (theme) => ({
   container: {
@@ -78,54 +76,59 @@ const styles = (theme) => ({
 });
 
 const UsernameForm = (props) => (
-  <TextField
-    label="Username"
-    value={props.username}
-    onChange={props.handleChange('username')}
-    margin="normal"
-    variant="outlined"
-    fullWidth
-    helperText={
-      !props.showValid || props.isValid ? '' : "We can't find that username."
-    }
-    error={props.showValid && !props.isValid}
-  />
+  <FormFunc onSubmit={props.onReturnKey}>
+    <TextField
+      label="Username"
+      value={props.username}
+      onChange={props.handleChange('username')}
+      margin="normal"
+      variant="outlined"
+      fullWidth
+      helperText={!props.showValid || props.isValid ? '' : props.errorMessage}
+      error={props.showValid && !props.isValid}
+    />
+  </FormFunc>
 );
 
 UsernameForm.propTypes = {
+  onReturnKey: PropTypes.func.isRequired,
   handleChange: PropTypes.func.isRequired,
+  errorMessage: PropTypes.string.isRequired,
   username: PropTypes.string.isRequired,
   isValid: PropTypes.bool.isRequired,
   showValid: PropTypes.bool.isRequired,
 };
 
 const PasswordForm = (props) => (
-  <TextField
-    label="Password"
-    type={props.hide ? 'password' : 'text'}
-    value={props.password}
-    onChange={props.handleChange('password')}
-    margin="normal"
-    variant="outlined"
-    fullWidth
-    helperText={!props.showValid || props.isValid ? '' : props.errorMessage}
-    error={props.showValid && !props.isValid}
-    InputProps={{
-      endAdornment: (
-        <InputAdornment position="end">
-          <IconButton
-            aria-label="Toggle password visibility"
-            onClick={props.toggleShowPassword}
-          >
-            {props.hide ? <Visibility /> : <VisibilityOff />}
-          </IconButton>
-        </InputAdornment>
-      ),
-    }}
-  />
+  <FormFunc onSubmit={props.onReturnKey}>
+    <TextField
+      label="Password"
+      type={props.hide ? 'password' : 'text'}
+      value={props.password}
+      onChange={props.handleChange('password')}
+      margin="normal"
+      variant="outlined"
+      fullWidth
+      helperText={!props.showValid || props.isValid ? '' : props.errorMessage}
+      error={props.showValid && !props.isValid}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="Toggle password visibility"
+              onClick={props.toggleShowPassword}
+            >
+              {props.hide ? <Visibility /> : <VisibilityOff />}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+  </FormFunc>
 );
 
 PasswordForm.propTypes = {
+  onReturnKey: PropTypes.func.isRequired,
   handleChange: PropTypes.func.isRequired,
   password: PropTypes.string.isRequired,
   hide: PropTypes.bool.isRequired,
@@ -136,32 +139,35 @@ PasswordForm.propTypes = {
 };
 
 const ForgotPasswordFormQuestion = (props) => (
-  <TextField
-    label="Security answer"
-    type={props.hide ? 'password' : 'text'}
-    value={props.secA}
-    onChange={props.handleChange('secA')}
-    margin="normal"
-    variant="outlined"
-    fullWidth
-    helperText={!props.showValid || props.isValid ? '' : props.errorMessage}
-    error={props.showValid && !props.isValid}
-    InputProps={{
-      endAdornment: (
-        <InputAdornment position="end">
-          <IconButton
-            aria-label="Toggle password visibility"
-            onClick={props.toggleShowSecA}
-          >
-            {props.hide ? <Visibility /> : <VisibilityOff />}
-          </IconButton>
-        </InputAdornment>
-      ),
-    }}
-  />
+  <FormFunc onSubmit={props.onReturnKey}>
+    <TextField
+      label="Security answer"
+      type={props.hide ? 'password' : 'text'}
+      value={props.secA}
+      onChange={props.handleChange('secA')}
+      margin="normal"
+      variant="outlined"
+      fullWidth
+      helperText={!props.showValid || props.isValid ? '' : props.errorMessage}
+      error={props.showValid && !props.isValid}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="Toggle password visibility"
+              onClick={props.toggleShowSecA}
+            >
+              {props.hide ? <Visibility /> : <VisibilityOff />}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+  </FormFunc>
 );
 
 ForgotPasswordFormQuestion.propTypes = {
+  onReturnKey: PropTypes.func.isRequired,
   handleChange: PropTypes.func.isRequired,
   secA: PropTypes.string.isRequired,
   hide: PropTypes.bool.isRequired,
@@ -172,12 +178,12 @@ ForgotPasswordFormQuestion.propTypes = {
 };
 
 const ForgotPasswordFormReset = (props) => (
-  <Fragment>
+  <FormFunc onSubmit={props.onReturnKey}>
     <TextField
       label="New password"
       type={props.hidePassword ? 'password' : 'text'}
-      value={props.newPassword}
-      onChange={props.handleChange('newPassword')}
+      value={props.resetPassword}
+      onChange={props.handleChange('resetPassword')}
       margin="normal"
       variant="outlined"
       fullWidth
@@ -192,7 +198,7 @@ const ForgotPasswordFormReset = (props) => (
           <InputAdornment position="end">
             <IconButton
               aria-label="Toggle password visibility"
-              onClick={props.toggleShowResetPass}
+              onClick={props.toggleShowResetPassword}
             >
               {props.hide ? <Visibility /> : <VisibilityOff />}
             </IconButton>
@@ -203,8 +209,8 @@ const ForgotPasswordFormReset = (props) => (
     <TextField
       label="Confirm new password"
       type={props.hideConfirm ? 'password' : 'text'}
-      value={props.newPasswordConfirm}
-      onChange={props.handleChange('newPasswordConfirm')}
+      value={props.resetConfirm}
+      onChange={props.handleChange('resetConfirm')}
       margin="normal"
       variant="outlined"
       fullWidth
@@ -227,14 +233,17 @@ const ForgotPasswordFormReset = (props) => (
         ),
       }}
     />
-  </Fragment>
+  </FormFunc>
 );
 
-ForgotPasswordFormQuestion.propTypes = {
+ForgotPasswordFormReset.propTypes = {
+  onReturnKey: PropTypes.func.isRequired,
+  resetPassword: PropTypes.string.isRequired,
+  resetConfirm: PropTypes.string.isRequired,
   handleChange: PropTypes.func.isRequired,
   hidePassword: PropTypes.bool.isRequired,
   hideConfirm: PropTypes.bool.isRequired,
-  toggleShowResetPass: PropTypes.func.isRequired,
+  toggleShowResetPassword: PropTypes.func.isRequired,
   toggleShowResetConfirm: PropTypes.func.isRequired,
   errorMessagePassword: PropTypes.string.isRequired,
   errorMessageConfirm: PropTypes.string.isRequired,
@@ -249,15 +258,20 @@ class LoginPage extends Component {
     this.state = {
       activeComponent: 0,
       username: '',
+      usernameErrorMessage: '',
       password: '',
-      hidePassword: true,
+      hideField: {
+        password: true,
+        secA: true,
+        resetPassword: true,
+        resetConfirm: true,
+      },
       passwordErrorMessage: '',
       secQ: '',
       secA: '',
       secAErrorMessage: '',
-      hideSecA: true,
-      hideResetConfirm: true,
-      hideResetPassword: true,
+      resetPassword: '',
+      resetConfirm: '',
       resetPassErrorMessage: '',
       resetConfirmErrorMessage: '',
       showValid: [false, false, false, false],
@@ -265,28 +279,33 @@ class LoginPage extends Component {
     };
   }
 
-  toggleHide = () => {
-    const { activeComponent, hidePassword, hideSecA } = this.state;
-    switch (activeComponent) {
-      case 1:
-        this.setState({
-          hidePassword: !hidePassword,
-        });
-        break;
-      case 2:
-        this.setState({
-          hideSecA: !hideSecA,
-        });
+  toggleHide = (field) => () => {
+    const { hideField } = this.state;
+    switch (field) {
+      case 'password':
+      case 'secA':
+      case 'resetPassword':
+      case 'resetConfirm':
+        hideField[field] = !hideField[field];
         break;
       default:
         break;
     }
+    this.setState({
+      hideField,
+    });
   };
 
   validate = (componentIdx, callback) => {
     let uri = '//' + backend + '/api/validate';
     let data;
-    const { username, secA, isValid, secAErrorMessage } = this.state;
+    const {
+      username,
+      secA,
+      isValid,
+      newPassword,
+      newPasswordConfirm,
+    } = this.state;
     switch (componentIdx) {
       case 0:
         data = {
@@ -316,12 +335,23 @@ class LoginPage extends Component {
               } else {
                 // Username does not exist in the database
                 isValid[0] = false;
-                this.setState(
-                  {
-                    isValid,
-                  },
-                  callback,
-                );
+                if ('message' in response.data) {
+                  this.setState(
+                    {
+                      isValid,
+                      usernameErrorMessage: response.data.message,
+                    },
+                    callback,
+                  );
+                } else {
+                  this.setState(
+                    {
+                      isValid,
+                      usernameErrorMessage: "We can't find that username.",
+                    },
+                    callback,
+                  );
+                }
               }
             } else {
               // Response does not contain all required fields
@@ -434,6 +464,93 @@ class LoginPage extends Component {
           });
         break;
       case 3:
+        data = {
+          type: 'password',
+          value: {
+            newPassword,
+          },
+        };
+        isValid[3].confirm = newPassword === newPasswordConfirm;
+        let resetConfirmErrorMessage =
+          newPassword === newPasswordConfirm
+            ? ''
+            : 'Please make sure that your passwords match';
+        axios
+          .post(uri, data)
+          .then((response) => {
+            if (
+              response.status === 200 &&
+              response.data &&
+              'ok' in response.data
+            ) {
+              if (response.data.ok === true) {
+                // Password meets complexity requirements
+                isValid[3].password = true;
+                this.setState(
+                  {
+                    isValid,
+                    resetPassErrorMessage: '',
+                    resetConfirmErrorMessage,
+                  },
+                  callback,
+                );
+              } else {
+                // Password does not meet complexity requirements
+                isValid[3].password = false;
+                if ('message' in response.data) {
+                  this.setState(
+                    {
+                      isValid,
+                      resetPassErrorMessage: response.data.message,
+                    },
+                    callback,
+                  );
+                } else {
+                  if (debug) {
+                    console.log(
+                      "Didn't get message in response from password validation",
+                    );
+                  }
+                  this.setState(
+                    {
+                      isValid,
+                      resetPassErrorMessage:
+                        'Your password does not meet complexity requirements',
+                    },
+                    callback,
+                  );
+                }
+              }
+            } else {
+              // Response does not contain all required fields
+              if (debug) {
+                console.log(
+                  'Response lacking required data:',
+                  response.status,
+                  response,
+                );
+                isValid[2] = false;
+                this.setState(
+                  {
+                    isValid,
+                  },
+                  callback,
+                );
+              }
+            }
+          })
+          .catch((error) => {
+            if (debug) {
+              console.log('Error in validation:', error);
+            }
+            isValid[componentIdx] = false;
+            this.setState(
+              {
+                isValid,
+              },
+              callback,
+            );
+          });
         break;
       default:
         break;
@@ -547,6 +664,8 @@ class LoginPage extends Component {
     });
   };
 
+  attemptReset = () => {};
+
   fetchAssets = (componentIdx, callback) => {
     const { username } = this.state;
     const uri = `//${backend}/api/fetch`;
@@ -563,7 +682,6 @@ class LoginPage extends Component {
         axios
           .post(uri, data)
           .then((response) => {
-            console.log(response);
             if (
               response.status === 200 &&
               response.data.ok === true &&
@@ -597,14 +715,13 @@ class LoginPage extends Component {
     const {
       username,
       password,
-      hidePassword,
+      hideField,
       secQ,
       secA,
-      hideSecA,
+      resetPassword,
+      resetConfirm,
       passwordErrorMessage,
       secAErrorMessage,
-      hideResetPassword,
-      hideResetConfirm,
       resetPassErrorMessage,
       resetConfirmErrorMessage,
       showValid,
@@ -615,6 +732,7 @@ class LoginPage extends Component {
       {
         content: (
           <UsernameForm
+            onReturnKey={this.nextStep(true)}
             username={username}
             showValid={showValid[0]}
             isValid={isValid[0]}
@@ -644,8 +762,9 @@ class LoginPage extends Component {
       {
         content: (
           <PasswordForm
-            toggleShowPassword={this.toggleHide}
-            hide={hidePassword}
+            onReturnKey={this.attemptSignIn}
+            toggleShowPassword={this.toggleHide('password')}
+            hide={hideField.password}
             errorMessage={passwordErrorMessage}
             showValid={showValid[1]}
             isValid={isValid[1]}
@@ -690,8 +809,9 @@ class LoginPage extends Component {
         ),
         content: (
           <ForgotPasswordFormQuestion
-            toggleShowSecA={this.toggleHide}
-            hide={hideSecA}
+            onReturnKey={this.nextStep(true)}
+            toggleShowSecA={this.toggleHide('secA')}
+            hide={hideField.secA}
             errorMessage={secAErrorMessage}
             showValid={showValid[2]}
             isValid={isValid[2]}
@@ -715,14 +835,19 @@ class LoginPage extends Component {
               Reset your password
             </Typography>
             <Typography variant="h6" component="p">
-              But first, {secQ.charAt(0).toLowerCase() + secQ.slice(1)}
+              Great! Now create a new password
             </Typography>
           </Fragment>
         ),
         content: (
           <ForgotPasswordFormReset
-            hidePassword={hideResetPassword}
-            hideConfirm={hideResetConfirm}
+            onReturnKey={this.attemptReset}
+            resetPassword={resetPassword}
+            resetConfirm={resetConfirm}
+            toggleShowResetPassword={this.toggleHide('resetPassword')}
+            toggleShowResetConfirm={this.toggleHide('resetConfirm')}
+            hidePassword={hideField.resetPassword}
+            hideConfirm={hideField.resetConfirm}
             errorMessagePassword={resetPassErrorMessage}
             errorMessageConfirm={resetConfirmErrorMessage}
             showValid={showValid[3]}
@@ -805,6 +930,7 @@ class LoginPage extends Component {
 
 LoginPage.propTypes = {
   classes: PropTypes.object.isRequired,
+  globalUpdate: PropTypes.func.isRequired,
   enqueueSnackbar: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
 };
