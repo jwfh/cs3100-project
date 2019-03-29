@@ -3,7 +3,7 @@ import {
   IconButton,
   MenuItem,
   Menu,
-} from '@material-ui/core'; import { withStyles } from '@material-ui/core/styles';
+} from '@material-ui/core';
 
 class MenuButton extends React.Component {
   state = {
@@ -56,8 +56,6 @@ class MenuButton extends React.Component {
           onClose={this.handleClose}
         >
           {listItems}
-
-
         </Menu>
       </div>
     );

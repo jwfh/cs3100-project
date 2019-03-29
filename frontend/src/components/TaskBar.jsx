@@ -18,7 +18,8 @@ import {
   Search as SearchIcon,
 } from '@material-ui/icons';
 import classNames from 'classnames';
-import MenuButton from './menuButton';
+import MenuButton from './AccountBar';
+import NotificationBar from './NotificationBar';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import { withStyles } from '@material-ui/core/styles';
 import WhiteLogo from '../assets/images/logo-02.svg';
@@ -198,14 +199,13 @@ class TaskBar extends React.Component {
         open={isMobileMenuOpen}
         onClose={this.handleMenuClose}
       >
-        <MenuItem onClick={this.handleMobileMenuClose}>
-          <IconButton color="inherit">
-            <Badge badgeContent={11} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+        <NotificationBar onClick={this.handleMobileMenuClose}>
+          <Badge badgeContent={11} color="secondary">
+            <NotificationsIcon />
+          </Badge>
+
           <p>Notifications</p>
-        </MenuItem>
+        </NotificationBar>
         <MenuButton onClick={this.handleProfileMenuOpen}>
           <AccountCircle items={['Profile', 'My account']} />
           <p>Profile</p>

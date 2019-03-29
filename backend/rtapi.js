@@ -26,3 +26,4 @@ router.ws('/notify', (ws, req) => {
     ws.send(m);
   });
   console.log('socket open: ', ws.sequence);
+});
