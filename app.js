@@ -16,7 +16,7 @@ app.use(compression());
 // https://www.npmjs.com/package/express-rate-limit
 const limiter = rateLimit({
   // 1 minute
-  windowMs: 60 * 1000, 
+  windowMs: 60 * 1000,
   // limit each IP to 100 requests per windowMs
   max: 100,
 });
@@ -26,7 +26,7 @@ app.use(limiter);
 // app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(jsonParser);
 
@@ -40,13 +40,13 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
 });
 
-
 // catch 404 and forward to error handler
 app.use(function(_req, _res, next) {
   next(createError(404));
 });
 
 // error handler
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, _next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;

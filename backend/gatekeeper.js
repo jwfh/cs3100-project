@@ -19,7 +19,7 @@ const register = (req, res) => {
         username: req.body.username,
         email: req.body.email,
         password: sha256(req.body.password),
-        secA: sha256(req.body.secA),
+        secA: sha256(req.body.secA.toLowerCase().replace(/\s/g, '')),
         secQ: req.body.secQ,
       },
       (error) => {
@@ -46,7 +46,7 @@ const register = (req, res) => {
 
 const signIn = (req, res) => {
   if (req.body.username && req.body.password) {
-    db.get('userByUsername', { username: req.body.username }, (error, row) => {
+    db.get('userByUsername', {username: req.body.username}, (error, row) => {
       if (!error) {
         if (row.lockoutCount < 10) {
           if (sha256(req.body.password) === row.password) {

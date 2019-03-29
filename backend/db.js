@@ -225,10 +225,13 @@ module.exports.get = (type, params, callback) => {
         [params.username],
         (error, row) => {
           if (!error) {
-            console.log(row);
+            if (settings.debug) {
+              console.log('User is', row);
+            }
+            callback(error, row);
           } else {
             if (settings.debug) {
-              console.log(error);
+              console.log('Error:', error);
             }
             callback('Erorr contacting database.', null);
           }

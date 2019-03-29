@@ -5,9 +5,32 @@ module.exports.fetch = (req, res) => {
   switch (req.body.type) {
   case 'secQ':
     if (req.body.value && req.body.value.username) {
-      db.get('secQ', req.body.username, (error, row) => {
-        
-      });
+      db.get(
+        'userByUsername',
+        {username: req.body.value.username},
+        (error, row) => {
+          if (!error) {
+            if (typeof row === 'undefined') {
+              res.send({
+                ok: false,
+                message: 'User does not exist.',
+              });
+            } else {
+              // Got a user
+              res.send({
+                ok: true,
+                secQ: row.secQ,
+                message: 'User exists',
+              });
+            }
+          } else {
+            res.send({
+              ok: false,
+              message: `Error contacting database: ${error}`,
+            });
+          }
+        }
+      );
     } else {
       res.status(400);
       res.type('text');
@@ -34,7 +57,10 @@ module.exports.all = (req, res) => {
       } else {
         res.status(500);
         res.type('text');
-        res.send('Unable to retrieve ' + req.body.type + 's from database:', error);
+        res.send(
+          'Unable to retrieve ' + req.body.type + 's from database:',
+          error
+        );
       }
     });
     break;

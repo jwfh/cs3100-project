@@ -135,18 +135,16 @@ PasswordForm.propTypes = {
   showValid: PropTypes.bool.isRequired,
 };
 
-const ForgotPasswordForm = (props) => (
+const ForgotPasswordFormQuestion = (props) => (
   <TextField
-    label="Security Answer"
+    label="Security answer"
     type={props.hide ? 'password' : 'text'}
     value={props.secA}
     onChange={props.handleChange('secA')}
     margin="normal"
     variant="outlined"
     fullWidth
-    helperText={
-      !props.showValid || props.isValid ? '' : 'Incorrect security answer.'
-    }
+    helperText={!props.showValid || props.isValid ? '' : props.errorMessage}
     error={props.showValid && !props.isValid}
     InputProps={{
       endAdornment: (
@@ -163,12 +161,85 @@ const ForgotPasswordForm = (props) => (
   />
 );
 
-ForgotPasswordForm.propTypes = {
+ForgotPasswordFormQuestion.propTypes = {
   handleChange: PropTypes.func.isRequired,
   secA: PropTypes.string.isRequired,
   hide: PropTypes.bool.isRequired,
   toggleShowSecA: PropTypes.func.isRequired,
+  errorMessage: PropTypes.string.isRequired,
   isValid: PropTypes.bool.isRequired,
+  showValid: PropTypes.bool.isRequired,
+};
+
+const ForgotPasswordFormReset = (props) => (
+  <Fragment>
+    <TextField
+      label="New password"
+      type={props.hidePassword ? 'password' : 'text'}
+      value={props.newPassword}
+      onChange={props.handleChange('newPassword')}
+      margin="normal"
+      variant="outlined"
+      fullWidth
+      helperText={
+        !props.showValid || props.isValidPassword
+          ? ''
+          : props.errorMessagePassword
+      }
+      error={props.showValid && !props.isValid}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="Toggle password visibility"
+              onClick={props.toggleShowResetPass}
+            >
+              {props.hide ? <Visibility /> : <VisibilityOff />}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+    <TextField
+      label="Confirm new password"
+      type={props.hideConfirm ? 'password' : 'text'}
+      value={props.newPasswordConfirm}
+      onChange={props.handleChange('newPasswordConfirm')}
+      margin="normal"
+      variant="outlined"
+      fullWidth
+      helperText={
+        !props.showValid || props.isValidConfirm
+          ? ''
+          : props.errorMessageConfirm
+      }
+      error={props.showValid && !props.isValid}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="Toggle password visibility"
+              onClick={props.toggleShowResetConfirm}
+            >
+              {props.hide ? <Visibility /> : <VisibilityOff />}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+  </Fragment>
+);
+
+ForgotPasswordFormQuestion.propTypes = {
+  handleChange: PropTypes.func.isRequired,
+  hidePassword: PropTypes.bool.isRequired,
+  hideConfirm: PropTypes.bool.isRequired,
+  toggleShowResetPass: PropTypes.func.isRequired,
+  toggleShowResetConfirm: PropTypes.func.isRequired,
+  errorMessagePassword: PropTypes.string.isRequired,
+  errorMessageConfirm: PropTypes.string.isRequired,
+  isValidPassword: PropTypes.bool.isRequired,
+  isValidConfirm: PropTypes.bool.isRequired,
   showValid: PropTypes.bool.isRequired,
 };
 
@@ -183,10 +254,14 @@ class LoginPage extends Component {
       passwordErrorMessage: '',
       secQ: '',
       secA: '',
+      secAErrorMessage: '',
       hideSecA: true,
-      errorMessage: '',
-      showValid: [false, false, false],
-      isValid: [false, false],
+      hideResetConfirm: true,
+      hideResetPassword: true,
+      resetPassErrorMessage: '',
+      resetConfirmErrorMessage: '',
+      showValid: [false, false, false, false],
+      isValid: [false, false, false, { password: false, confirm: false }],
     };
   }
 
@@ -211,7 +286,7 @@ class LoginPage extends Component {
   validate = (componentIdx, callback) => {
     let uri = '//' + backend + '/api/validate';
     let data;
-    const { username, secA, isValid } = this.state;
+    const { username, secA, isValid, secAErrorMessage } = this.state;
     switch (componentIdx) {
       case 0:
         data = {
@@ -220,6 +295,64 @@ class LoginPage extends Component {
             username,
           },
         };
+        axios
+          .post(uri, data)
+          .then((response) => {
+            if (
+              response.status === 200 &&
+              response.data &&
+              response.data.ok === true &&
+              'exists' in response.data
+            ) {
+              if (response.data.exists) {
+                // Username exists in the database
+                isValid[0] = true;
+                this.setState(
+                  {
+                    isValid,
+                  },
+                  callback,
+                );
+              } else {
+                // Username does not exist in the database
+                isValid[0] = false;
+                this.setState(
+                  {
+                    isValid,
+                  },
+                  callback,
+                );
+              }
+            } else {
+              // Response does not contain all required fields
+              if (debug) {
+                console.log(
+                  'Response lacking required data:',
+                  response.status,
+                  response,
+                );
+                isValid[0] = false;
+                this.setState(
+                  {
+                    isValid,
+                  },
+                  callback,
+                );
+              }
+            }
+          })
+          .catch((error) => {
+            if (debug) {
+              console.log('Error in validation:', error);
+            }
+            isValid[componentIdx] = false;
+            this.setState(
+              {
+                isValid,
+              },
+              callback,
+            );
+          });
         break;
       case 2:
         data = {
@@ -229,38 +362,81 @@ class LoginPage extends Component {
             secA,
           },
         };
+        axios
+          .post(uri, data)
+          .then((response) => {
+            if (
+              response.status === 200 &&
+              response.data &&
+              'ok' in response.data
+            ) {
+              if (response.data.ok === true) {
+                // Username exists and answer was correct
+                isValid[2] = true;
+                this.setState(
+                  {
+                    isValid,
+                    secAErrorMessage: '',
+                  },
+                  callback,
+                );
+              } else {
+                // Username does not exist in the database
+                // Or answer was not correct
+                if ('message' in response.data) {
+                  isValid[2] = false;
+                  this.setState(
+                    {
+                      isValid,
+                      secAErrorMessage: response.data.message,
+                    },
+                    callback,
+                  );
+                } else {
+                  isValid[2] = false;
+                  this.setState(
+                    {
+                      isValid,
+                    },
+                    callback,
+                  );
+                }
+              }
+            } else {
+              // Response does not contain all required fields
+              if (debug) {
+                console.log(
+                  'Response lacking required data:',
+                  response.status,
+                  response,
+                );
+                isValid[2] = false;
+                this.setState(
+                  {
+                    isValid,
+                  },
+                  callback,
+                );
+              }
+            }
+          })
+          .catch((error) => {
+            if (debug) {
+              console.log('Error in validation:', error);
+            }
+            isValid[componentIdx] = false;
+            this.setState(
+              {
+                isValid,
+              },
+              callback,
+            );
+          });
+        break;
+      case 3:
         break;
       default:
         break;
-    }
-    if (data) {
-      axios
-        .post(uri, data)
-        .then((response) => {
-          if (response.status === 202) {
-            isValid[componentIdx] = true;
-          } else {
-            isValid[componentIdx] = false;
-          }
-          this.setState(
-            {
-              isValid,
-            },
-            callback,
-          );
-        })
-        .catch((error) => {
-          if (debug) {
-            console.log('Error in validation:', error);
-          }
-          isValid[componentIdx] = false;
-          this.setState(
-            {
-              isValid,
-            },
-            callback,
-          );
-        });
     }
   };
 
@@ -272,20 +448,30 @@ class LoginPage extends Component {
 
   nextStep = (validateFirst) => () => {
     const { activeComponent, isValid, showValid } = this.state;
-    this.validate(activeComponent, () => {
-      let componentIsValid = isValid[activeComponent];
-      if (!validateFirst || componentIsValid) {
-        this.fetchAssets(activeComponent + 1, () => {
-          this.setState({
-            activeComponent: activeComponent + 1,
+    if (validateFirst) {
+      this.validate(activeComponent, () => {
+        let componentIsValid = isValid[activeComponent];
+        showValid[activeComponent] = true;
+        if (componentIsValid) {
+          this.fetchAssets(activeComponent + 1, () => {
+            this.setState({
+              activeComponent: activeComponent + 1,
+              showValid,
+            });
           });
-        });
-      }
-      showValid[activeComponent] = true;
-      this.setState({
-        showValid,
+        } else {
+          this.setState({
+            showValid,
+          });
+        }
       });
-    });
+    } else {
+      this.fetchAssets(activeComponent + 1, () => {
+        this.setState({
+          activeComponent: activeComponent + 1,
+        });
+      });
+    }
   };
 
   prevStep = () => {
@@ -367,7 +553,7 @@ class LoginPage extends Component {
     let data = {};
     switch (componentIdx) {
       case 2:
-        // Fetching security question before advance to #2 (ForgotPasswordForm)
+        // Fetching security question before advance to #2 (ForgotPasswordFormQuestion)
         data = {
           type: 'secQ',
           value: {
@@ -378,8 +564,18 @@ class LoginPage extends Component {
           .post(uri, data)
           .then((response) => {
             console.log(response);
-            if (response.status === 200) {
+            if (
+              response.status === 200 &&
+              response.data.ok === true &&
+              response.data.secQ
+            ) {
               // Valid response
+              this.setState(
+                {
+                  secQ: response.data.secQ,
+                },
+                callback,
+              );
             }
             callback();
           })
@@ -406,7 +602,11 @@ class LoginPage extends Component {
       secA,
       hideSecA,
       passwordErrorMessage,
-      passwordAttempts,
+      secAErrorMessage,
+      hideResetPassword,
+      hideResetConfirm,
+      resetPassErrorMessage,
+      resetConfirmErrorMessage,
       showValid,
       isValid,
     } = this.state;
@@ -446,7 +646,7 @@ class LoginPage extends Component {
           <PasswordForm
             toggleShowPassword={this.toggleHide}
             hide={hidePassword}
-            erorMessage={passwordErrorMessage}
+            errorMessage={passwordErrorMessage}
             showValid={showValid[1]}
             isValid={isValid[1]}
             password={password}
@@ -454,13 +654,17 @@ class LoginPage extends Component {
           />
         ),
         header: (
-          <Typography variant="body1">
-            Enter the password for{' '}
-            <span className={classes.boldFace}>{username}</span>.
-          </Typography>
+          <Fragment>
+            <Typography variant="h4" component="p">
+              Welcome, <span className={classes.boldFace}>{username}</span>
+            </Typography>
+            <Typography variant="h6" component="p">
+              Enter your password below
+            </Typography>
+          </Fragment>
         ),
         footer: (
-          <Button onClick={this.nextStep(false)} to="/register">
+          <Button onClick={this.nextStep(false)}>
             <Typography>Forgot password?</Typography>
           </Button>
         ),
@@ -474,10 +678,21 @@ class LoginPage extends Component {
         },
       },
       {
+        header: (
+          <Fragment>
+            <Typography variant="h4" component="p">
+              Reset your password
+            </Typography>
+            <Typography variant="h6" component="p">
+              But first, {secQ.charAt(0).toLowerCase() + secQ.slice(1)}
+            </Typography>
+          </Fragment>
+        ),
         content: (
-          <ForgotPasswordForm
+          <ForgotPasswordFormQuestion
             toggleShowSecA={this.toggleHide}
             hide={hideSecA}
+            errorMessage={secAErrorMessage}
             showValid={showValid[2]}
             isValid={isValid[2]}
             secA={secA}
@@ -485,8 +700,40 @@ class LoginPage extends Component {
           />
         ),
         nextButton: {
+          label: 'Next',
+          action: this.nextStep(true),
+        },
+        backButton: {
+          label: 'Back',
+          action: this.prevStep,
+        },
+      },
+      {
+        header: (
+          <Fragment>
+            <Typography variant="h4" component="p">
+              Reset your password
+            </Typography>
+            <Typography variant="h6" component="p">
+              But first, {secQ.charAt(0).toLowerCase() + secQ.slice(1)}
+            </Typography>
+          </Fragment>
+        ),
+        content: (
+          <ForgotPasswordFormReset
+            hidePassword={hideResetPassword}
+            hideConfirm={hideResetConfirm}
+            errorMessagePassword={resetPassErrorMessage}
+            errorMessageConfirm={resetConfirmErrorMessage}
+            showValid={showValid[3]}
+            isValidPassword={isValid[3].password}
+            isValidConfirm={isValid[3].confirm}
+            handleChange={this.handleChange}
+          />
+        ),
+        nextButton: {
           label: 'Reset',
-          action() {},
+          action: this.attemptReset,
         },
         backButton: {
           label: 'Back',
