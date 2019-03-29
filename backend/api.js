@@ -1,3 +1,4 @@
+// API
 const express = require('express');
 // eslint-disable-next-line
 const router = express.Router();
@@ -25,4 +26,3 @@ router.post('/gatekeeper', gatekeeper.gatekeeper);
 router.post('/validate', validate.validate);
 
 module.exports = router;
-

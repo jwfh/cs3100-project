@@ -16,7 +16,7 @@ app.use(compression());
 // https://www.npmjs.com/package/express-rate-limit
 const limiter = rateLimit({
   // 1 minute
-  windowMs: 60 * 1000, 
+  windowMs: 60 * 1000,
   // limit each IP to 100 requests per windowMs
   max: 100,
 });
@@ -26,20 +26,21 @@ app.use(limiter);
 // app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(jsonParser);
 
 // API routes to backend logic
 const apiRouter = require('./backend/api');
 app.use('/api', apiRouter);
+const wsRouter = require('./backend/rtapi');
+app.use('/rtapi', wsRouter);
 
 // Serve static React frontend
 app.use(express.static(path.join(__dirname, 'frontend/build')));
 app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
 });
-
 
 // catch 404 and forward to error handler
 app.use(function(_req, _res, next) {
