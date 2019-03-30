@@ -30,6 +30,9 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(jsonParser);
 
+const robots = require('./backend/robots');
+app.use('/robots.txt', robots.txt);
+
 // API routes to backend logic
 const apiRouter = require('./backend/api');
 app.use('/api', apiRouter);

@@ -25,4 +25,3 @@ router.post('/gatekeeper', gatekeeper.gatekeeper);
 router.post('/validate', validate.validate);
 
 module.exports = router;
-
