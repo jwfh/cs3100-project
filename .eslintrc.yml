@@ -1,0 +1,152 @@
+env:
+  browser: true
+  es6: true
+  node: true
+extends: 'eslint:recommended'
+globals:
+  Atomics: readonly
+  SharedArrayBuffer: readonly
+parser: babel-eslint
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: 2018
+  sourceType: module
+plugins:
+  - react
+rules:
+  indent:
+    - error
+    - 2
+  linebreak-style:
+    - error
+    - unix
+  quotes:
+    - error
+    - single
+  semi:
+    - error
+    - always
+  no-console:
+    - off
+  eqeqeq:
+    - error
+    - smart
+  no-unsafe-negation:
+    - error
+  operator-assignment:
+    - error
+    - always
+  brace-style:
+    - error
+    - 1tbs
+  curly:
+    - error
+    - all
+  comma-dangle:
+    - error
+    - always-multiline
+  jsx-quotes:
+    - error
+    - prefer-double
+  object-shorthand:
+    - error
+    - always
+  camelcase:
+    - error
+    - properties: always
+  no-inner-declarations:
+    - error
+    - functions
+  use-isnan:
+    - error
+  block-spacing:
+    - error
+    - always
+  no-this-before-super:
+    - error
+  no-cond-assign:
+    - error
+    - always
+  no-return-assign:
+    - error
+    - except-parens
+  no-dupe-keys:
+    - error
+  no-extra-semi:
+    - error
+  no-func-assign:
+    - error
+  no-loop-func:
+    - error
+  no-multi-str:
+    - error
+  no-redeclare:
+    - error
+  no-sparse-arrays:
+    - error
+  no-fallthrough:
+    - error
+  no-duplicate-case:
+    - error
+  no-undef:
+    - error
+  no-unreachable:
+    - warn
+  no-undefined:
+    - error
+  no-ex-assign:
+    - error
+  no-constant-condition:
+    - warn
+  no-dupe-args:
+    - error
+  no-dupe-class-members:
+    - error
+  no-eval:
+    - warn
+  no-extra-boolean-cast:
+    - error
+  require-yield:
+    - error
+  no-inline-comments:
+    - error
+  valid-typeof:
+    - error
+  no-irregular-whitespace:
+    - error
+    - skipComments: true
+  no-mixed-spaces-and-tabs:
+    - error
+  no-class-assign:
+    - error
+  no-const-assign:
+    - error
+  no-negated-in-lhs:
+    - error
+  block-scoped-var:
+    - error
+  no-use-before-define:
+    - error
+  wrap-iife:
+    - error
+    - inside
+  new-cap:
+    - warn
+    - properties: false
+  arrow-parens:
+    - error
+    - always
+  arrow-spacing:
+    - error
+  constructor-super:
+    - error
+  react/jsx-uses-vars:
+    - error
+  react/jsx-uses-react:
+    - error
+  no-unused-vars:
+    - warn
+  object-curly-spacing:
+    - error
+    - never

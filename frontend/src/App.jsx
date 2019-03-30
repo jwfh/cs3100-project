@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import './assets/style/Europa.scss';
@@ -11,18 +11,19 @@ import HomePage from './components/HomePage';
 import PostCreatePage from './components/PostCreatePage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
-import ForgotPasswordPage from './components/ForgotPasswordPage';
 import PageBody from './components/PageBody';
 import Error404 from './components/Error404';
-import { 
-  Filter1, 
-  Filter2, 
-  Filter3, 
-  Filter4, 
-  Filter5, 
+import {
+  Filter1,
+  Filter2,
+  Filter3,
+  Filter4,
+  Filter5,
   Filter6,
 } from '@material-ui/icons';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'; 
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { SnackbarProvider, withSnackbar } from 'notistack';
+import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 export const sideBarDrawerWidth = 240;
@@ -64,109 +65,160 @@ const theme = createMuiTheme({
   },
 });
 
+// eslint-disable-next-line no-unused-vars
 const styles = (theme) => ({
   a: {
     color: '#00B7FF',
   },
+  dismissSnackbarText: {
+    color: 'white',
+  },
 });
 
-class App extends Component {
+const TaskBarWithRouter = withRouter(TaskBar);
 
+class AppBody extends Component {
   constructor(props) {
     super(props);
     this.siteLevelItems = [
-      this.createSiteLevelItem('Primary', <Filter1/>),
-      this.createSiteLevelItem('Elementary', <Filter2/>),
-      this.createSiteLevelItem('Intermediate', <Filter3/>),
-      this.createSiteLevelItem('Secondary', <Filter4/>),
-      this.createSiteLevelItem('Undergraduate', <Filter5/>),
-      this.createSiteLevelItem('Graduate', <Filter6/>),
+      this.createSiteLevelItem('Primary', <Filter1 />),
+      this.createSiteLevelItem('Elementary', <Filter2 />),
+      this.createSiteLevelItem('Intermediate', <Filter3 />),
+      this.createSiteLevelItem('Secondary', <Filter4 />),
+      this.createSiteLevelItem('Undergraduate', <Filter5 />),
+      this.createSiteLevelItem('Graduate', <Filter6 />),
     ];
     this.state = {
       sideBarOpen: false,
       siteLevelIdx: 0,
       showBrand: true,
     };
-
-    this.createSiteLevelItem = this.createSiteLevelItem.bind(this);
-
   }
 
-  createSiteLevelItem = (label, icon) => {
-    let item = {
-      label, 
-      icon,
-    };
-    return item;
-  };
+  createSiteLevelItem = (label, icon) => ({
+    label,
+    icon,
+  });
 
   updateState = (key, value) => {
     this.setState({ [key]: value });
   };
 
-  getState = (key) => {
-    return this.state[key];
-  };
+  getState = (key) => this.state[key];
 
   render() {
+    const { enqueueSnackbar } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <div className={'App'}>
-          <TaskBar 
-            sideBarOpen={this.state.sideBarOpen}
-            globalUpdate={this.updateState}
-            siteLevelName={this.siteLevelItems[this.state.siteLevelIdx].label}
-          />
-          <PageBody>
-          <Switch>
-            <Route 
-              path="/"
-              component={HomePage}
-              exact
+        <CssBaseline />
+        <BrowserRouter>
+          <div className={'App'}>
+            <TaskBarWithRouter
+              sideBarOpen={this.state.sideBarOpen}
+              globalUpdate={this.updateState}
+              siteLevelName={this.siteLevelItems[this.state.siteLevelIdx].label}
             />
-            <Route 
-              path="/new"
-              component={PostCreatePage}
-              exact
+            <PageBody>
+              <Switch>
+                <Route
+                  path="/"
+                  render={withRouter((props) => (
+                    <HomePage {...props} enqueueSnackbar={enqueueSnackbar} />
+                  ))}
+                  exact
+                />
+                <Route
+                  path="/new"
+                  render={withRouter((props) => (
+                    <PostCreatePage
+                      {...props}
+                      enqueueSnackbar={enqueueSnackbar}
+                      level={this.siteLevelItems[this.state.siteLevelIdx].label}
+                    />
+                  ))}
+                  exact
+                />
+                <Route
+                  path="/register"
+                  render={withRouter((props) => (
+                    <RegisterPage
+                      {...props}
+                      globalUpdate={this.updateState}
+                      enqueueSnackbar={enqueueSnackbar}
+                    />
+                  ))}
+                  exact
+                />
+                <Route
+                  path="/login"
+                  render={withRouter((props) => (
+                    <LoginPage
+                      {...props}
+                      globalUpdate={this.updateState}
+                      enqueueSnackbar={enqueueSnackbar}
+                    />
+                  ))}
+                  exact
+                />
+                <Route
+                  render={withRouter((props) => (
+                    <Error404 {...props} enqueueSnackbar={enqueueSnackbar} />
+                  ))}
+                />
+              </Switch>
+            </PageBody>
+            <SideBar
+              sideBarOpen={this.state.sideBarOpen}
+              siteLevelItems={this.siteLevelItems}
+              siteLevelIdx={this.state.siteLevelIdx}
+              globalUpdate={this.updateState}
             />
-            <Route 
-              path="/register"
-              component={RegisterPage}
-              exact
-            />
-            <Route 
-              path="/login"
-              component={LoginPage}
-              exact
-            />
-            <Route
-              path="/forgot"
-              component={ForgotPasswordPage}
-              exact
-            />
-            <Route
-              component={Error404}
-            />
-          </Switch>
-          </PageBody>
-          <SideBar
-            sideBarOpen={this.state.sideBarOpen}
-            siteLevelItems={this.siteLevelItems}
-            siteLevelIdx={this.state.siteLevelIdx}
-            globalUpdate={this.updateState}
-          />
-        </div>
-      </BrowserRouter>
+          </div>
+        </BrowserRouter>
       </MuiThemeProvider>
     );
   }
 }
 
-
-App.propTypes = {
+AppBody.propTypes = {
   classes: PropTypes.object.isRequired,
+  enqueueSnackbar: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(App);
+const AppWithStyles = withStyles(styles, { withTheme: true })(AppBody);
+
+const AppWithSnackBar = withSnackbar(AppWithStyles);
+
+const App = (props) => {
+  const { classes } = props;
+  return (
+    <SnackbarProvider
+      maxSnack={3}
+      hideIconVariant={true}
+      preventDuplicate
+      action={[
+        <Button className={classes.dismissSnackbarText} size="small">
+          {'GOT IT'}
+        </Button>,
+      ]}
+    >
+      <AppWithSnackBar />
+    </SnackbarProvider>
+  );
+};
+
+/*
+ * Snack bars can have any of the following in their `options` argument:
+ *
+ * options =  {
+ *   variant: 'default', // one of 'default', 'error', 'success', 'warning', and 'info'
+ *   persist: false, // either true or false
+ *   preventDuplicate: true, // either true or false
+ *   autoHideDuration: 1000, // time in milliseconds before dismissal
+ * };
+ *
+ * this.props.enqueueSnackbar(message, options) returns a unique key. This key can be passed as
+ * an argument to this.props.closeSnackbar(key) to close a particular snackbar.
+ */
+
+export default withStyles(styles)(App);

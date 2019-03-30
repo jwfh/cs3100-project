@@ -1,18 +1,21 @@
+const settings = require('../settings');
+
 const sqlite3 = require('sqlite3').verbose();
-const crypto = require('crypto');
-const md5hash = crypto.createHash('md5');
-md5hash.setEncoding('hex');
 
 const dbFile = __dirname + '/../numhub.db';
 
-const db = new sqlite3.Database(dbFile, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-  if (err) {
-    console.error(err.message);
-    process.exit(1);
+const db = new sqlite3.Database(
+  dbFile,
+  sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+  (err) => {
+    if (err) {
+      console.error(err.message);
+      process.exit(1);
+    }
+    module.exports.init();
+    console.log('Connected to the NumHub database...');
   }
-  module.exports.init();
-  console.log('Connected to the NumHub database...');
-});
+);
 
 module.exports.init = () => {
   console.log('Beginning DB initialization...');
@@ -31,43 +34,23 @@ module.exports.init = () => {
     CREATE TABLE IF NOT EXISTS \`USERS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
       \`username\` VARCHAR(32) NOT NULL,
+      \`name\` VARCHAR(256) NOT NULL,
+      \`email\` VARCHAR(256) NOT NULL,
+      \`password\` VARCHAR(256) NOT NULL,
       \`admin\` INT NOT NULL DEFAULT 0,
-      \`active\` INT NOT NULL DEFAULT 1,
-      \`lockout_count\` INT DEFAULT 0,
-      \`sec_q1\` INT NOT NULL,
-      \`sec_a1\` VARCHAR(255) NOT NULL,
-      \`sec_q2\` INT NOT NULL,
-      /* Need some way to enforce that sec_q1 != sec_q2. */
-      \`sec_a2\` VARCHAR(255) NOT NULL,
-      UNIQUE(\`username\`),
-      FOREIGN KEY (\`sec_q1\`) REFERENCES \`SEC_Q\`(\`id\`),
-      FOREIGN KEY (\`sec_q2\`) REFERENCES \`SEC_Q\`(\`id\`)
+      \`lockoutCount\` INT DEFAULT 0,
+      \`secQ\` INT NOT NULL,
+      \`secA\` VARCHAR(255) NOT NULL,
+      UNIQUE(\`username\`)
     )`);
     console.log('Created user table...');
-    db.run(`\
-    /* Table of past user password hashes. */
-    CREATE TABLE IF NOT EXISTS \`PASSWORDS\` (
-      \`id\` INT AUTO_INCREMENT NOT NULL,
-      \`user_id\` INT NOT NULL,
-      \`hash\` CHAR(130) NOT NULL,
-      \`time_changed\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (\`user_id\`) REFERENCES \`USERS\`(\`id\`)
-    )`);
-    console.log('Created passwords table...');
-    db.run(`\
-    /* Question categories (i.e., Geometry, Number Theory, etc.). */
-    CREATE TABLE IF NOT EXISTS \`Q_CATS\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`category\` VARCHAR(64)
-    )`);
-    console.log('Created question categories...');
     db.run(`\
     /* Question levels (i.e., Elementary, High School, Undergraduate, 
      * Graduate, etc.). 
      */
     CREATE TABLE IF NOT EXISTS \`Q_LEVELS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`category\` VARCHAR(64)
+      \`level\` VARCHAR(64)
     )`);
     console.log('Created question levels...');
     db.run(`\
@@ -78,11 +61,9 @@ module.exports.init = () => {
       \`q_id\` INT NOT NULL,
       \`q_rev_id\` INT NOT NULL DEFAULT 0,
       \`q_text\` TEXT NOT NULL,
-      \`q_cat_id\` INT NOT NULL,
       \`q_level_id\` INT NOT NULL,
       \`post_time\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (\`author_id\`) REFERENCES \`USERS\`(\`id\`),
-      FOREIGN KEY (\`q_cat_id\`) REFERENCES \`Q_CATS\`(\`id\`),
       FOREIGN KEY (\`q_level_id\`) REFERENCES \`Q_LEVELS\`(\`id\`)
     )`);
     console.log('Created question table...');
@@ -102,7 +83,7 @@ module.exports.init = () => {
     /* List of possible question tags (i.e., #homework, #power-series,
      * #wave-equation, etc.). */
     CREATE TABLE IF NOT EXISTS \`TAGS\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
+      \`id\` INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
       \`tag\` VARCHAR(32)
     )`);
     console.log('Created tags table...');
@@ -126,9 +107,243 @@ module.exports.init = () => {
     )`);
     console.log('Created URL shortener table...');
   });
+
+  [
+    {
+      table: 'TAGS',
+      field: 'tag',
+      values: ['Geometry', 'Number Theory', 'Algebra', 'Calculus', 'Analysis'],
+    },
+    {
+      table: 'Q_LEVELS',
+      field: 'level',
+      values: [
+        'Primary',
+        'Elementary',
+        'Intermediate',
+        'Secondary',
+        'Undergraduate',
+        'Graduate',
+      ],
+    },
+    {
+      table: 'SEC_Q',
+      field: 'question',
+      values: [
+        'What town does your grandmother live in?',
+        'What was your favourite childhood toy called?',
+        'What was your favourite childhood book?',
+        'What is your father\'s birthday?',
+        'What is your favourite country outside North America?',
+        'What was your childhood dream job?',
+        'When did you begin dating your first girlfriend/boyfriend?',
+      ],
+    },
+  ].map((data) => {
+    data.values.map((text, index) => {
+      db.serialize(() => {
+        db.all(
+          'SELECT * FROM `' + data.table + '` WHERE `' + data.field + '`=?',
+          [text],
+          (err, rows) => {
+            if (err) {
+              console.log(
+                '[' + __filename + ']',
+                'Error searching',
+                data.field,
+                'in',
+                data.table,
+                'for',
+                text,
+                err
+              );
+            } else if (rows.length === 0) {
+              console.log('Adding', text, 'to', data.table);
+              db.run(
+                'INSERT INTO `' +
+                  data.table +
+                  '` (`id`, `' +
+                  data.field +
+                  '`) VALUES (?, ?)',
+                [index, text],
+                (err) => {
+                  if (err) {
+                    console.log(
+                      '[' + __filename + ']',
+                      'Error adding new',
+                      data.field,
+                      'to',
+                      data.table,
+                      'with value',
+                      text,
+                      err
+                    );
+                  }
+                }
+              );
+            }
+          }
+        );
+      });
+    });
+  });
 };
 
-module.exports.demo = function () {
+module.exports.all = (type, callback) => {
+  switch (type) {
+  case 'tag':
+    db.all('SELECT `id`,`tag` from `TAGS`', (error, rows) => {
+      if (error) {
+        console.log('[' + __filename + ']', 'Error retrieving tags:', error);
+      }
+      callback(error, rows);
+    });
+    break;
+  case 'level':
+    db.all('SELECT `id`,`level` from `Q_LEVELS`', (error, rows) => {
+      if (error) {
+        console.log(
+          '[' + __filename + ']',
+          'Error retrieving levels:',
+          error
+        );
+      }
+      callback(error, rows);
+    });
+    break;
+  default:
+    break;
+  }
+};
+
+module.exports.get = (type, params, callback) => {
+  switch (type) {
+  case 'userByUsername':
+    if (params.username) {
+      db.get(
+        'SELECT * from `USERS` where `username`=?',
+        [params.username],
+        (error, row) => {
+          if (!error) {
+            if (settings.debug) {
+              console.log('User is', row);
+            }
+            callback(error, row);
+          } else {
+            if (settings.debug) {
+              console.log('Error:', error);
+            }
+            callback('Erorr contacting database.', null);
+          }
+        }
+      );
+    } else {
+      callback('No username provided.', null);
+    }
+    break;
+  default:
+    break;
+  }
+};
+
+// TODO
+module.exports.update = (table, attribute, value, id, callback) => {
+  switch (table) {
+  case 'USERS':
+    db.run(
+      `UPDATE \`USERS\` SET \`${attribute}\`=? WHERE \`id\`=?`,
+      [value, id],
+      callback
+    );
+    break;
+  default:
+    callback('No table given.');
+    break;
+  }
+};
+
+module.exports.create = (type, params, callback) => {
+  switch (type) {
+  case 'question':
+    if (
+      params.title &&
+        params.content &&
+        params.tags &&
+        params.level &&
+        params.author
+    ) {
+      db.serialize(() => {
+        // TODO
+        db.run('', (error) => {
+          callback('Error adding new question: ' + error, null);
+        });
+      });
+    } else {
+      callback('Required parameters missing to add new question', null);
+    }
+    break;
+  case 'answer':
+    break;
+  case 'user':
+    if (
+      params.name &&
+        params.username &&
+        params.secQ &&
+        params.secA &&
+        params.password &&
+        params.email
+    ) {
+      db.get(
+        'SELECT COUNT(`id`) AS count, MAX(`id`) AS max FROM `USERS`',
+        (error, row) => {
+          if (!error) {
+            const newUID = row.count < 1 ? 1 : row.max + 1;
+            db.run(
+              'INSERT INTO `USERS` (`id`, `name`, `username`, `password`, `secQ`, `secA`,' +
+                  ' `email`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+              [
+                newUID,
+                params.name,
+                params.username,
+                params.password,
+                params.secQ,
+                params.secA,
+                params.email,
+              ],
+              callback
+            );
+          } else {
+            if (settings.debug) {
+              console.log('Error getting user ID count and max:', error);
+            }
+          }
+        }
+      );
+    }
+    break;
+  case 'tag':
+    break;
+  default:
+    break;
+  }
+};
+
+module.exports.delete = (type, params, callback) => {
+  switch (type) {
+  case 'question':
+    break;
+  case 'answer':
+    break;
+  case 'user':
+    break;
+  case 'tag':
+    break;
+  default:
+    break;
+  }
+};
+
+module.exports.demo = () => {
   module.exports.init();
   console.log('Add demo rows here...');
 };

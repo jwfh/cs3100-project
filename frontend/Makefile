@@ -15,3 +15,6 @@ install: package.json
 
 audit: install 
 	npm audit fix
+	
+clean:
+	rm -rf node_modules

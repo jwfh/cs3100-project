@@ -20,7 +20,7 @@ import {
 import classNames from 'classnames';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import { withStyles } from '@material-ui/core/styles';
-import Logo2 from '../assets/images/logo-02.svg';
+import WhiteLogo from '../assets/images/logo-02.svg';
 import {
   sideBarDrawerWidth as drawerWidth,
 } from '../App';
@@ -240,17 +240,17 @@ class TaskBar extends React.Component {
             <div className={classes.brand}>
               <img 
                 className={classes.logo}
-                src={Logo2} 
+                src={WhiteLogo} 
                 alt="NumHub"
               ></img>
-            <Typography
-              className={classes.siteVariant}
-              variant="h5"
-              color="inherit"
-              noWrap
-            >
-              {siteLevelName}
-            </Typography>
+              <Typography
+                className={classes.siteVariant}
+                variant="h5"
+                color="inherit"
+                noWrap
+              >
+                {siteLevelName}
+              </Typography>
             </div>
             <div className={classes.search}>
               <div className={classes.searchIcon}>
@@ -274,6 +274,7 @@ class TaskBar extends React.Component {
                 </Badge>
               </IconButton>
               <IconButton
+                // eslint-disable-next-line no-undefined
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}
                 aria-haspopup="true"
                 onClick={this.handleProfileMenuOpen}
