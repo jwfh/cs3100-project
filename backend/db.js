@@ -345,5 +345,54 @@ module.exports.delete = (type, params, callback) => {
 
 module.exports.demo = () => {
   module.exports.init();
-  console.log('Add demo rows here...');
+  const demoUsers = [
+    {
+      "id": 1,
+      "name": "Leanne Graham",
+      "username": "Bret",
+      "email": "Sincere@april.biz",
+      "password": "Bret",
+      "secQ": "Whats your favourite animal",
+      "secA": "Dog"
+    },
+
+    {
+    "id": 2,
+    "name": "Ervin Howell",
+    "username": "Antonette",
+    "email": "Shanna@melissa.tv",
+    "password": "Antonette",
+    "secQ": "Whats favourite food",
+    "secA": "Rice"
+    },
+    {
+    "id": 3,
+    "name": "Clementine Bauch",
+    "username": "Samantha",
+    "email": "Nathan@yesenia.net",
+    "password": "Samantha",
+    "secQ": "Whats your favourite colour",
+    "secA": "Blue"
+    
+    },
+    {
+    "id": 4,
+    "name": "Patricia Lebsack",
+    "username": "Karianne",
+    "email": "Julianne.OConner@kory.org",
+    "password": "Karianne",
+    "secQ": "Whats your mothers maiden name",
+    "secA": "Gina"
+    },
+    {
+    "id": 5,
+    "name": "Chelsey Dietrich",
+    "username": "Kamren",
+    "email": "Lucio_Hettinger@annie.ca",
+    "password": "Kamren",
+    "secQ": "Whats the best day of the week",
+    "secA": "Friday"
+    }
+  
+  ];
 };
