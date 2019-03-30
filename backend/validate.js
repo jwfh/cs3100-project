@@ -8,7 +8,7 @@ module.exports.validate = (req, res) => {
     if (req.body.value && req.body.value.username) {
       db.get(
         'userByUsername',
-        {username: req.body.value.username},
+        {username: req.body.value.username.toLowerCase()},
         (error, row) => {
           if (!error) {
             if (typeof row === 'undefined') {
@@ -44,7 +44,7 @@ module.exports.validate = (req, res) => {
     if (req.body.value && req.body.value.username && req.body.value.secA) {
       db.get(
         'userByUsername',
-        {username: req.body.value.username},
+        {username: req.body.value.username.toLowerCase()},
         (error, row) => {
           if (!error) {
             if (typeof row === 'undefined') {
@@ -54,7 +54,10 @@ module.exports.validate = (req, res) => {
               });
             } else if (
               row.secA ===
-                sha256(req.body.value.secA.toLowerCase().replace(/\s/g, ''))
+                sha256(
+                  req.body.value.username.toLowerCase() +
+                    req.body.value.secA.toLowerCase().replace(/\s/g, '')
+                )
             ) {
               // Answer must be correct
               res.send({

@@ -251,8 +251,8 @@ module.exports.update = (table, attribute, value, id, callback) => {
   switch (table) {
   case 'USERS':
     db.run(
-      'UPDATE `USERS` SET ?=? WHERE `id`=?',
-      [attribute, value, id],
+      `UPDATE \`USERS\` SET \`${attribute}\`=? WHERE \`id\`=?`,
+      [value, id],
       callback
     );
     break;

@@ -192,7 +192,7 @@ const ForgotPasswordFormReset = (props) => (
           ? ''
           : props.errorMessagePassword
       }
-      error={props.showValid && !props.isValid}
+      error={props.showValid && !props.isValidPassword}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
@@ -219,7 +219,7 @@ const ForgotPasswordFormReset = (props) => (
           ? ''
           : props.errorMessageConfirm
       }
-      error={props.showValid && !props.isValid}
+      error={props.showValid && !props.isValidConfirm}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
@@ -299,13 +299,7 @@ class LoginPage extends Component {
   validate = (componentIdx, callback) => {
     let uri = '//' + backend + '/api/validate';
     let data;
-    const {
-      username,
-      secA,
-      isValid,
-      newPassword,
-      newPasswordConfirm,
-    } = this.state;
+    const { username, secA, isValid, resetPassword, resetConfirm } = this.state;
     switch (componentIdx) {
       case 0:
         data = {
@@ -467,12 +461,12 @@ class LoginPage extends Component {
         data = {
           type: 'password',
           value: {
-            newPassword,
+            password: resetPassword,
           },
         };
-        isValid[3].confirm = newPassword === newPasswordConfirm;
+        isValid[3].confirm = resetPassword === resetConfirm;
         let resetConfirmErrorMessage =
-          newPassword === newPasswordConfirm
+          resetPassword === resetConfirm
             ? ''
             : 'Please make sure that your passwords match';
         axios
@@ -502,6 +496,7 @@ class LoginPage extends Component {
                     {
                       isValid,
                       resetPassErrorMessage: response.data.message,
+                      resetConfirmErrorMessage,
                     },
                     callback,
                   );
@@ -516,6 +511,7 @@ class LoginPage extends Component {
                       isValid,
                       resetPassErrorMessage:
                         'Your password does not meet complexity requirements',
+                      resetConfirmErrorMessage,
                     },
                     callback,
                   );
@@ -664,7 +660,64 @@ class LoginPage extends Component {
     });
   };
 
-  attemptReset = () => {};
+  attemptReset = () => {
+    const {
+      activeComponent,
+      isValid,
+      showValid,
+      username,
+      secA,
+      resetPassword,
+    } = this.state;
+    const uri = `//${backend}/api/gatekeeper`;
+    const data = {
+      action: 'reset',
+      value: {
+        username,
+        secA,
+        newPassword: resetPassword,
+      },
+    };
+    this.validate(activeComponent, () => {
+      let componentIsValid =
+        isValid[activeComponent].password && isValid[activeComponent].confirm;
+      showValid[activeComponent] = true;
+      if (componentIsValid) {
+        axios
+          .post(uri, data)
+          .then((response) => {
+            if (response.status === 200 && response.data.ok === true) {
+              this.props.enqueueSnackbar(
+                'Your password has been reset. Try logging in.',
+              );
+              this.props.history.push('/login');
+            } else {
+              if (debug) {
+                if ('message' in response.data) {
+                  console.log(
+                    'The password reset failed:',
+                    response.data.message,
+                  );
+                } else {
+                  console.log(
+                    "The password reset request failed but the server didn't say why.",
+                  );
+                }
+              }
+            }
+          })
+          .catch((error) => {
+            if (debug) {
+              console.log('Unable to rest password:', error);
+            }
+          });
+      } else {
+        this.setState({
+          showValid,
+        });
+      }
+    });
+  };
 
   fetchAssets = (componentIdx, callback) => {
     const { username } = this.state;
@@ -720,6 +773,7 @@ class LoginPage extends Component {
       secA,
       resetPassword,
       resetConfirm,
+      usernameErrorMessage,
       passwordErrorMessage,
       secAErrorMessage,
       resetPassErrorMessage,
@@ -732,6 +786,7 @@ class LoginPage extends Component {
       {
         content: (
           <UsernameForm
+            errorMessage={usernameErrorMessage}
             onReturnKey={this.nextStep(true)}
             username={username}
             showValid={showValid[0]}
