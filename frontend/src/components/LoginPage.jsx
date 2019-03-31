@@ -297,7 +297,10 @@ class LoginPage extends Component {
   };
 
   validate = (componentIdx, callback) => {
-    let uri = '//' + backend + '/api/validate';
+    const uri = '//' + backend + '/api/validate';
+    const config = {
+      timeout: 2000,
+    };
     let data;
     const { username, secA, isValid, resetPassword, resetConfirm } = this.state;
     switch (componentIdx) {
@@ -309,7 +312,7 @@ class LoginPage extends Component {
           },
         };
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (
               response.status === 200 &&
@@ -387,7 +390,7 @@ class LoginPage extends Component {
           },
         };
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (
               response.status === 200 &&
@@ -470,7 +473,7 @@ class LoginPage extends Component {
             ? ''
             : 'Please make sure that your passwords match';
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (
               response.status === 200 &&
@@ -607,8 +610,11 @@ class LoginPage extends Component {
         password,
       },
     };
+    const config = {
+      timeout: 2000,
+    };
     axios
-      .post(uri, data)
+      .post(uri, data, config)
       .then((response) => {
         if (response.status === 200) {
           if (response.data) {
@@ -682,13 +688,16 @@ class LoginPage extends Component {
         newPassword: resetPassword,
       },
     };
+    const config = {
+      timeout: 2000,
+    };
     this.validate(activeComponent, () => {
       let componentIsValid =
         isValid[activeComponent].password && isValid[activeComponent].confirm;
       showValid[activeComponent] = true;
       if (componentIsValid) {
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (response.status === 200 && response.data.ok === true) {
               this.props.enqueueSnackbar(
@@ -744,7 +753,10 @@ class LoginPage extends Component {
   fetchAssets = (componentIdx, callback) => {
     const { username } = this.state;
     const uri = `//${backend}/api/fetch`;
-    let data = {};
+    let data;
+    const config = {
+      timeout: 2000,
+    };
     switch (componentIdx) {
       case 2:
         // Fetching security question before advance to #2 (ForgotPasswordFormQuestion)
@@ -755,7 +767,7 @@ class LoginPage extends Component {
           },
         };
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (
               response.status === 200 &&
