@@ -9,7 +9,7 @@ import StepContent from '@material-ui/core/StepContent';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import PageTitle from './PageTitle';
+import { Title } from './PageTitle';
 import QuestionFormContent from './QuestionFormContent';
 import QuestionFormTag from './QuestionFormTag';
 import QuestionFormConfirm from './QuestionFormConfirm';
@@ -49,6 +49,7 @@ export class PostCreatePage extends Component {
     title: '',
     content: '',
     tags: [],
+    fetchedTags: false,
     availableTags: [],
     contentSyntaxErrorMsg: '',
     showValid: [false, false, false],
@@ -94,18 +95,18 @@ export class PostCreatePage extends Component {
   validate = (step) => {
     const { content, title, tags, isValid } = this.state;
     switch (step) {
-    case 0:
-      // Content
-      isValid[0].contentNotEmpty = content !== '';
-      isValid[0].titleNotEmpty = title !== '';
-      isValid[0].contentSyntaxErrorFree = this.isContentSyntaxErrorFree();
-      break;
-    case 1:
-      // Tags
-      isValid[1].hasTags = tags.length > 0;
-      break;
-    default:
-      break;
+      case 0:
+        // Content
+        isValid[0].contentNotEmpty = content !== '';
+        isValid[0].titleNotEmpty = title !== '';
+        isValid[0].contentSyntaxErrorFree = this.isContentSyntaxErrorFree();
+        break;
+      case 1:
+        // Tags
+        isValid[1].hasTags = tags.length > 0;
+        break;
+      default:
+        break;
     }
     this.setState({
       isValid,
@@ -157,7 +158,7 @@ export class PostCreatePage extends Component {
       },
       () => {
         this.validate(activeStep);
-      }
+      },
     );
   };
 
@@ -222,24 +223,33 @@ export class PostCreatePage extends Component {
     return steps;
   };
 
-  retrieveTags = () => {
+  fetchTags = async () => {
     const uri = '//' + backend + '/api/fetch/all';
-    const data = {
+    const reqData = {
       type: 'tag',
     };
-    axios
-      .post(uri, data)
-      .then((response) => {
-        this.setState({
-          availableTags: response.data,
-        });
-        console.log('Successfully retrieved tags from API');
-      })
-      .catch((error) => {
-        if (debug) {
-          console.log('Unable to retrieve tags:', error);
-        }
-      });
+    const config = {
+      timeout: 2000,
+    };
+    try {
+      const users = await axios.post(uri, reqData, config);
+      const { data } = await users;
+      this.setState(
+        {
+          availableTags: data,
+          fetchedTags: true,
+        },
+        () => {
+          if (debug) {
+            console.log('Successfully retrieved tags from API');
+          }
+        },
+      );
+    } catch (error) {
+      if (debug) {
+        console.log('Unable to retrieve tags:', error);
+      }
+    }
   };
 
   submit = () => {
@@ -253,6 +263,9 @@ export class PostCreatePage extends Component {
       tags,
       level,
     };
+    const config = {
+      timeout: 2000,
+    };
     let pageIsValid = true;
     // TODO loop through this.state.isValid instead of 3 constant
     for (let i = 0; i < 3 && pageIsValid; i++) {
@@ -265,7 +278,7 @@ export class PostCreatePage extends Component {
     }
     if (pageIsValid) {
       axios
-        .post(uri, data)
+        .post(uri, data, config)
         .then((response) => {
           if (response.status === 200 && response.data.route) {
             console.log(response.data);
@@ -284,85 +297,82 @@ export class PostCreatePage extends Component {
     }
   };
 
-  componentWillMount() {
-    const steps = this.getSteps();
-    this.setState({
-      steps,
-    });
-  }
-
-  componentDidMount() {
-    this.retrieveTags();
+  async componentDidMount() {
+    await this.fetchTags();
   }
 
   render() {
     const { classes } = this.props;
-    const steps = this.getSteps();
-    const { activeStep, postSuccessful } = this.state;
+    const { activeStep, postSuccessful, fetchedTags } = this.state;
 
-    return (
-      <div className={classes.container}>
-        <div className={classes.root}>
-          <PageTitle>Post an Exercise</PageTitle>
-          <Stepper activeStep={activeStep} orientation="vertical">
-            {steps.map((step, index) => (
-              <Step key={step.label}>
-                <StepLabel>{step.label}</StepLabel>
-                <StepContent>
-                  {step.content}
-                  <div className={classes.actionsContainer}>
-                    <div>
-                      <Button
-                        disabled={index === 0}
-                        onClick={this.prevStep}
-                        className={classNames(
-                          classes.button,
-                          index === 0 && classes.hidden
-                        )}
-                      >
-                        Back
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={
-                          index === steps.length - 1
-                            ? this.submit
-                            : this.nextStep
-                        }
-                        className={classes.button}
-                      >
-                        {index === steps.length - 1 ? 'Publish' : 'Next'}
-                      </Button>
+    const steps = this.getSteps();
+    if (fetchedTags) {
+      return (
+        <div className={classes.container}>
+          <div className={classes.root}>
+            <Title>Post an Exercise</Title>
+            <Stepper activeStep={activeStep} orientation="vertical">
+              {steps.map((step, index) => (
+                <Step key={step.label}>
+                  <StepLabel>{step.label}</StepLabel>
+                  <StepContent>
+                    {step.content}
+                    <div className={classes.actionsContainer}>
+                      <div>
+                        <Button
+                          disabled={index === 0}
+                          onClick={this.prevStep}
+                          className={classNames(
+                            classes.button,
+                            index === 0 && classes.hidden,
+                          )}
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={
+                            index === steps.length - 1
+                              ? this.submit
+                              : this.nextStep
+                          }
+                          className={classes.button}
+                        >
+                          {index === steps.length - 1 ? 'Publish' : 'Next'}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </StepContent>
-              </Step>
-            ))}
-          </Stepper>
-          {activeStep === steps.length && (
-            <Paper square elevation={0} className={classes.resetContainer}>
-              <Typography>
-                {postSuccessful
-                  ? 'Your question has been published!'
-                  : 'There was an error submitting your post. Please try again later.'}
-              </Typography>
-              <Button onClick={this.handleReset} className={classes.button}>
-                Go to homepage
-              </Button>
-              <Button
-                onClick={this.handleReset}
-                className={classes.button}
-                color="primary"
-                variant="contained"
-              >
-                View question
-              </Button>
-            </Paper>
-          )}
+                  </StepContent>
+                </Step>
+              ))}
+            </Stepper>
+            {activeStep === steps.length && (
+              <Paper square elevation={0} className={classes.resetContainer}>
+                <Typography>
+                  {postSuccessful
+                    ? 'Your question has been published!'
+                    : 'There was an error submitting your post. Please try again later.'}
+                </Typography>
+                <Button onClick={this.handleReset} className={classes.button}>
+                  Go to homepage
+                </Button>
+                <Button
+                  onClick={this.handleReset}
+                  className={classes.button}
+                  color="primary"
+                  variant="contained"
+                >
+                  View question
+                </Button>
+              </Paper>
+            )}
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      return <div />;
+    }
   }
 }
 

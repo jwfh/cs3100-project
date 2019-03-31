@@ -1,97 +1,244 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { List, Datagrid, TextField, EmailField } from 'react-admin';
-import{
-    baselinelock_open24px,
-}from '@material-ui/icons';
+import { GroupAdd, Lock, LockOpen, RemoveCircle } from '@material-ui/icons';
 import axios from 'axios';
+import { debug, backend } from '../settings';
 import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+  TextField,
+} from '@material-ui/core';
+import { Title, Subtitle } from './PageTitle';
+import FormFunc from './FormFunc';
 
-const styles = theme => ({
-    root: {
-      width: '100%',
-      marginTop: theme.spacing.unit * 3,
-      overflowX: 'auto',
-    },
-    table: {
-      minWidth: 700,
-    },
+const styles = (theme) => ({
+  container: {
+    textAlign: 'center',
+    marginTop: '15vh',
+  },
+  hidden: {
+    display: 'none',
+  },
+  root: {
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2,
+    width: '75%',
+    display: 'inline-block',
+    textAlign: 'left',
+  },
+  block: {
+    marginBottom: theme.spacing.unit * 5,
+  },
+  button: {
+    marginTop: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+  },
 });
-let id = 0;
-function createData(...rest) {
-  id += 1;
-  return { id, name, username, email,secQ};
-}
 
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-  
 export class AdminPage extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            users: [],
-        };
-    }
-
-    renderResetIcon = (user) => {
-        
+  constructor(props) {
+    super(props);
+    this.state = {
+      fetchedUsers: false,
+      users: [],
+      fetchedTags: false,
+      tags: [],
+      newTag: '',
     };
+  }
 
-    fetchUsers = () => {
-        let users;
-        const uri = '/api/fetch/all';
-        const data = {
-            type: 'user',
-        };
-        axios
-            .post(uri, data)
-            .then((response) => {
-                users = response.body;
-                this.setState({
-                    users,
-                });
-            })
-            .catch((error) => {
-
-            });
+  fetchUsers = async () => {
+    const uri = '//' + backend + '/api/fetch/all';
+    const requestData = {
+      type: 'user',
+    };
+    const config = {
+      timeout: 2000,
+    };
+    try {
+      const users = await axios.post(uri, requestData, config);
+      const { data } = await users;
+      this.setState(
+        {
+          users: data,
+          fetchedUsers: true,
+        },
+        () => {
+          if (debug) {
+            console.log('Successfully retrieved users from API');
+          }
+        },
+      );
+    } catch (error) {
+      if (debug) {
+        console.log('Unable to retrieve users:', error);
+      }
     }
+  };
 
-    getUserList = () => {
-        const { users } = this.state;
-        this.fetchUsers();
-        const rows = users.map((user, index) => (
-            <TableRow key={user.id}>
-                <TableCell align="left">{user.name}</TableCell>
-                <TableCell align="left">{user.username}</TableCell>
-                <TableCell align="left">{user.email}</TableCell>
-                <TableCell align="left">{this.renderResetIcon(user)}</TableCell>
-            </TableRow>
-        ));
+  fetchTags = async () => {
+    const uri = `//${backend}/api/fetch/all`;
+    const requestData = {
+      type: 'tag',
+    };
+    const config = {
+      timeout: 2000,
+    };
+    try {
+      const users = await axios.post(uri, requestData, config);
+      const { data } = await users;
+      this.setState(
+        {
+          tags: data.map((row) => row.tag.toLowerCase()),
+          fetchedTags: true,
+        },
+        () => {
+          if (debug) {
+            console.log('Successfully retrieved tags from API');
+          }
+        },
+      );
+    } catch (error) {
+      if (debug) {
+        console.log('Unable to retrieve tags:', error);
+      }
     }
+  };
 
-    render() {
-        return (
-            <div>
-                {this.getUserList()}
+  addTag = async () => {
+    const { newTag } = this.state;
+    if (newTag !== '') {
+      if (debug) {
+        console.log('Submitting tag', newTag, 'for creation.');
+      }
+      const uri = `//${backend}/api/post/create`;
+      const requestData = {
+        type: 'tag',
+        value: {
+          tag: newTag,
+        },
+      };
+      const config = {
+        timeout: 2000,
+      };
+      try {
+        const response = await axios.post(uri, requestData, config);
+        const { status, data } = await response;
+        if (status === 200 && data.ok === true) {
+          this.setState(
+            {
+              newTag: '',
+            },
+            () => {
+              if ('message' in data) {
+                this.props.enqueueSnackbar(data.message);
+              } else {
+                this.props.enqueueSnackbar('Tag added');
+              }
+              if (debug) {
+                console.log('Successfully created new tag');
+              }
+            },
+          );
+          await this.fetchAll();
+        } else {
+          this.props.enqueueSnackbar('An erorr occurred.', {
+            variant: 'error',
+          });
+        }
+      } catch (error) {
+        if (debug) {
+          console.log('Unable to create new tag:', error);
+        }
+      }
+    }
+  };
+
+  getActions = (user) => <Fragment />;
+
+  makeUserTable = (users) => (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell align="left">Username</TableCell>
+          <TableCell align="left">Full Name</TableCell>
+          <TableCell align="left">Email</TableCell>
+          <TableCell align="right">Actions</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {users.map((user, index) => (
+          <TableRow key={index}>
+            <TableCell align="left">{user.username}</TableCell>
+            <TableCell align="left">{user.name}</TableCell>
+            <TableCell align="left">{user.email}</TableCell>
+            <TableCell align="left">{this.getActions(user)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+
+  handleChange = (input) => (e) => {
+    this.setState({
+      [input]: e.target.value,
+    });
+  };
+
+  fetchAll = async () => {
+    await Promise.all([this.fetchUsers(), this.fetchTags()]);
+  };
+
+  async componentDidMount() {
+    await this.fetchAll();
+  }
+
+  render() {
+    const { classes } = this.props;
+    const { fetchedUsers, users, fetchedTags, tags, newTag } = this.state;
+    if (fetchedUsers && fetchedTags) {
+      return (
+        <div className={classes.container}>
+          <div className={classes.root}>
+            <Title>Admin Console</Title>
+            <div className={classes.block}>
+              <Subtitle>Profile Manager</Subtitle>
+              {this.makeUserTable(users)}
             </div>
-        );
+            <div className={classes.block}>
+              <Subtitle>Add Post Tag Options</Subtitle>
+              <FormFunc onSubmit={this.addTag}>
+                <TextField
+                  label="New tag"
+                  value={newTag}
+                  onChange={this.handleChange('newTag')}
+                  margin="normal"
+                  variant="outlined"
+                  helperText={
+                    newTag !== '' && tags.includes(newTag.toLowerCase())
+                      ? 'This tag already exists.'
+                      : ''
+                  }
+                  error={newTag !== '' && tags.includes(newTag.toLowerCase())}
+                />
+              </FormFunc>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return <div />;
     }
+  }
 }
 
 AdminPage.propTypes = {
-    classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired,
 };
 
-export default AdminPage;
+export default withStyles(styles)(AdminPage);

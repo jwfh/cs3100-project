@@ -10,6 +10,7 @@ import SideBar from './components/SideBar';
 import HomePage from './components/HomePage';
 import PostCreatePage from './components/PostCreatePage';
 import LoginPage from './components/LoginPage';
+import AdminPage from './components/AdminPage';
 import RegisterPage from './components/RegisterPage';
 import PageBody from './components/PageBody';
 import Error404 from './components/Error404';
@@ -153,6 +154,17 @@ class AppBody extends Component {
                   path="/login"
                   render={withRouter((props) => (
                     <LoginPage
+                      {...props}
+                      globalUpdate={this.updateState}
+                      enqueueSnackbar={enqueueSnackbar}
+                    />
+                  ))}
+                  exact
+                />
+                <Route
+                  path="/admin"
+                  render={withRouter((props) => (
+                    <AdminPage
                       {...props}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}

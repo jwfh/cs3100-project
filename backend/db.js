@@ -191,155 +191,170 @@ module.exports.init = () => {
 
 module.exports.all = (type, callback) => {
   switch (type) {
-  case 'tag':
-    db.all('SELECT `id`,`tag` from `TAGS`', (error, rows) => {
-      if (error) {
-        console.log('[' + __filename + ']', 'Error retrieving tags:', error);
-      }
-      callback(error, rows);
-    });
-    break;
-  case 'level':
-    db.all('SELECT `id`,`level` from `Q_LEVELS`', (error, rows) => {
-      if (error) {
-        console.log(
-          '[' + __filename + ']',
-          'Error retrieving levels:',
-          error
-        );
-      }
-      callback(error, rows);
-    });
-    break;
-  default:
-    break;
+    case 'tag':
+      db.all('SELECT `id`,`tag` FROM `TAGS`', (error, rows) => {
+        if (error) {
+          console.log('[' + __filename + ']', 'Error retrieving tags:', error);
+        }
+        callback(error, rows);
+      });
+      break;
+    case 'level':
+      db.all('SELECT `id`,`level` FROM `Q_LEVELS`', (error, rows) => {
+        if (error) {
+          console.log(
+            '[' + __filename + ']',
+            'Error retrieving levels:',
+            error
+          );
+        }
+        callback(error, rows);
+      });
+      break;
+    case 'user':
+      db.all(
+        'SELECT `id`,`username`,`name`,`email` FROM `USERS`',
+        (error, rows) => {
+          if (error) {
+            console.log(
+              '[' + __filename + ']',
+              'Error retrieving users:',
+              error
+            );
+          }
+          callback(error, rows);
+        }
+      );
+      break;
+    default:
+      break;
   }
 };
 
 module.exports.get = (type, params, callback) => {
   switch (type) {
-  case 'userByUsername':
-    if (params.username) {
-      db.get(
-        'SELECT * from `USERS` where `username`=?',
-        [params.username],
-        (error, row) => {
-          if (!error) {
-            if (settings.debug) {
-              console.log('User is', row);
+    case 'userByUsername':
+      if (params.username) {
+        db.get(
+          'SELECT * from `USERS` where `username`=?',
+          [params.username],
+          (error, row) => {
+            if (!error) {
+              if (settings.debug) {
+                console.log('User is', row);
+              }
+              callback(error, row);
+            } else {
+              if (settings.debug) {
+                console.log('Error:', error);
+              }
+              callback('Erorr contacting database.', null);
             }
-            callback(error, row);
-          } else {
-            if (settings.debug) {
-              console.log('Error:', error);
-            }
-            callback('Erorr contacting database.', null);
           }
-        }
-      );
-    } else {
-      callback('No username provided.', null);
-    }
-    break;
-  default:
-    break;
+        );
+      } else {
+        callback('No username provided.', null);
+      }
+      break;
+    default:
+      break;
   }
 };
 
 // TODO
 module.exports.update = (table, attribute, value, id, callback) => {
   switch (table) {
-  case 'USERS':
-    db.run(
-      `UPDATE \`USERS\` SET \`${attribute}\`=? WHERE \`id\`=?`,
-      [value, id],
-      callback
-    );
-    break;
-  default:
-    callback('No table given.');
-    break;
+    case 'USERS':
+      db.run(
+        `UPDATE \`USERS\` SET \`${attribute}\`=? WHERE \`id\`=?`,
+        [value, id],
+        callback
+      );
+      break;
+    default:
+      callback('No table given.');
+      break;
   }
 };
 
 module.exports.create = (type, params, callback) => {
   switch (type) {
-  case 'question':
-    if (
-      params.title &&
+    case 'question':
+      if (
+        params.title &&
         params.content &&
         params.tags &&
         params.level &&
         params.author
-    ) {
-      db.serialize(() => {
-        // TODO
-        db.run('', (error) => {
-          callback('Error adding new question: ' + error, null);
+      ) {
+        db.serialize(() => {
+          // TODO
+          db.run('', (error) => {
+            callback('Error adding new question: ' + error, null);
+          });
         });
-      });
-    } else {
-      callback('Required parameters missing to add new question', null);
-    }
-    break;
-  case 'answer':
-    break;
-  case 'user':
-    if (
-      params.name &&
+      } else {
+        callback('Required parameters missing to add new question', null);
+      }
+      break;
+    case 'answer':
+      break;
+    case 'user':
+      if (
+        params.name &&
         params.username &&
         params.secQ &&
         params.secA &&
         params.password &&
         params.email
-    ) {
-      db.get(
-        'SELECT COUNT(`id`) AS count, MAX(`id`) AS max FROM `USERS`',
-        (error, row) => {
-          if (!error) {
-            const newUID = row.count < 1 ? 1 : row.max + 1;
-            db.run(
-              'INSERT INTO `USERS` (`id`, `name`, `username`, `password`, `secQ`, `secA`,' +
+      ) {
+        db.get(
+          'SELECT COUNT(`id`) AS count, MAX(`id`) AS max FROM `USERS`',
+          (error, row) => {
+            if (!error) {
+              const newUID = row.count < 1 ? 1 : row.max + 1;
+              db.run(
+                'INSERT INTO `USERS` (`id`, `name`, `username`, `password`, `secQ`, `secA`,' +
                   ' `email`) VALUES (?, ?, ?, ?, ?, ?, ?)',
-              [
-                newUID,
-                params.name,
-                params.username,
-                params.password,
-                params.secQ,
-                params.secA,
-                params.email,
-              ],
-              callback
-            );
-          } else {
-            if (settings.debug) {
-              console.log('Error getting user ID count and max:', error);
+                [
+                  newUID,
+                  params.name,
+                  params.username,
+                  params.password,
+                  params.secQ,
+                  params.secA,
+                  params.email,
+                ],
+                callback
+              );
+            } else {
+              if (settings.debug) {
+                console.log('Error getting user ID count and max:', error);
+              }
             }
           }
-        }
-      );
-    }
-    break;
-  case 'tag':
-    break;
-  default:
-    break;
+        );
+      }
+      break;
+    case 'tag':
+      break;
+    default:
+      break;
   }
 };
 
 module.exports.delete = (type, params, callback) => {
   switch (type) {
-  case 'question':
-    break;
-  case 'answer':
-    break;
-  case 'user':
-    break;
-  case 'tag':
-    break;
-  default:
-    break;
+    case 'question':
+      break;
+    case 'answer':
+      break;
+    case 'user':
+      break;
+    case 'tag':
+      break;
+    default:
+      break;
   }
 };
 
@@ -347,52 +362,50 @@ module.exports.demo = () => {
   module.exports.init();
   const demoUsers = [
     {
-      "id": 1,
-      "name": "Leanne Graham",
-      "username": "Bret",
-      "email": "Sincere@april.biz",
-      "password": "Bret",
-      "secQ": "Whats your favourite animal",
-      "secA": "Dog"
+      id: 1,
+      name: 'Leanne Graham',
+      username: 'Bret',
+      email: 'Sincere@april.biz',
+      password: 'Bret',
+      secQ: 'Whats your favourite animal',
+      secA: 'Dog',
     },
 
     {
-    "id": 2,
-    "name": "Ervin Howell",
-    "username": "Antonette",
-    "email": "Shanna@melissa.tv",
-    "password": "Antonette",
-    "secQ": "Whats favourite food",
-    "secA": "Rice"
+      id: 2,
+      name: 'Ervin Howell',
+      username: 'Antonette',
+      email: 'Shanna@melissa.tv',
+      password: 'Antonette',
+      secQ: 'Whats favourite food',
+      secA: 'Rice',
     },
     {
-    "id": 3,
-    "name": "Clementine Bauch",
-    "username": "Samantha",
-    "email": "Nathan@yesenia.net",
-    "password": "Samantha",
-    "secQ": "Whats your favourite colour",
-    "secA": "Blue"
-    
+      id: 3,
+      name: 'Clementine Bauch',
+      username: 'Samantha',
+      email: 'Nathan@yesenia.net',
+      password: 'Samantha',
+      secQ: 'Whats your favourite colour',
+      secA: 'Blue',
     },
     {
-    "id": 4,
-    "name": "Patricia Lebsack",
-    "username": "Karianne",
-    "email": "Julianne.OConner@kory.org",
-    "password": "Karianne",
-    "secQ": "Whats your mothers maiden name",
-    "secA": "Gina"
+      id: 4,
+      name: 'Patricia Lebsack',
+      username: 'Karianne',
+      email: 'Julianne.OConner@kory.org',
+      password: 'Karianne',
+      secQ: 'Whats your mothers maiden name',
+      secA: 'Gina',
     },
     {
-    "id": 5,
-    "name": "Chelsey Dietrich",
-    "username": "Kamren",
-    "email": "Lucio_Hettinger@annie.ca",
-    "password": "Kamren",
-    "secQ": "Whats the best day of the week",
-    "secA": "Friday"
-    }
-  
+      id: 5,
+      name: 'Chelsey Dietrich',
+      username: 'Kamren',
+      email: 'Lucio_Hettinger@annie.ca',
+      password: 'Kamren',
+      secQ: 'Whats the best day of the week',
+      secA: 'Friday',
+    },
   ];
 };

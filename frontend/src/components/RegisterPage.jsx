@@ -13,7 +13,6 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import PageTitle from './PageTitle';
 import axios from 'axios';
 
 const styles = (theme) => ({
@@ -249,7 +248,10 @@ export class RegisterPage extends Component {
 
   fetchAssets = (componentIdx, callback) => {
     const uri = `//${backend}/api/fetch/all`;
-    let data = {};
+    let data;
+    const config = {
+      timeout: 2000,
+    };
     switch (componentIdx) {
       case 2:
         // Fetching list of security questions here before advance to #2 (RegisterFormSecurity)
@@ -257,7 +259,7 @@ export class RegisterPage extends Component {
           type: 'secQ',
         };
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (response.status === 200) {
               // Valid response

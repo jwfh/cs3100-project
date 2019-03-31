@@ -166,25 +166,25 @@ const reset = (req, res) => {
   }
 };
 
-module.exports.isAdmin = (req) => {};
+module.exports.auth = (req) => {};
 
 module.exports.gatekeeper = (req, res) => {
   switch (req.body.action) {
-  case 'sign-in':
-    signIn(req, res);
-    break;
-  case 'sign-out':
-    signOut(req, res);
-    break;
-  case 'register':
-    register(req, res);
-    break;
-  case 'reset':
-    reset(req, res);
-    break;
-  default:
-    res.status(400);
-    res.type('text');
-    res.send('400 Bad Request');
+    case 'sign-in':
+      signIn(req, res);
+      break;
+    case 'sign-out':
+      signOut(req, res);
+      break;
+    case 'register':
+      register(req, res);
+      break;
+    case 'reset':
+      reset(req, res);
+      break;
+    default:
+      res.status(400);
+      res.type('text');
+      res.send('400 Bad Request');
   }
 };
