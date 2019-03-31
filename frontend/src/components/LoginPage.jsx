@@ -611,14 +611,18 @@ class LoginPage extends Component {
       .post(uri, data)
       .then((response) => {
         if (response.status === 200) {
-          if (response.body) {
-            if (response.body.ok === true) {
+          if (response.data) {
+            if (response.data.ok === true) {
               isValid[1] = true;
               this.setState(
                 {
                   isValid,
                 },
                 () => {
+                  this.props.enqueueSnackbar(
+                    'You are now signed in to NumHub.',
+                    { variant: 'success' },
+                  );
                   history.push('/');
                 },
               );
@@ -626,7 +630,7 @@ class LoginPage extends Component {
               isValid[1] = false;
               this.setState({
                 isValid,
-                passwordErrorMessage: response.body.message
+                passwordErrorMessage: response.data.message
                   ? response.body.message
                   : "The request failed but the server didn't tell us why.",
               });
@@ -690,7 +694,25 @@ class LoginPage extends Component {
               this.props.enqueueSnackbar(
                 'Your password has been reset. Try logging in.',
               );
-              this.props.history.push('/login');
+              this.setState({
+                activeComponent: 1,
+                password: '',
+                hideField: {
+                  password: true,
+                  secA: true,
+                  resetPassword: true,
+                  resetConfirm: true,
+                },
+                passwordErrorMessage: '',
+                secQ: '',
+                secA: '',
+                secAErrorMessage: '',
+                resetPassword: '',
+                resetConfirm: '',
+                resetPassErrorMessage: '',
+                resetConfirmErrorMessage: '',
+                showValid: [false, false, false, false],
+              });
             } else {
               if (debug) {
                 if ('message' in response.data) {

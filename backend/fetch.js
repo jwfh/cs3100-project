@@ -50,6 +50,7 @@ module.exports.all = (req, res) => {
   switch (req.body.type) {
   case 'tag':
   case 'level':
+  case 'question':
     db.all(req.body.type, (error, rows) => {
       if (!error) {
         res.status(200);

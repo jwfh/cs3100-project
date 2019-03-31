@@ -107,6 +107,7 @@ class AppBody extends Component {
   getState = (key) => this.state[key];
 
   render() {
+    const { sideBarOpen } = this.state;
     const { enqueueSnackbar } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
@@ -118,7 +119,7 @@ class AppBody extends Component {
               globalUpdate={this.updateState}
               siteLevelName={this.siteLevelItems[this.state.siteLevelIdx].label}
             />
-            <PageBody>
+            <PageBody sideBarOpen={sideBarOpen}>
               <Switch>
                 <Route
                   path="/"

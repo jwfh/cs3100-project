@@ -45,6 +45,15 @@ module.exports.init = () => {
     )`);
     console.log('Created user table...');
     db.run(`\
+    /* Table of active cookie sessions. */
+    CREATE TABLE IF NOT EXISTS \`SESSIONS\` (
+      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
+      \`uid\` INT NOT NULL,
+      \`updatedAt\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (\`uid\`) REFERENCES \`USERS\`(\`id\`)
+    )`);
+    console.log('Created session table...');
+    db.run(`\
     /* Question levels (i.e., Elementary, High School, Undergraduate, 
      * Graduate, etc.). 
      */
@@ -57,26 +66,27 @@ module.exports.init = () => {
     /* Table containing questions. */
     CREATE TABLE IF NOT EXISTS \`QUESTIONS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`author_id\` INT NOT NULL,
-      \`q_id\` INT NOT NULL,
-      \`q_rev_id\` INT NOT NULL DEFAULT 0,
-      \`q_text\` TEXT NOT NULL,
-      \`q_level_id\` INT NOT NULL,
-      \`post_time\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (\`author_id\`) REFERENCES \`USERS\`(\`id\`),
-      FOREIGN KEY (\`q_level_id\`) REFERENCES \`Q_LEVELS\`(\`id\`)
+      \`authorID\` INT NOT NULL,
+      \`content\` TEXT NOT NULL,
+      \`title\` TEXT NOT NULL,
+      \`levelID\` INT NOT NULL,
+      \`idHash\` TEXT NOT NULL,
+      \`postTime\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(\`idHash\`),
+      FOREIGN KEY (\`authorID\`) REFERENCES \`USERS\`(\`id\`),
+      FOREIGN KEY (\`levelID\`) REFERENCES \`Q_LEVELS\`(\`id\`)
     )`);
     console.log('Created question table...');
     db.run(`\
     /* Table of question answers. */
     CREATE TABLE IF NOT EXISTS \`ANSWERS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`author_id\` INT NOT NULL,
-      \`q_id\` INT NOT NULL,
-      \`a_text\` TEXT NOT NULL,
-      \`post_time\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (\`author_id\`) REFERENCES \`USERS\`(\`id\`),
-      FOREIGN KEY (\`q_id\`) REFERENCES \`QUESTIONS\`(\`q_id\`)
+      \`authorID\` INT NOT NULL,
+      \`qID\` INT NOT NULL,
+      \`content\` TEXT NOT NULL,
+      \`postTime\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (\`authorID\`) REFERENCES \`USERS\`(\`id\`),
+      FOREIGN KEY (\`qID\`) REFERENCES \`QUESTIONS\`(\`id\`)
     )`);
     console.log('Created answer table...');
     db.run(`\
@@ -91,19 +101,19 @@ module.exports.init = () => {
     /* Table to maintain association of what tags a question has. */
     CREATE TABLE IF NOT EXISTS \`Q_TAGS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`q_id\` INT NOT NULL,
-      \`q_tag_id\` INT NOT NULL,
-      FOREIGN KEY (\`q_id\`) REFERENCES \`QUESTIONS\`(\`id\`),
-      FOREIGN KEY (\`q_tag_id\`) REFERENCES \`TAGS\`(\`id\`)
+      \`qID\` INT NOT NULL,
+      \`qTagID\` INT NOT NULL,
+      FOREIGN KEY (\`qID\`) REFERENCES \`QUESTIONS\`(\`id\`),
+      FOREIGN KEY (\`qTagID\`) REFERENCES \`TAGS\`(\`id\`)
     )`);
     console.log('Created tag association table...');
     db.run(`\
     /* Table for to facilitate URL shortening (for sharing link feature). */
     CREATE TABLE IF NOT EXISTS \`URLS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`url_leaf\` VARCHAR(10),
-      \`redirect_q_id\` INT NOT NULL,
-      \`redirect_a_id\` INT DEFAULT NULL
+      \`uriLeaf\` VARCHAR(10),
+      \`redirectQID\` INT NOT NULL,
+      \`redirectAID\` INT DEFAULT NULL
     )`);
     console.log('Created URL shortener table...');
   });
@@ -192,7 +202,7 @@ module.exports.init = () => {
 module.exports.all = (type, callback) => {
   switch (type) {
   case 'tag':
-    db.all('SELECT `id`,`tag` from `TAGS`', (error, rows) => {
+    db.all('SELECT `id`,`tag` FROM `TAGS`', (error, rows) => {
       if (error) {
         console.log('[' + __filename + ']', 'Error retrieving tags:', error);
       }
@@ -200,7 +210,7 @@ module.exports.all = (type, callback) => {
     });
     break;
   case 'level':
-    db.all('SELECT `id`,`level` from `Q_LEVELS`', (error, rows) => {
+    db.all('SELECT `id`,`level` FROM `Q_LEVELS`', (error, rows) => {
       if (error) {
         console.log(
           '[' + __filename + ']',
@@ -210,6 +220,21 @@ module.exports.all = (type, callback) => {
       }
       callback(error, rows);
     });
+    break;
+  case 'session':
+    db.all('SELECT `id`,`updatedAt` FROM `SESSIONS`', (error, rows) => {
+      if (error) {
+        console.log(
+          '[' + __filename + ']',
+          'Error retrieving sessions:',
+          error
+        );
+      }
+      callback(error, rows);
+    });
+    break;
+  case 'question':
+    db.all('SELECT `id`,');
     break;
   default:
     break;
@@ -323,6 +348,8 @@ module.exports.create = (type, params, callback) => {
     break;
   case 'tag':
     break;
+  case 'session':
+    break;
   default:
     break;
   }
@@ -337,6 +364,8 @@ module.exports.delete = (type, params, callback) => {
   case 'user':
     break;
   case 'tag':
+    break;
+  case 'session':
     break;
   default:
     break;

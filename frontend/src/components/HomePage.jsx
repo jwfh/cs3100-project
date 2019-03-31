@@ -1,79 +1,67 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import { Title } from './PageTitle';
 import PostPreview from './PostPreview';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-
+import axios from 'axios';
 
 const styles = (theme) => ({
   filter: {
     width: '20%',
   },
   posts: {
-    float: 'right',
-    width: '75%',
+    marginLeft: '5%',
+    marginRight: '5%',
+    width: '90%',
   },
 });
 
 export class HomePage extends Component {
-  
-  fetchPosts = () => {
-    return [
-      {
-        title: 'Some Post 1',
-        body: 'Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body',
-        link: '/questions/abcd',
-        id: 1,
-      },
-      {
-        title: 'Some Post 2',
-        body: 'Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body',
-        link: '/questions/abcd',
-        id: 2,
-      },
-      {
-        title: 'Some Post 2',
-        body: 'Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body',
-        link: '/questions/abcd',
-        id: 3,
-      },
-      {
-        title: 'Some Post 2',
-        body: 'Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body',
-        link: '/questions/abcd',
-        id: 4,
-      },
-      {
-        title: 'Some Post 3',
-        body: 'Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body Some body',
-        link: '/questions/abcd',
-        id: 5,
-      },
-    ];
+  constructor(props) {
+    super(props);
+    this.state = {
+      tags: [],
+      questions: [],
+    };
+  }
+
+  fetchPosts = async () => {
+    return [];
   };
 
-  createPostPreviews = (posts) => {
-    let previews = posts.map((post, index) => {
-      let shortPost = post.body.length < 150 ? post.body : post.body.substring(0, 150) + '...';
-      return (
-        <PostPreview
-          key={post.id}
-          title={post.title}
-          bodyPreview={shortPost}
-          link={post.link}
-        />
-      );
-    });
-    return previews;
+  fetchTags = async () => {
+    return [];
   };
+
+  createPostPreviews = (post) => (
+    <PostPreview
+      key={post.id}
+      title={post.title}
+      bodyPreview={
+        post.body.length < 150 ? post.body : post.body.substring(0, 150) + '...'
+      }
+      link={post.link}
+    />
+  );
+
+  fetchAll = async () => {
+    await Promise.all([this.fetchPosts(), this.fetchTags()]);
+  };
+
+  async componentDidMount() {
+    await this.fetchAll();
+  }
 
   render() {
     const { classes } = this.props;
-    let posts = this.fetchPosts();
-    let previewsToRender = this.createPostPreviews(posts);
+    const { questions, tags } = this.state;
+    let previewsToRender = questions.map((question) =>
+      this.createPostPreview(question),
+    );
     return (
-      <div className={classes.posts}>
-        {previewsToRender}
-      </div>
+      <Fragment>
+        <div className={classes.posts}>{previewsToRender}</div>
+      </Fragment>
     );
   }
 }

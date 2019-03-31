@@ -3,6 +3,36 @@ const settings = require('../settings');
 const sha256 = require('sha-256-js');
 const cookieSession = require('cookie-session');
 
+// Check for expired sessions and delete them from the database once per minute
+setInterval(() => {
+  const now = new Date();
+  db.all('session', (error, rows) => {
+    if (!error && rows) {
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].updatedAt + settings.sessionLenth > now) {
+          db.delete(
+            'session',
+            {
+              sID: rows[i].id,
+            },
+            (error) => {
+              if (settings.debug) {
+                if (!error) {
+                  console.log('Cleaning stale session...');
+                } else {
+                  console.log('Erorr cleaning stale session...');
+                }
+              }
+            }
+          );
+        }
+      }
+    } else if (settings.debug) {
+      console.log('Erorr fetching stale sessions...');
+    }
+  });
+}, 60000);
+
 const register = (req, res) => {
   if (
     req.body.name &&
@@ -48,16 +78,18 @@ const register = (req, res) => {
 };
 
 const signIn = (req, res) => {
-  if (req.body.username && req.body.password) {
+  if (req.body.value && req.body.value.username && req.body.value.password) {
     db.get(
       'userByUsername',
-      {username: req.body.username.toLowerCase()},
+      {username: req.body.value.username.toLowerCase()},
       (error, row) => {
         if (!error) {
-          if (row.lockoutCount < 10) {
+          console.log(req.body.value);
+          if (row.lockoutCount < settings.lockoutCount) {
             if (
-              sha256(req.body.username.toLowerCase() + req.body.password) ===
-              row.password
+              sha256(
+                req.body.value.username.toLowerCase() + req.body.value.password
+              ) === row.password
             ) {
               res.send({
                 ok: true,
@@ -128,7 +160,7 @@ const reset = (req, res) => {
             db.update(
               'USERS',
               'password',
-              sha256(row.username + req.body.newPassword),
+              sha256(row.username + req.body.value.newPassword),
               row.id,
               (error) => {
                 if (!error) {
@@ -166,7 +198,12 @@ const reset = (req, res) => {
   }
 };
 
-module.exports.isAdmin = (req) => {};
+module.exports.auth = (req) => {
+  return {
+    authenticated: false,
+    admin: false,
+  };
+};
 
 module.exports.gatekeeper = (req, res) => {
   switch (req.body.action) {
