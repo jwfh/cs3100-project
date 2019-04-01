@@ -37,6 +37,35 @@ module.exports.fetch = (req, res) => {
         res.send('Bad Request');
       }
       break;
+    case 'question':
+      if (req.body.value && req.body.value.id) {
+        db.get('question', {id: req.body.value.id}, (error, row) => {
+          console.log('q');
+          if (!error) {
+            if (typeof row !== 'undefined') {
+              res.send({
+                ok: true,
+                post: row,
+              });
+            } else {
+              res.send({
+                ok: false,
+                message: 'ID doesn\'t exist',
+              });
+            }
+          } else {
+            res.send({
+              ok: false,
+              message: `Error contacting database: ${error}`,
+            });
+          }
+        });
+      } else {
+        res.status(400);
+        res.type('text');
+        res.send('Bad Request');
+      }
+      break;
     default:
       res.status(400);
       res.type('text');
@@ -127,7 +156,8 @@ module.exports.create = (req, res) => {
         req.body.value.title &&
         req.body.value.content &&
         req.body.value.tags &&
-        req.body.value.level
+        req.body.value.level &&
+        req.body.value.uid
       ) {
         db.create(
           'question',
@@ -136,6 +166,7 @@ module.exports.create = (req, res) => {
             content: req.body.value.content,
             tags: req.body.value.tags,
             level: req.body.value.level,
+            authorID: req.body.value.uid,
           },
           (error, route) => {
             if (!error) {

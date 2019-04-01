@@ -8,3 +8,4 @@ module.exports.passwordPolicy = {
   pDigits: false,
 };
 module.exports.lockoutCount = 10;
+module.exports.backend = 'localhost:3100';

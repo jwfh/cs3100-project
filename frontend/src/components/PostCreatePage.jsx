@@ -254,7 +254,7 @@ export class PostCreatePage extends Component {
 
   submit = () => {
     const { title, content, tags, activeStep } = this.state;
-    const { level } = this.props;
+    const { level, uid } = this.props;
     const uri = '//' + backend + '/api/create';
     const data = {
       type: 'question',
@@ -263,6 +263,7 @@ export class PostCreatePage extends Component {
         content,
         tags,
         level,
+        uid,
       },
     };
     const config = {
@@ -300,11 +301,16 @@ export class PostCreatePage extends Component {
   };
 
   async componentDidMount() {
+    if (!this.props.authenticated) {
+      this.props.enqueueSnackbar('You need to sign in to post a question.');
+      this.props.history.push('/login');
+    }
     await this.fetchTags();
   }
 
   render() {
     const { classes } = this.props;
+
     const { activeStep, postSuccessful, postRoute, fetchedTags } = this.state;
 
     const steps = this.getSteps();
@@ -386,6 +392,7 @@ PostCreatePage.propTypes = {
   classes: PropTypes.object.isRequired,
   enqueueSnackbar: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
+  authenticated: PropTypes.bool.isRequired,
 };
 
 export default withStyles(styles)(PostCreatePage);

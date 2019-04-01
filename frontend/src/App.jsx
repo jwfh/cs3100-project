@@ -14,6 +14,7 @@ import LoginPage from './components/LoginPage';
 import AdminPage from './components/AdminPage';
 import RegisterPage from './components/RegisterPage';
 import PageBody from './components/PageBody';
+import PostViewPage from './components/PostViewPage';
 import Error404 from './components/Error404';
 import {
   Filter1,
@@ -152,6 +153,18 @@ class AppBody extends Component {
                   path="/register"
                   render={withRouter((props) => (
                     <RegisterPage
+                      {...props}
+                      globalUpdate={this.updateState}
+                      enqueueSnackbar={enqueueSnackbar}
+                      authenticated={isAuthenticated}
+                    />
+                  ))}
+                  exact
+                />
+                <Route
+                  path="/post/:id"
+                  render={withRouter((props) => (
+                    <PostViewPage
                       {...props}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}

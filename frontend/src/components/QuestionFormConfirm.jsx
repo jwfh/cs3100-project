@@ -29,19 +29,19 @@ export class QuestionFormConfirm extends Component {
           that the tags you included reflect the purpose and subject of the
           question.
         </Typography>
-        <Paper className={classes.root} elevation={1}>
-          <PostDisplay title={values.title} content={values.content} />
-          {values.tags.map((tag) => {
-            return (
-              <Chip
-                key={tag.label}
-                variant="outlined"
-                label={tag.label}
-                className={classes.chip}
-              />
-            );
-          })}
-        </Paper>
+        {/* <Paper className={classes.root} elevation={1}> */}
+        <PostDisplay title={values.title} content={values.content} />
+        {values.tags.map((tag) => {
+          return (
+            <Chip
+              key={tag.label}
+              variant="outlined"
+              label={tag.label}
+              className={classes.chip}
+            />
+          );
+        })}
+        {/* </Paper> */}
       </Fragment>
     );
   }

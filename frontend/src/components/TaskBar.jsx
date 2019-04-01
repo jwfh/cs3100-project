@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
   AppBar,
@@ -179,7 +179,13 @@ class TaskBar extends React.Component {
 
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
-    const { classes, siteLevelName, sideBarOpen, authenticated } = this.props;
+    const {
+      classes,
+      siteLevelName,
+      sideBarOpen,
+      authenticated,
+      admin,
+    } = this.props;
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -287,13 +293,17 @@ class TaskBar extends React.Component {
             <div className={classes.grow} />
             {authenticated ? (
               <div className={classes.sectionDesktop}>
-                <IconButton
-                  component={Link}
-                  to="/admin"
-                  className={classes.button}
-                >
-                  <Settings />
-                </IconButton>
+                {admin ? (
+                  <IconButton
+                    component={Link}
+                    to="/admin"
+                    className={classes.button}
+                  >
+                    <Settings />
+                  </IconButton>
+                ) : (
+                  <Fragment />
+                )}
                 <IconButton
                   component={Link}
                   to="/new"

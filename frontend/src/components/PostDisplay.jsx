@@ -35,16 +35,21 @@ const isValidMathIndices = (openIdxs, closeIdxs) => {
 };
 
 const inlineMath = (mathContent) => (
-  <InlineMath>\displaystyle {mathContent}</InlineMath>
+  <InlineMath>{'\\displaystyle ' + mathContent}</InlineMath>
 );
 
-const displayMath = (mathContent) => <BlockMath>{mathContent}</BlockMath>;
+const displayMath = (mathContent) => (
+  <div style={{ display: 'block' }}>
+    <BlockMath>{mathContent}</BlockMath>
+  </div>
+);
 
 const renderContent = (content) => {
   const inlineOpen = getIndicesOf('\\(', content),
     inlineClose = getIndicesOf('\\)', content),
     displayOpen = getIndicesOf('\\[', content),
     displayClose = getIndicesOf('\\]', content);
+  let components = [];
   if (
     inlineOpen.length !== inlineClose.length ||
     displayOpen.length !== displayClose.length ||
@@ -53,16 +58,88 @@ const renderContent = (content) => {
   ) {
     console.log('Missing $ inserted.');
   } else {
-    let components = [];
+    // Merge indices into one array for open and one array for close
+    let open = [],
+      close = [];
+    let i = 0,
+      j = 0,
+      k = 0;
+    while (i < inlineOpen.length || j < displayOpen.length) {
+      let inlineIdx = null,
+        displayIdx = null,
+        openIdx,
+        closeIdx,
+        mathType;
+
+      if (i < inlineOpen.length) {
+        inlineIdx = inlineOpen[i];
+      }
+      if (j < displayOpen.length) {
+        displayIdx = displayOpen[j];
+      }
+      if (inlineIdx !== null && displayIdx !== null) {
+        // We got two indices... pick the smaller one the decrement the other counter
+        if (inlineIdx < displayIdx) {
+          openIdx = inlineIdx;
+          closeIdx = inlineClose[i];
+          i++;
+          mathType = 'inline';
+        } else {
+          openIdx = displayIdx;
+          closeIdx = displayClose[j];
+          j++;
+          mathType = 'display';
+        }
+      } else if (inlineIdx === null) {
+        // Must use the display
+        openIdx = displayIdx;
+        closeIdx = displayClose[j];
+        j++;
+        mathType = 'display';
+      } else {
+        // Must use inline
+        openIdx = inlineIdx;
+        closeIdx = inlineClose[i];
+        i++;
+        mathType = 'inline';
+      }
+      console.log(k, openIdx, closeIdx);
+      let before = content.substring(k, openIdx),
+        inside = content.substring(openIdx + 2, closeIdx);
+
+      console.log('before', before);
+      console.log('inside', inside);
+
+      components.push(
+        <Typography style={{ display: 'inline' }}>{before}</Typography>,
+      );
+
+      components.push(' ');
+
+      if (mathType === 'display') {
+        components.push(displayMath(inside));
+      } else {
+        components.push(inlineMath(inside));
+      }
+
+      components.push(' ');
+
+      k = closeIdx + 2;
+    }
+    let last = content.substring(k + 2, content.length);
+    console.log('last', last);
+    components.push(<Typography>{last}</Typography>);
   }
 
-  return <div />;
+  return components;
 };
 
 const PostDisplay = (props) => (
   <Fragment>
-    <Typography>{props.title}</Typography>
-    {renderContent(props.content)}
+    <Typography variant="h6" component="p" style={{ display: 'block' }}>
+      {props.title}
+    </Typography>
+    <div style={{ display: 'block' }}>{renderContent(props.content)}</div>
   </Fragment>
 );
 

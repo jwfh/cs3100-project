@@ -325,6 +325,25 @@ module.exports.get = (type, params, callback) => {
         callback('No UID provided.', null);
       }
       break;
+    case 'question':
+      if (params.id) {
+        db.get(
+          'SELECT * from `QUESTIONS` WHERE id=?',
+          [params.id],
+          (error, row) => {
+            if (!error) {
+              let res = row;
+              res.tags = [{id: 1, label: 'Number Theory'}];
+              callback(error, res);
+            } else {
+              callback(error, null);
+            }
+          }
+        );
+      } else {
+        callback('No UID provided.', null);
+      }
+      break;
     default:
       break;
   }
@@ -354,14 +373,51 @@ module.exports.create = (type, params, callback) => {
         params.content &&
         params.tags &&
         params.level &&
-        params.author
+        params.authorID
       ) {
-        db.serialize(() => {
-          // TODO
-          db.run('', (error) => {
-            callback('Error adding new question: ' + error, null);
-          });
-        });
+        db.get(
+          'SELECT COUNT(`id`) AS count, MAX(`id`) AS max FROM `QUESTIONS`',
+          (error1, row1) => {
+            if (!error1) {
+              db.get(
+                'SELECT `id` FROM `Q_LEVELS` WHERE `level`=?',
+                [params.level],
+                (error2, row2) => {
+                  if (!error2) {
+                    const newQID = row1.count < 1 ? 1 : row1.max + 1;
+                    db.run(
+                      'INSERT INTO `QUESTIONS` (id, title, content, authorID, levelID, idHash) VALUES (?, ?, ?, ?, ?, ?)',
+                      [
+                        newQID,
+                        params.title,
+                        params.content,
+                        params.authorID,
+                        row2.id,
+                        sha256(newQID.toString()),
+                      ],
+                      (error) => {
+                        if (!error) {
+                          const newRoute = `/post/${newQID}`;
+                          callback(null, newRoute);
+                        } else {
+                          callback('Error adding new question: ' + error, null);
+                        }
+                      }
+                    );
+                  } else {
+                    if (settings.debug) {
+                      console.log('Error getting level name:', error1);
+                    }
+                  }
+                }
+              );
+            } else {
+              if (settings.debug) {
+                console.log('Error getting user ID count and max:', error1);
+              }
+            }
+          }
+        );
       } else {
         callback('Required parameters missing to add new question', null);
       }
