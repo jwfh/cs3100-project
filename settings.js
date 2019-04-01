@@ -7,3 +7,4 @@ module.exports.passwordPolicy = {
   pLowercase: false,
   pDigits: false,
 };
+module.exports.lockoutCount = 10;

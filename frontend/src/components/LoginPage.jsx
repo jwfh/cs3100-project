@@ -22,14 +22,17 @@ const styles = (theme) => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
     width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '75%',
+    [theme.breakpoints.up('sm')]: {
+      width: '60%',
     },
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('md')]: {
       width: '50%',
     },
+    [theme.breakpoints.up('lg')]: {
+      width: '35%',
+    },
     [theme.breakpoints.up('xl')]: {
-      width: '33%',
+      width: '25%',
     },
     display: 'inline-block',
     textAlign: 'center',
@@ -44,7 +47,7 @@ const styles = (theme) => ({
     display: 'none',
   },
   root: {
-    width: '50%',
+    width: '90%',
     display: 'inline-block',
     textAlign: 'center',
   },
@@ -102,6 +105,7 @@ UsernameForm.propTypes = {
 const PasswordForm = (props) => (
   <FormFunc onSubmit={props.onReturnKey}>
     <TextField
+      autoFocus
       label="Password"
       type={props.hide ? 'password' : 'text'}
       value={props.password}
@@ -297,7 +301,10 @@ class LoginPage extends Component {
   };
 
   validate = (componentIdx, callback) => {
-    let uri = '//' + backend + '/api/validate';
+    const uri = '//' + backend + '/api/validate';
+    const config = {
+      timeout: 2000,
+    };
     let data;
     const { username, secA, isValid, resetPassword, resetConfirm } = this.state;
     switch (componentIdx) {
@@ -309,7 +316,7 @@ class LoginPage extends Component {
           },
         };
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (
               response.status === 200 &&
@@ -387,7 +394,7 @@ class LoginPage extends Component {
           },
         };
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (
               response.status === 200 &&
@@ -470,7 +477,7 @@ class LoginPage extends Component {
             ? ''
             : 'Please make sure that your passwords match';
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (
               response.status === 200 &&
@@ -598,7 +605,7 @@ class LoginPage extends Component {
 
   attemptSignIn = () => {
     const { history } = this.props;
-    const { username, password, isValid } = this.state;
+    const { username, password, isValid, showValid } = this.state;
     const uri = '//' + backend + '/api/gatekeeper';
     const data = {
       action: 'sign-in',
@@ -607,27 +614,46 @@ class LoginPage extends Component {
         password,
       },
     };
+    const config = {
+      timeout: 2000,
+      crossOrigin: true,
+      withCredentials: true,
+    };
+    showValid[1] = true;
     axios
-      .post(uri, data)
+      .post(uri, data, config)
       .then((response) => {
         if (response.status === 200) {
-          if (response.body) {
-            if (response.body.ok === true) {
+          if (response.data) {
+            if (response.data.ok === true) {
               isValid[1] = true;
               this.setState(
                 {
+                  showValid,
                   isValid,
                 },
                 () => {
+                  this.props.enqueueSnackbar(
+                    'You are now signed in to NumHub.',
+                    { variant: 'success' },
+                  );
+                  this.props.globalUpdate('isAuthenticated', true);
+                  if ('uid' in response.data) {
+                    this.props.globalUpdate('uid', response.data.uid);
+                  }
+                  if ('admin' in response.data) {
+                    this.props.globalUpdate('isAdmin', response.data.admin);
+                  }
                   history.push('/');
                 },
               );
             } else {
               isValid[1] = false;
               this.setState({
+                showValid,
                 isValid,
-                passwordErrorMessage: response.body.message
-                  ? response.body.message
+                passwordErrorMessage: response.data.message
+                  ? response.data.message
                   : "The request failed but the server didn't tell us why.",
               });
             }
@@ -678,19 +704,40 @@ class LoginPage extends Component {
         newPassword: resetPassword,
       },
     };
+    const config = {
+      timeout: 2000,
+    };
     this.validate(activeComponent, () => {
       let componentIsValid =
         isValid[activeComponent].password && isValid[activeComponent].confirm;
       showValid[activeComponent] = true;
       if (componentIsValid) {
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (response.status === 200 && response.data.ok === true) {
               this.props.enqueueSnackbar(
                 'Your password has been reset. Try logging in.',
               );
-              this.props.history.push('/login');
+              this.setState({
+                activeComponent: 1,
+                password: '',
+                hideField: {
+                  password: true,
+                  secA: true,
+                  resetPassword: true,
+                  resetConfirm: true,
+                },
+                passwordErrorMessage: '',
+                secQ: '',
+                secA: '',
+                secAErrorMessage: '',
+                resetPassword: '',
+                resetConfirm: '',
+                resetPassErrorMessage: '',
+                resetConfirmErrorMessage: '',
+                showValid: [false, false, false, false],
+              });
             } else {
               if (debug) {
                 if ('message' in response.data) {
@@ -722,7 +769,10 @@ class LoginPage extends Component {
   fetchAssets = (componentIdx, callback) => {
     const { username } = this.state;
     const uri = `//${backend}/api/fetch`;
-    let data = {};
+    let data;
+    const config = {
+      timeout: 2000,
+    };
     switch (componentIdx) {
       case 2:
         // Fetching security question before advance to #2 (ForgotPasswordFormQuestion)
@@ -733,7 +783,7 @@ class LoginPage extends Component {
           },
         };
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (
               response.status === 200 &&

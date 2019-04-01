@@ -19,11 +19,13 @@
     "express": "~4.16.0",
     "express-rate-limit": "^3.4.0",
     "express-ws": "^4.0.0",
+    "express-session": "^1.15.6",
     "gm": "^1.23.1",
     "helmet": "^3.16.0",
     "http-errors": "~1.6.2",
     "morgan": "^1.9.1",
     "pug": "^2.0.3",
+    "session-file-store": "^1.2.0",
     "sha-256-js": "^1.0.3",
     "sqlite3": "^4.0.6"
   },

@@ -1,5 +1,5 @@
 const settings = require('../settings');
-
+const sha256 = require('sha-256-js');
 const sqlite3 = require('sqlite3').verbose();
 
 const dbFile = __dirname + '/../numhub.db';
@@ -45,6 +45,15 @@ module.exports.init = () => {
     )`);
     console.log('Created user table...');
     db.run(`\
+    /* Table of active cookie sessions. */
+    CREATE TABLE IF NOT EXISTS \`SESSIONS\` (
+      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
+      \`uid\` INT NOT NULL,
+      \`updatedAt\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (\`uid\`) REFERENCES \`USERS\`(\`id\`)
+    )`);
+    console.log('Created session table...');
+    db.run(`\
     /* Question levels (i.e., Elementary, High School, Undergraduate, 
      * Graduate, etc.). 
      */
@@ -57,26 +66,27 @@ module.exports.init = () => {
     /* Table containing questions. */
     CREATE TABLE IF NOT EXISTS \`QUESTIONS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`author_id\` INT NOT NULL,
-      \`q_id\` INT NOT NULL,
-      \`q_rev_id\` INT NOT NULL DEFAULT 0,
-      \`q_text\` TEXT NOT NULL,
-      \`q_level_id\` INT NOT NULL,
-      \`post_time\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (\`author_id\`) REFERENCES \`USERS\`(\`id\`),
-      FOREIGN KEY (\`q_level_id\`) REFERENCES \`Q_LEVELS\`(\`id\`)
+      \`authorID\` INT NOT NULL,
+      \`content\` TEXT NOT NULL,
+      \`title\` TEXT NOT NULL,
+      \`levelID\` INT NOT NULL,
+      \`idHash\` TEXT NOT NULL,
+      \`postTime\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(\`idHash\`),
+      FOREIGN KEY (\`authorID\`) REFERENCES \`USERS\`(\`id\`),
+      FOREIGN KEY (\`levelID\`) REFERENCES \`Q_LEVELS\`(\`id\`)
     )`);
     console.log('Created question table...');
     db.run(`\
     /* Table of question answers. */
     CREATE TABLE IF NOT EXISTS \`ANSWERS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`author_id\` INT NOT NULL,
-      \`q_id\` INT NOT NULL,
-      \`a_text\` TEXT NOT NULL,
-      \`post_time\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (\`author_id\`) REFERENCES \`USERS\`(\`id\`),
-      FOREIGN KEY (\`q_id\`) REFERENCES \`QUESTIONS\`(\`q_id\`)
+      \`authorID\` INT NOT NULL,
+      \`qID\` INT NOT NULL,
+      \`content\` TEXT NOT NULL,
+      \`postTime\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (\`authorID\`) REFERENCES \`USERS\`(\`id\`),
+      FOREIGN KEY (\`qID\`) REFERENCES \`QUESTIONS\`(\`id\`)
     )`);
     console.log('Created answer table...');
     db.run(`\
@@ -91,19 +101,19 @@ module.exports.init = () => {
     /* Table to maintain association of what tags a question has. */
     CREATE TABLE IF NOT EXISTS \`Q_TAGS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`q_id\` INT NOT NULL,
-      \`q_tag_id\` INT NOT NULL,
-      FOREIGN KEY (\`q_id\`) REFERENCES \`QUESTIONS\`(\`id\`),
-      FOREIGN KEY (\`q_tag_id\`) REFERENCES \`TAGS\`(\`id\`)
+      \`qID\` INT NOT NULL,
+      \`qTagID\` INT NOT NULL,
+      FOREIGN KEY (\`qID\`) REFERENCES \`QUESTIONS\`(\`id\`),
+      FOREIGN KEY (\`qTagID\`) REFERENCES \`TAGS\`(\`id\`)
     )`);
     console.log('Created tag association table...');
     db.run(`\
     /* Table for to facilitate URL shortening (for sharing link feature). */
     CREATE TABLE IF NOT EXISTS \`URLS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`url_leaf\` VARCHAR(10),
-      \`redirect_q_id\` INT NOT NULL,
-      \`redirect_a_id\` INT DEFAULT NULL
+      \`uriLeaf\` VARCHAR(10),
+      \`redirectQID\` INT NOT NULL,
+      \`redirectAID\` INT DEFAULT NULL
     )`);
     console.log('Created URL shortener table...');
   });
@@ -191,159 +201,314 @@ module.exports.init = () => {
 
 module.exports.all = (type, callback) => {
   switch (type) {
-  case 'tag':
-    db.all('SELECT `id`,`tag` from `TAGS`', (error, rows) => {
-      if (error) {
-        console.log('[' + __filename + ']', 'Error retrieving tags:', error);
-      }
-      callback(error, rows);
-    });
-    break;
-  case 'level':
-    db.all('SELECT `id`,`level` from `Q_LEVELS`', (error, rows) => {
-      if (error) {
-        console.log(
-          '[' + __filename + ']',
-          'Error retrieving levels:',
-          error
-        );
-      }
-      callback(error, rows);
-    });
-    break;
-  default:
-    break;
+    case 'tag':
+      db.all('SELECT `id`,`tag` FROM `TAGS`', (error, rows) => {
+        if (error) {
+          console.log('[' + __filename + ']', 'Error retrieving tags:', error);
+        }
+        callback(error, rows);
+      });
+      break;
+    case 'level':
+      db.all('SELECT `id`,`level` FROM `Q_LEVELS`', (error, rows) => {
+        if (error) {
+          console.log(
+            '[' + __filename + ']',
+            'Error retrieving levels:',
+            error
+          );
+        }
+        callback(error, rows);
+      });
+      break;
+    case 'session':
+      db.all('SELECT `id`,`updatedAt` FROM `SESSIONS`', (error, rows) => {
+        if (error) {
+          console.log(
+            '[' + __filename + ']',
+            'Error retrieving sessions:',
+            error
+          );
+        }
+        callback(error, rows);
+      });
+      break;
+    case 'user':
+      db.all(
+        'SELECT `id`,`username`,`name`,`email`,`admin`,`lockoutCount` FROM `USERS`',
+        (error, rows) => {
+          if (error) {
+            console.log(
+              '[' + __filename + ']',
+              'Error retrieving users:',
+              error
+            );
+          }
+          for (let row of rows) {
+            row.admin = row.admin === 1;
+          }
+          callback(error, rows);
+        }
+      );
+      break;
+    case 'question':
+      db.all(
+        'SELECT `id`,`title`,`content`,`levelID`,`idHash` FROM `QUESTIONS`',
+        (error, rows) => {
+          if (error) {
+            console.log(
+              '[' + __filename + ']',
+              'Error retrieving questions:',
+              error
+            );
+          }
+          callback(error, rows);
+        }
+      );
+      break;
+    default:
+      break;
   }
 };
 
 module.exports.get = (type, params, callback) => {
   switch (type) {
-  case 'userByUsername':
-    if (params.username) {
-      db.get(
-        'SELECT * from `USERS` where `username`=?',
-        [params.username],
-        (error, row) => {
-          if (!error) {
-            if (settings.debug) {
-              console.log('User is', row);
+    case 'userByUsername':
+      if (params.username) {
+        db.get(
+          'SELECT * from `USERS` where `username`=?',
+          [params.username],
+          (error, row) => {
+            if (!error) {
+              if (settings.debug) {
+                console.log('User is', row);
+              }
+              if (typeof row !== 'undefined') {
+                row.admin = row.admin === 1;
+              }
+              callback(error, row);
+            } else {
+              if (settings.debug) {
+                console.log('Error:', error);
+              }
+              callback('Erorr contacting database.', null);
             }
-            callback(error, row);
-          } else {
-            if (settings.debug) {
-              console.log('Error:', error);
-            }
-            callback('Erorr contacting database.', null);
           }
-        }
-      );
-    } else {
-      callback('No username provided.', null);
-    }
-    break;
-  default:
-    break;
+        );
+      } else {
+        callback('No username provided.', null);
+      }
+      break;
+    case 'userByID':
+      if (params.id) {
+        db.get(
+          'SELECT * from `USERS` where `id`=?',
+          [params.id],
+          (error, row) => {
+            if (!error) {
+              if (settings.debug) {
+                console.log('User is', row);
+              }
+              if (typeof row !== 'undefined') {
+                row.admin = row.admin === 1;
+              }
+              callback(error, row);
+            } else {
+              if (settings.debug) {
+                console.log('Error:', error);
+              }
+              callback('Erorr contacting database.', null);
+            }
+          }
+        );
+      } else {
+        callback('No UID provided.', null);
+      }
+      break;
+    default:
+      break;
   }
 };
 
 // TODO
 module.exports.update = (table, attribute, value, id, callback) => {
   switch (table) {
-  case 'USERS':
-    db.run(
-      `UPDATE \`USERS\` SET \`${attribute}\`=? WHERE \`id\`=?`,
-      [value, id],
-      callback
-    );
-    break;
-  default:
-    callback('No table given.');
-    break;
+    case 'USERS':
+      db.run(
+        `UPDATE \`USERS\` SET \`${attribute}\`=? WHERE \`id\`=?`,
+        [value, id],
+        callback
+      );
+      break;
+    default:
+      callback('No table given.');
+      break;
   }
 };
 
 module.exports.create = (type, params, callback) => {
   switch (type) {
-  case 'question':
-    if (
-      params.title &&
+    case 'question':
+      if (
+        params.title &&
         params.content &&
         params.tags &&
         params.level &&
         params.author
-    ) {
-      db.serialize(() => {
-        // TODO
-        db.run('', (error) => {
-          callback('Error adding new question: ' + error, null);
+      ) {
+        db.serialize(() => {
+          // TODO
+          db.run('', (error) => {
+            callback('Error adding new question: ' + error, null);
+          });
         });
-      });
-    } else {
-      callback('Required parameters missing to add new question', null);
-    }
-    break;
-  case 'answer':
-    break;
-  case 'user':
-    if (
-      params.name &&
+      } else {
+        callback('Required parameters missing to add new question', null);
+      }
+      break;
+    case 'answer':
+      break;
+    case 'user':
+      if (
+        params.name &&
         params.username &&
         params.secQ &&
         params.secA &&
         params.password &&
         params.email
-    ) {
-      db.get(
-        'SELECT COUNT(`id`) AS count, MAX(`id`) AS max FROM `USERS`',
-        (error, row) => {
-          if (!error) {
-            const newUID = row.count < 1 ? 1 : row.max + 1;
-            db.run(
-              'INSERT INTO `USERS` (`id`, `name`, `username`, `password`, `secQ`, `secA`,' +
+      ) {
+        db.get(
+          'SELECT COUNT(`id`) AS count, MAX(`id`) AS max FROM `USERS`',
+          (error, row) => {
+            if (!error) {
+              const newUID = row.count < 1 ? 1 : row.max + 1;
+              db.run(
+                'INSERT INTO `USERS` (`id`, `name`, `username`, `password`, `secQ`, `secA`,' +
                   ' `email`) VALUES (?, ?, ?, ?, ?, ?, ?)',
-              [
-                newUID,
-                params.name,
-                params.username,
-                params.password,
-                params.secQ,
-                params.secA,
-                params.email,
-              ],
-              callback
-            );
-          } else {
-            if (settings.debug) {
-              console.log('Error getting user ID count and max:', error);
+                [
+                  newUID,
+                  params.name,
+                  params.username,
+                  params.password,
+                  params.secQ,
+                  params.secA,
+                  params.email,
+                ],
+                callback
+              );
+            } else {
+              if (settings.debug) {
+                console.log('Error getting user ID count and max:', error);
+              }
             }
           }
-        }
-      );
-    }
-    break;
-  case 'tag':
-    break;
-  default:
-    break;
+        );
+      }
+      break;
+    case 'tag':
+      break;
+    case 'session':
+      if (params.uid) {
+        db.get(
+          'SELECT COUNT(`id`) AS count, MAX(`id`) as max FROM `SESSIONS`',
+          (error1, row) => {
+            if (!error1) {
+              const newSessID = row.count < 1 ? 1 : row.max + 1;
+              const newSessionKey = sha256(
+                newSessID.toString() + params.uid.toString()
+              );
+              db.run(
+                'INSERT INTO `SESSIONS` (id, uid) VALUES (?, ?)',
+                [newSessID, params.uid],
+                (error2) => {
+                  if (!error2) {
+                    callback(error2, newSessionKey);
+                  } else {
+                    callback(error2, null);
+                  }
+                }
+              );
+            } else {
+              if (settings.debug) {
+                console.log('Error getting session ID count and max:', error1);
+              }
+            }
+          }
+        );
+      } else {
+        callback('No UID provided.', null);
+      }
+      break;
+    default:
+      break;
   }
 };
 
 module.exports.delete = (type, params, callback) => {
   switch (type) {
-  case 'question':
-    break;
-  case 'answer':
-    break;
-  case 'user':
-    break;
-  case 'tag':
-    break;
-  default:
-    break;
+    case 'question':
+      break;
+    case 'answer':
+      break;
+    case 'user':
+      break;
+    case 'tag':
+      break;
+    case 'session':
+      break;
+    default:
+      break;
   }
 };
 
 module.exports.demo = () => {
   module.exports.init();
-  console.log('Add demo rows here...');
+  const demoUsers = [
+    {
+      id: 1,
+      name: 'Leanne Graham',
+      username: 'Bret',
+      email: 'Sincere@april.biz',
+      password: 'Bret',
+      secQ: 'Whats your favourite animal',
+      secA: 'Dog',
+    },
+
+    {
+      id: 2,
+      name: 'Ervin Howell',
+      username: 'Antonette',
+      email: 'Shanna@melissa.tv',
+      password: 'Antonette',
+      secQ: 'Whats favourite food',
+      secA: 'Rice',
+    },
+    {
+      id: 3,
+      name: 'Clementine Bauch',
+      username: 'Samantha',
+      email: 'Nathan@yesenia.net',
+      password: 'Samantha',
+      secQ: 'Whats your favourite colour',
+      secA: 'Blue',
+    },
+    {
+      id: 4,
+      name: 'Patricia Lebsack',
+      username: 'Karianne',
+      email: 'Julianne.OConner@kory.org',
+      password: 'Karianne',
+      secQ: 'Whats your mothers maiden name',
+      secA: 'Gina',
+    },
+    {
+      id: 5,
+      name: 'Chelsey Dietrich',
+      username: 'Kamren',
+      email: 'Lucio_Hettinger@annie.ca',
+      password: 'Kamren',
+      secQ: 'Whats the best day of the week',
+      secA: 'Friday',
+    },
+  ];
 };

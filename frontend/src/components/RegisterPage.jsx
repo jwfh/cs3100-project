@@ -13,7 +13,6 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import PageTitle from './PageTitle';
 import axios from 'axios';
 
 const styles = (theme) => ({
@@ -26,14 +25,17 @@ const styles = (theme) => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
     width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '75%',
+    [theme.breakpoints.up('sm')]: {
+      width: '60%',
     },
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('md')]: {
       width: '50%',
     },
+    [theme.breakpoints.up('lg')]: {
+      width: '35%',
+    },
     [theme.breakpoints.up('xl')]: {
-      width: '33%',
+      width: '25%',
     },
     display: 'inline-block',
     textAlign: 'center',
@@ -48,7 +50,7 @@ const styles = (theme) => ({
     display: 'none',
   },
   root: {
-    width: '50%',
+    width: '90%',
     display: 'inline-block',
     textAlign: 'center',
   },
@@ -249,7 +251,10 @@ export class RegisterPage extends Component {
 
   fetchAssets = (componentIdx, callback) => {
     const uri = `//${backend}/api/fetch/all`;
-    let data = {};
+    let data;
+    const config = {
+      timeout: 2000,
+    };
     switch (componentIdx) {
       case 2:
         // Fetching list of security questions here before advance to #2 (RegisterFormSecurity)
@@ -257,7 +262,7 @@ export class RegisterPage extends Component {
           type: 'secQ',
         };
         axios
-          .post(uri, data)
+          .post(uri, data, config)
           .then((response) => {
             if (response.status === 200) {
               // Valid response
