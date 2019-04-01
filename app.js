@@ -8,8 +8,10 @@ const logger = require('morgan');
 const compression = require('compression');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const expressWS = require('express-ws');
 
 const app = express();
+expressWS(app);
 app.use(helmet());
 app.use(compression());
 
@@ -36,11 +38,17 @@ app.use('/robots.txt', robots.txt);
 // API routes to backend logic
 const apiRouter = require('./backend/api');
 app.use('/api', apiRouter);
+const wsRouter = require('./backend/rtapi');
+app.use('/rtapi', wsRouter);
 
 // Serve static React frontend
 app.use(express.static(path.join(__dirname, 'frontend/build')));
 app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+});
+
+app.ws('/test', (ws, req) => {
+  console.log('ws');
 });
 
 // catch 404 and forward to error handler

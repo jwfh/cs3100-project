@@ -18,6 +18,8 @@ import {
   Search as SearchIcon,
 } from '@material-ui/icons';
 import classNames from 'classnames';
+import MenuButton from './AccountBar';
+import NotificationBar from './NotificationBar';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import { withStyles } from '@material-ui/core/styles';
 import WhiteLogo from '../assets/images/logo-02.svg';
@@ -182,8 +184,10 @@ class TaskBar extends React.Component {
         open={isMenuOpen}
         onClose={this.handleMenuClose}
       >
-        <MenuItem onClick={this.handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+        <MenuItem onClick={this.handleMenuClose}>Notification 1</MenuItem>
+        <MenuItem onClick={this.handleMenuClose}>Notification 2</MenuItem>
+        <MenuItem onClick={this.handleMenuClose}>Notification 3</MenuItem>
+        <MenuItem onClick={this.handleMenuClose}>Notification 4</MenuItem>
       </Menu>
     );
 
@@ -195,33 +199,30 @@ class TaskBar extends React.Component {
         open={isMobileMenuOpen}
         onClose={this.handleMenuClose}
       >
-        <MenuItem onClick={this.handleMobileMenuClose}>
-          <IconButton color="inherit">
-            <Badge badgeContent={11} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+        <NotificationBar onClick={this.handleMobileMenuClose}>
+          <Badge badgeContent={11} color="secondary">
+            <NotificationsIcon />
+          </Badge>
+
           <p>Notifications</p>
-        </MenuItem>
-        <MenuItem onClick={this.handleProfileMenuOpen}>
-          <IconButton color="inherit">
-            <AccountCircle />
-          </IconButton>
+        </NotificationBar>
+        <MenuButton onClick={this.handleProfileMenuOpen}>
+          <AccountCircle items={['Profile', 'My account']} />
           <p>Profile</p>
-        </MenuItem>
+        </MenuButton>
       </Menu>
     );
 
     return (
       <div className={classes.root}>
-        <AppBar 
+        <AppBar
           position="fixed"
           className={classNames(classes.appBar, {
             [classes.appBarShift]: sideBarOpen,
           })}
         >
-          <Toolbar 
-            // disableGutters={!sideBarOpen}
+          <Toolbar
+          // disableGutters={!sideBarOpen}
           >
             <IconButton
               color="inherit"
@@ -231,16 +232,16 @@ class TaskBar extends React.Component {
               //   [classes.hide]: sideBarOpen,
               // })}
               className={classNames(
-                classes.menuButton, 
+                classes.menuButton,
                 sideBarOpen && classes.hide
               )}
             >
               <MenuIcon />
             </IconButton>
             <div className={classes.brand}>
-              <img 
+              <img
                 className={classes.logo}
-                src={WhiteLogo} 
+                src={WhiteLogo}
                 alt="NumHub"
               ></img>
               <Typography
@@ -268,20 +269,18 @@ class TaskBar extends React.Component {
             </div>
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>
-              <IconButton color="inherit">
-                <Badge badgeContent={17} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
               <IconButton
-                // eslint-disable-next-line no-undefined
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}
                 aria-haspopup="true"
                 onClick={this.handleProfileMenuOpen}
                 color="inherit"
               >
-                <AccountCircle />
+                <Badge badgeContent={17} color="secondary">
+                  <NotificationsIcon />
+                </Badge>
               </IconButton>
+              <MenuButton iconType={AccountCircle} items={['Profile', 'My account']} />
+
             </div>
             <div className={classes.sectionMobile}>
               <IconButton
