@@ -1,5 +1,5 @@
 const settings = require('../settings');
-
+const sha256 = require('sha-256-js');
 const sqlite3 = require('sqlite3').verbose();
 
 const dbFile = __dirname + '/../numhub.db';
@@ -235,7 +235,7 @@ module.exports.all = (type, callback) => {
       break;
     case 'user':
       db.all(
-        'SELECT `id`,`username`,`name`,`email` FROM `USERS`',
+        'SELECT `id`,`username`,`name`,`email`,`admin`,`lockoutCount` FROM `USERS`',
         (error, rows) => {
           if (error) {
             console.log(
@@ -244,12 +244,27 @@ module.exports.all = (type, callback) => {
               error
             );
           }
+          for (let row of rows) {
+            row.admin = row.admin === 1;
+          }
           callback(error, rows);
         }
       );
       break;
     case 'question':
-      db.all('SELECT `id`,');
+      db.all(
+        'SELECT `id`,`title`,`content`,`levelID`,`idHash` FROM `QUESTIONS`',
+        (error, rows) => {
+          if (error) {
+            console.log(
+              '[' + __filename + ']',
+              'Error retrieving questions:',
+              error
+            );
+          }
+          callback(error, rows);
+        }
+      );
       break;
     default:
       break;
@@ -268,6 +283,9 @@ module.exports.get = (type, params, callback) => {
               if (settings.debug) {
                 console.log('User is', row);
               }
+              if (typeof row !== 'undefined') {
+                row.admin = row.admin === 1;
+              }
               callback(error, row);
             } else {
               if (settings.debug) {
@@ -279,6 +297,32 @@ module.exports.get = (type, params, callback) => {
         );
       } else {
         callback('No username provided.', null);
+      }
+      break;
+    case 'userByID':
+      if (params.id) {
+        db.get(
+          'SELECT * from `USERS` where `id`=?',
+          [params.id],
+          (error, row) => {
+            if (!error) {
+              if (settings.debug) {
+                console.log('User is', row);
+              }
+              if (typeof row !== 'undefined') {
+                row.admin = row.admin === 1;
+              }
+              callback(error, row);
+            } else {
+              if (settings.debug) {
+                console.log('Error:', error);
+              }
+              callback('Erorr contacting database.', null);
+            }
+          }
+        );
+      } else {
+        callback('No UID provided.', null);
       }
       break;
     default:
@@ -364,6 +408,36 @@ module.exports.create = (type, params, callback) => {
     case 'tag':
       break;
     case 'session':
+      if (params.uid) {
+        db.get(
+          'SELECT COUNT(`id`) AS count, MAX(`id`) as max FROM `SESSIONS`',
+          (error1, row) => {
+            if (!error1) {
+              const newSessID = row.count < 1 ? 1 : row.max + 1;
+              const newSessionKey = sha256(
+                newSessID.toString() + params.uid.toString()
+              );
+              db.run(
+                'INSERT INTO `SESSIONS` (id, uid) VALUES (?, ?)',
+                [newSessID, params.uid],
+                (error2) => {
+                  if (!error2) {
+                    callback(error2, newSessionKey);
+                  } else {
+                    callback(error2, null);
+                  }
+                }
+              );
+            } else {
+              if (settings.debug) {
+                console.log('Error getting session ID count and max:', error1);
+              }
+            }
+          }
+        );
+      } else {
+        callback('No UID provided.', null);
+      }
       break;
     default:
       break;

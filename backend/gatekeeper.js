@@ -33,6 +33,22 @@ setInterval(() => {
   });
 }, 60000);
 
+const newSession = (uid, callback) => {
+  db.create(
+    'session',
+    {
+      uid,
+    },
+    (error, sessionKey) => {
+      if (!error) {
+        callback(sessionKey);
+      } else if (settings.debug) {
+        console.log(`Unable to create session: ${error}`);
+      }
+    }
+  );
+};
+
 const register = (req, res) => {
   if (
     req.body.name &&
@@ -91,9 +107,14 @@ const signIn = (req, res) => {
                 req.body.value.username.toLowerCase() + req.body.value.password
               ) === row.password
             ) {
-              res.send({
-                ok: true,
-                message: 'Access granted',
+              newSession(row.id, (sessionKey) => {
+                res.cookie('numHubSession', sessionKey);
+                res.send({
+                  ok: true,
+                  message: 'Access granted',
+                  uid: row.id,
+                  admin: row.admin,
+                });
               });
             } else {
               db.update(
@@ -199,9 +220,36 @@ const reset = (req, res) => {
 };
 
 module.exports.auth = (req) => {
+  let authenticated = false;
+  let admin = false;
+  if (typeof req.cookies.numHubSession !== 'undefined') {
+    // Yes, cookie was present. Now check the database for the session.
+    db.get(
+      'session',
+      {sessionKey: req.cookies.numHubSession},
+      (error, session) => {
+        if (!error) {
+          db.get('userByID', {id: session.uid}, (error, user) => {
+            if (!error) {
+              authenticated = true;
+              admin = user.admin;
+            } else if (settings.debug) {
+              console.log('Unable to fetch user from the database.');
+            }
+          });
+        } else if (settings.debug) {
+          console.log(
+            `Unable to fetch cookie ${
+              req.cookies.numHubSession
+            } from the database.`
+          );
+        }
+      }
+    );
+  }
   return {
-    authenticated: false,
-    admin: false,
+    authenticated,
+    admin,
   };
 };
 

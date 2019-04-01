@@ -25,14 +25,17 @@ const styles = (theme) => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
     width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '75%',
+    [theme.breakpoints.up('sm')]: {
+      width: '60%',
     },
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('md')]: {
       width: '50%',
     },
+    [theme.breakpoints.up('lg')]: {
+      width: '35%',
+    },
     [theme.breakpoints.up('xl')]: {
-      width: '33%',
+      width: '25%',
     },
     display: 'inline-block',
     textAlign: 'center',
@@ -47,7 +50,7 @@ const styles = (theme) => ({
     display: 'none',
   },
   root: {
-    width: '50%',
+    width: '90%',
     display: 'inline-block',
     textAlign: 'center',
   },

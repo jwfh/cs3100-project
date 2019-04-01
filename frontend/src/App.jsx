@@ -93,6 +93,8 @@ class AppBody extends Component {
       sideBarOpen: false,
       siteLevelIdx: 0,
       showBrand: true,
+      isAuthenticated: false,
+      isAdmin: false,
     };
   }
 
@@ -108,7 +110,7 @@ class AppBody extends Component {
   getState = (key) => this.state[key];
 
   render() {
-    const { sideBarOpen } = this.state;
+    const { sideBarOpen, isAuthenticated, isAdmin } = this.state;
     const { enqueueSnackbar } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
@@ -119,6 +121,8 @@ class AppBody extends Component {
               sideBarOpen={this.state.sideBarOpen}
               globalUpdate={this.updateState}
               siteLevelName={this.siteLevelItems[this.state.siteLevelIdx].label}
+              authenticated={isAuthenticated}
+              admin={isAdmin}
             />
             <PageBody sideBarOpen={sideBarOpen}>
               <Switch>
@@ -136,6 +140,7 @@ class AppBody extends Component {
                       {...props}
                       enqueueSnackbar={enqueueSnackbar}
                       level={this.siteLevelItems[this.state.siteLevelIdx].label}
+                      authenticated={isAuthenticated}
                     />
                   ))}
                   exact
@@ -147,6 +152,7 @@ class AppBody extends Component {
                       {...props}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}
+                      authenticated={isAuthenticated}
                     />
                   ))}
                   exact
@@ -158,6 +164,7 @@ class AppBody extends Component {
                       {...props}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}
+                      authenticated={isAuthenticated}
                     />
                   ))}
                   exact
@@ -169,6 +176,8 @@ class AppBody extends Component {
                       {...props}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}
+                      authenticated={isAuthenticated}
+                      admin={isAdmin}
                     />
                   ))}
                   exact

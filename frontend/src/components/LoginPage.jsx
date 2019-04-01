@@ -22,14 +22,17 @@ const styles = (theme) => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
     width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '75%',
+    [theme.breakpoints.up('sm')]: {
+      width: '60%',
     },
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('md')]: {
       width: '50%',
     },
+    [theme.breakpoints.up('lg')]: {
+      width: '35%',
+    },
     [theme.breakpoints.up('xl')]: {
-      width: '33%',
+      width: '25%',
     },
     display: 'inline-block',
     textAlign: 'center',
@@ -44,7 +47,7 @@ const styles = (theme) => ({
     display: 'none',
   },
   root: {
-    width: '50%',
+    width: '90%',
     display: 'inline-block',
     textAlign: 'center',
   },
@@ -102,6 +105,7 @@ UsernameForm.propTypes = {
 const PasswordForm = (props) => (
   <FormFunc onSubmit={props.onReturnKey}>
     <TextField
+      autoFocus
       label="Password"
       type={props.hide ? 'password' : 'text'}
       value={props.password}
@@ -601,7 +605,7 @@ class LoginPage extends Component {
 
   attemptSignIn = () => {
     const { history } = this.props;
-    const { username, password, isValid } = this.state;
+    const { username, password, isValid, showValid } = this.state;
     const uri = '//' + backend + '/api/gatekeeper';
     const data = {
       action: 'sign-in',
@@ -612,7 +616,10 @@ class LoginPage extends Component {
     };
     const config = {
       timeout: 2000,
+      crossOrigin: true,
+      withCredentials: true,
     };
+    showValid[1] = true;
     axios
       .post(uri, data, config)
       .then((response) => {
@@ -622,6 +629,7 @@ class LoginPage extends Component {
               isValid[1] = true;
               this.setState(
                 {
+                  showValid,
                   isValid,
                 },
                 () => {
@@ -629,15 +637,23 @@ class LoginPage extends Component {
                     'You are now signed in to NumHub.',
                     { variant: 'success' },
                   );
+                  this.props.globalUpdate('isAuthenticated', true);
+                  if ('uid' in response.data) {
+                    this.props.globalUpdate('uid', response.data.uid);
+                  }
+                  if ('admin' in response.data) {
+                    this.props.globalUpdate('isAdmin', response.data.admin);
+                  }
                   history.push('/');
                 },
               );
             } else {
               isValid[1] = false;
               this.setState({
+                showValid,
                 isValid,
                 passwordErrorMessage: response.data.message
-                  ? response.body.message
+                  ? response.data.message
                   : "The request failed but the server didn't tell us why.",
               });
             }

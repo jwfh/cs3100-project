@@ -46,11 +46,11 @@ module.exports.fetch = (req, res) => {
 };
 
 module.exports.all = (req, res) => {
-  console.log(req.path, req.body);
   switch (req.body.type) {
     case 'tag':
     case 'level':
     case 'user':
+    case 'question':
       db.all(req.body.type, (error, rows) => {
         if (!error) {
           res.status(200);
@@ -71,3 +71,53 @@ module.exports.all = (req, res) => {
       break;
   }
 };
+
+module.exports.update = (req, res) => {
+  switch (req.body.type) {
+    case 'admin':
+      if (req.body.value && req.body.value.uid) {
+        db.update('USERS', 'admin', 1, req.body.value.uid, (error) => {
+          if (!error) {
+            res.send({
+              ok: true,
+              message: `Made UID ${req.body.value.uid} an admin.`,
+            });
+          } else {
+            res.send({
+              ok: false,
+              message: error,
+            });
+          }
+        });
+      }
+      break;
+    case 'lockoutCount':
+      if (req.body.value && req.body.value.uid) {
+        db.update('USERS', 'lockoutCount', 0, req.body.value.uid, (error) => {
+          if (!error) {
+            res.send({
+              ok: true,
+              message: `Reset UID ${
+                req.body.value.uid
+              }'s lockout count to zero.`,
+            });
+          } else {
+            res.send({
+              ok: false,
+              message: error,
+            });
+          }
+        });
+      }
+      break;
+    default:
+      res.status(400);
+      res.type('text');
+      res.send('Bad Request');
+      break;
+  }
+};
+
+module.exports.create = (req, res) => {};
+
+module.exports.delete = (req, res) => {};

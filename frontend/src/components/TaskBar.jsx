@@ -9,21 +9,24 @@ import {
   Badge,
   MenuItem,
   Menu,
+  Button,
 } from '@material-ui/core';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import {
   AccountCircle,
+  Add,
+  Settings,
   Notifications as NotificationsIcon,
   MoreVert as MoreIcon,
   Menu as MenuIcon,
   Search as SearchIcon,
 } from '@material-ui/icons';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import { withStyles } from '@material-ui/core/styles';
 import WhiteLogo from '../assets/images/logo-02.svg';
-import {
-  sideBarDrawerWidth as drawerWidth,
-} from '../App';
+import { sideBarDrawerWidth as drawerWidth } from '../App';
 
 const styles = (theme) => ({
   root: {
@@ -53,6 +56,7 @@ const styles = (theme) => ({
     },
   },
   siteVariant: {
+    color: '#fff',
     fontSize: theme.spacing.unit * 3,
     fontFamily: 'BellSlim',
     fontWeight: 500,
@@ -135,6 +139,9 @@ const styles = (theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
+  button: {
+    color: '#fff',
+  },
 });
 
 class TaskBar extends React.Component {
@@ -170,7 +177,7 @@ class TaskBar extends React.Component {
 
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
-    const { classes, siteLevelName, sideBarOpen } = this.props;
+    const { classes, siteLevelName, sideBarOpen, authenticated } = this.props;
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -195,6 +202,17 @@ class TaskBar extends React.Component {
         open={isMobileMenuOpen}
         onClose={this.handleMenuClose}
       >
+        <MenuItem
+          onClick={() => {
+            this.props.history.push('/new');
+            this.handleMenuClose();
+          }}
+        >
+          <IconButton color="inherit">
+            <Add />
+          </IconButton>
+          <p>New Question</p>
+        </MenuItem>
         <MenuItem onClick={this.handleMobileMenuClose}>
           <IconButton color="inherit">
             <Badge badgeContent={11} color="secondary">
@@ -214,14 +232,14 @@ class TaskBar extends React.Component {
 
     return (
       <div className={classes.root}>
-        <AppBar 
+        <AppBar
           position="fixed"
           className={classNames(classes.appBar, {
             [classes.appBarShift]: sideBarOpen,
           })}
         >
-          <Toolbar 
-            // disableGutters={!sideBarOpen}
+          <Toolbar
+          // disableGutters={!sideBarOpen}
           >
             <IconButton
               color="inherit"
@@ -231,27 +249,25 @@ class TaskBar extends React.Component {
               //   [classes.hide]: sideBarOpen,
               // })}
               className={classNames(
-                classes.menuButton, 
-                sideBarOpen && classes.hide
+                classes.menuButton,
+                sideBarOpen && classes.hide,
               )}
             >
               <MenuIcon />
             </IconButton>
-            <div className={classes.brand}>
-              <img 
-                className={classes.logo}
-                src={WhiteLogo} 
-                alt="NumHub"
-              ></img>
-              <Typography
-                className={classes.siteVariant}
-                variant="h5"
-                color="inherit"
-                noWrap
-              >
-                {siteLevelName}
-              </Typography>
-            </div>
+            <Link style={{ textDecoration: 'none' }} to="/">
+              <div className={classes.brand}>
+                <img className={classes.logo} src={WhiteLogo} alt="NumHub" />
+                <Typography
+                  className={classes.siteVariant}
+                  variant="h5"
+                  color="inherit"
+                  noWrap
+                >
+                  {siteLevelName}
+                </Typography>
+              </div>
+            </Link>
             <div className={classes.search}>
               <div className={classes.searchIcon}>
                 <SearchIcon />
@@ -267,22 +283,49 @@ class TaskBar extends React.Component {
               }
             </div>
             <div className={classes.grow} />
-            <div className={classes.sectionDesktop}>
-              <IconButton color="inherit">
-                <Badge badgeContent={17} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-              <IconButton
-                // eslint-disable-next-line no-undefined
-                aria-owns={isMenuOpen ? 'material-appbar' : undefined}
-                aria-haspopup="true"
-                onClick={this.handleProfileMenuOpen}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
-            </div>
+            {authenticated ? (
+              <div className={classes.sectionDesktop}>
+                <IconButton
+                  component={Link}
+                  to="/admin"
+                  className={classes.button}
+                >
+                  <Settings />
+                </IconButton>
+                <IconButton
+                  component={Link}
+                  to="/new"
+                  className={classes.button}
+                >
+                  <Add />
+                </IconButton>
+                <IconButton color="inherit">
+                  <Badge badgeContent={17} color="secondary">
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
+                <IconButton
+                  component={Link}
+                  to="/profile"
+                  className={classes.button}
+                >
+                  <AccountCircle />
+                </IconButton>
+              </div>
+            ) : (
+              <div className={classes.sectionDesktop}>
+                <Button component={Link} to="/login" className={classes.button}>
+                  Sign In
+                </Button>
+                <Button
+                  component={Link}
+                  to="/register"
+                  className={classes.button}
+                >
+                  Register
+                </Button>
+              </div>
+            )}
             <div className={classes.sectionMobile}>
               <IconButton
                 aria-haspopup="true"
@@ -306,6 +349,8 @@ TaskBar.propTypes = {
   sideBarOpen: PropTypes.bool,
   globalUpdate: PropTypes.func,
   siteLevelName: PropTypes.string,
+  authenticated: PropTypes.bool.isRequired,
+  admin: PropTypes.bool.isRequired,
 };
 
 export default withStyles(styles)(TaskBar);

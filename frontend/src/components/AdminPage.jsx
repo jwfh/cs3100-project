@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { GroupAdd, Lock, LockOpen, RemoveCircle } from '@material-ui/icons';
 import axios from 'axios';
-import { debug, backend } from '../settings';
+import { debug, backend, lockoutCount } from '../settings';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Table,
@@ -10,8 +10,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Paper,
   TextField,
+  IconButton,
 } from '@material-ui/core';
 import { Title, Subtitle } from './PageTitle';
 import FormFunc from './FormFunc';
@@ -159,7 +159,76 @@ export class AdminPage extends Component {
     }
   };
 
-  getActions = (user) => <Fragment />;
+  makeAdmin = (uid) => () => {
+    const uri = `//${backend}/api/update`;
+    const data = {
+      type: 'admin',
+      value: {
+        uid,
+      },
+    };
+    axios.post(uri, data).then((response) => {
+      if (response.status === 200 && response.data.ok === true) {
+        this.fetchUsers();
+      }
+    });
+  };
+
+  unlockAccount = (uid) => () => {
+    const uri = `//${backend}/api/update`;
+    const data = {
+      type: 'lockoutCount',
+      value: {
+        uid,
+      },
+    };
+    axios.post(uri, data).then((response) => {
+      if (response.status === 200 && response.data.ok === true) {
+        this.fetchUsers();
+      }
+    });
+  };
+
+  deleteAccount = (uid) => () => {
+    const uri = `//${backend}/api/delete`;
+    const data = {
+      type: 'user',
+      value: {
+        uid,
+      },
+    };
+    axios.post(uri, data).then((response) => {
+      if (response.status === 200 && response.data.ok === true) {
+        this.fetchUsers();
+      }
+    });
+  };
+
+  getActions = (user) => (
+    <Fragment>
+      {user.admin ? (
+        <IconButton disabled color="inherit">
+          <GroupAdd />
+        </IconButton>
+      ) : (
+        <IconButton onClick={this.makeAdmin(user.id)} color="inherit">
+          <GroupAdd />
+        </IconButton>
+      )}
+      {user.lockoutCount >= lockoutCount ? (
+        <IconButton onClick={this.unlockAccount(user.id)} color="inherit">
+          <Lock />
+        </IconButton>
+      ) : (
+        <IconButton disabled color="inherit">
+          <LockOpen />
+        </IconButton>
+      )}
+      <IconButton onClick={this.deleteAccount(user.id)} color="inherit">
+        <RemoveCircle />
+      </IconButton>
+    </Fragment>
+  );
 
   makeUserTable = (users) => (
     <Table>
