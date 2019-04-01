@@ -17,9 +17,8 @@ router.get('/*', (_req, res) => {
 router.post('/fetch', fetch.fetch);
 router.post('/fetch/all', fetch.all);
 router.post('/update', fetch.update);
-
-router.post('/post/create', post.create);
-router.post('/post/delete', post.delete);
+router.post('/create', fetch.create);
+router.post('/delete', fetch.delete);
 
 router.post('/gatekeeper', gatekeeper.gatekeeper);
 

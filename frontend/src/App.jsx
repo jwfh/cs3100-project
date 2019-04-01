@@ -7,6 +7,7 @@ import './assets/style/BellSlim.scss';
 import 'katex/dist/katex.min.css';
 import TaskBar from './components/TaskBar';
 import SideBar from './components/SideBar';
+import ProfilePage from './components/ProfilePage';
 import HomePage from './components/HomePage';
 import PostCreatePage from './components/PostCreatePage';
 import LoginPage from './components/LoginPage';
@@ -95,6 +96,7 @@ class AppBody extends Component {
       showBrand: true,
       isAuthenticated: false,
       isAdmin: false,
+      uid: null,
     };
   }
 
@@ -110,7 +112,7 @@ class AppBody extends Component {
   getState = (key) => this.state[key];
 
   render() {
-    const { sideBarOpen, isAuthenticated, isAdmin } = this.state;
+    const { sideBarOpen, isAuthenticated, isAdmin, uid } = this.state;
     const { enqueueSnackbar } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
@@ -141,6 +143,7 @@ class AppBody extends Component {
                       enqueueSnackbar={enqueueSnackbar}
                       level={this.siteLevelItems[this.state.siteLevelIdx].label}
                       authenticated={isAuthenticated}
+                      uid={uid}
                     />
                   ))}
                   exact
@@ -178,6 +181,20 @@ class AppBody extends Component {
                       enqueueSnackbar={enqueueSnackbar}
                       authenticated={isAuthenticated}
                       admin={isAdmin}
+                      uid={uid}
+                    />
+                  ))}
+                  exact
+                />
+                <Route
+                  path="/profile"
+                  render={withRouter((props) => (
+                    <ProfilePage
+                      {...props}
+                      globalUpdate={this.updateState}
+                      enqueueSnackbar={enqueueSnackbar}
+                      authenticated={isAuthenticated}
+                      uid={uid}
                     />
                   ))}
                   exact

@@ -255,13 +255,15 @@ export class PostCreatePage extends Component {
   submit = () => {
     const { title, content, tags, activeStep } = this.state;
     const { level } = this.props;
-    const uri = '//' + backend + '/api/post/create';
+    const uri = '//' + backend + '/api/create';
     const data = {
       type: 'question',
-      title,
-      content,
-      tags,
-      level,
+      value: {
+        title,
+        content,
+        tags,
+        level,
+      },
     };
     const config = {
       timeout: 2000,
@@ -303,7 +305,7 @@ export class PostCreatePage extends Component {
 
   render() {
     const { classes } = this.props;
-    const { activeStep, postSuccessful, fetchedTags } = this.state;
+    const { activeStep, postSuccessful, postRoute, fetchedTags } = this.state;
 
     const steps = this.getSteps();
     if (fetchedTags) {
@@ -357,14 +359,18 @@ export class PostCreatePage extends Component {
                 <Button onClick={this.handleReset} className={classes.button}>
                   Go to homepage
                 </Button>
-                <Button
-                  onClick={this.handleReset}
-                  className={classes.button}
-                  color="primary"
-                  variant="contained"
-                >
-                  View question
-                </Button>
+                {postSuccessful ? (
+                  <Button
+                    onClick={this.props.history.push(postRoute)}
+                    className={classes.button}
+                    color="primary"
+                    variant="contained"
+                  >
+                    View question
+                  </Button>
+                ) : (
+                  ''
+                )}
               </Paper>
             )}
           </div>

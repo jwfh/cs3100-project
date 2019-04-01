@@ -118,6 +118,55 @@ module.exports.update = (req, res) => {
   }
 };
 
-module.exports.create = (req, res) => {};
+module.exports.create = (req, res) => {
+  console.log(req.path, req.body);
+  switch (req.body.type) {
+    case 'question':
+      if (
+        req.body.value &&
+        req.body.value.title &&
+        req.body.value.content &&
+        req.body.value.tags &&
+        req.body.value.level
+      ) {
+        db.create(
+          'question',
+          {
+            title: req.body.value.title,
+            content: req.body.value.content,
+            tags: req.body.value.tags,
+            level: req.body.value.level,
+          },
+          (error, route) => {
+            if (!error) {
+              res.status(200);
+              res.send({
+                route,
+              });
+            } else {
+              res.status(500);
+              res.send(error);
+              console.log('Unable to create post', error);
+            }
+          }
+        );
+      } else {
+        res.status(400);
+        res.send(
+          'Unable to complete the post create request. Missing required parameters.'
+        );
+      }
+      break;
+    case 'answer':
+      break;
+    case 'tag':
+      break;
+    default:
+      res.status(400);
+      res.type('text');
+      res.send('Bad Request');
+      break;
+  }
+};
 
 module.exports.delete = (req, res) => {};
