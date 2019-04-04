@@ -28,6 +28,8 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { SnackbarProvider, withSnackbar } from 'notistack';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import axios from 'axios';
+import { backend, debug } from './settings';
 
 export const sideBarDrawerWidth = 240;
 
@@ -97,6 +99,7 @@ class AppBody extends Component {
       showBrand: true,
       isAuthenticated: false,
       isAdmin: false,
+      numHubSessionKey: '',
       uid: null,
     };
   }
@@ -106,14 +109,72 @@ class AppBody extends Component {
     icon,
   });
 
-  updateState = (key, value) => {
-    this.setState({ [key]: value });
+  updateState = (key, value, callback = () => {}) => {
+    this.setState({ [key]: value }, callback);
   };
 
   getState = (key) => this.state[key];
 
+  getAuthenticated = () => {
+    // The cookie should automatically be sent by the browser if it exists
+    const uri = `//${backend}/api/gatekeeper`;
+    const data = {
+      action: 'auth',
+    };
+    axios
+      .post(uri, data)
+      .then((response) => {
+        if (response.status === 200 && response.data) {
+          if (
+            response.data.ok === true &&
+            response.data.isAuthenticated === true
+          ) {
+            if (response.data.isAdmin === true) {
+              this.setState({
+                isAdmin: true,
+                isAuthenticated: true,
+              });
+            } else {
+              this.setState({
+                isAdmin: false,
+                isAuthenticated: true,
+              });
+            }
+          } else {
+            this.setState({
+              isAdmin: false,
+              isAuthenticated: false,
+            });
+          }
+        } else {
+          if (debug) {
+            console.log("Couldn't fetch authentication data from API.");
+          }
+        }
+      })
+      .catch((error) => {
+        if (debug) {
+          console.log("Couldn't fetch authentication data from API:", error);
+        }
+      });
+  };
+
+  componentDidMount() {
+    this.getAuthenticated();
+  }
+
+  componentDidUpdate() {
+    this.getAuthenticated();
+  }
+
   render() {
-    const { sideBarOpen, isAuthenticated, isAdmin, uid } = this.state;
+    const {
+      sideBarOpen,
+      isAuthenticated,
+      isAdmin,
+      uid,
+      numHubSessionKey,
+    } = this.state;
     const { enqueueSnackbar } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
@@ -123,6 +184,7 @@ class AppBody extends Component {
             <TaskBarWithRouter
               sideBarOpen={this.state.sideBarOpen}
               globalUpdate={this.updateState}
+              numHubSessionKey={numHubSessionKey}
               siteLevelName={this.siteLevelItems[this.state.siteLevelIdx].label}
               authenticated={isAuthenticated}
               admin={isAdmin}
@@ -132,7 +194,15 @@ class AppBody extends Component {
                 <Route
                   path="/"
                   render={withRouter((props) => (
-                    <HomePage {...props} enqueueSnackbar={enqueueSnackbar} />
+                    <HomePage
+                      {...props}
+                      numHubSessionKey={numHubSessionKey}
+                      levelIdx={this.state.siteLevelIdx}
+                      levelName={
+                        this.siteLevelItems[this.state.siteLevelIdx].label
+                      }
+                      enqueueSnackbar={enqueueSnackbar}
+                    />
                   ))}
                   exact
                 />
@@ -141,8 +211,12 @@ class AppBody extends Component {
                   render={withRouter((props) => (
                     <PostCreatePage
                       {...props}
+                      numHubSessionKey={numHubSessionKey}
                       enqueueSnackbar={enqueueSnackbar}
-                      level={this.siteLevelItems[this.state.siteLevelIdx].label}
+                      levelIdx={this.state.siteLevelIdx}
+                      levelName={
+                        this.siteLevelItems[this.state.siteLevelIdx].label
+                      }
                       authenticated={isAuthenticated}
                       uid={uid}
                     />
@@ -154,6 +228,7 @@ class AppBody extends Component {
                   render={withRouter((props) => (
                     <RegisterPage
                       {...props}
+                      numHubSessionKey={numHubSessionKey}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}
                       authenticated={isAuthenticated}
@@ -162,10 +237,11 @@ class AppBody extends Component {
                   exact
                 />
                 <Route
-                  path="/post/:id"
+                  path="/post/:idHash"
                   render={withRouter((props) => (
                     <PostViewPage
                       {...props}
+                      numHubSessionKey={numHubSessionKey}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}
                       authenticated={isAuthenticated}
@@ -178,6 +254,7 @@ class AppBody extends Component {
                   render={withRouter((props) => (
                     <LoginPage
                       {...props}
+                      numHubSessionKey={numHubSessionKey}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}
                       authenticated={isAuthenticated}
@@ -192,6 +269,7 @@ class AppBody extends Component {
                       {...props}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}
+                      numHubSessionKey={numHubSessionKey}
                       authenticated={isAuthenticated}
                       admin={isAdmin}
                       uid={uid}
@@ -206,6 +284,7 @@ class AppBody extends Component {
                       {...props}
                       globalUpdate={this.updateState}
                       enqueueSnackbar={enqueueSnackbar}
+                      numHubSessionKey={numHubSessionKey}
                       authenticated={isAuthenticated}
                       uid={uid}
                     />

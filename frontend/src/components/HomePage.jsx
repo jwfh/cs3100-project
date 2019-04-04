@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 import { backend, debug } from '../settings';
 import { Typography, Link } from '@material-ui/core';
+import { RenderContent } from './PostDisplay';
 import { Link as RouterLink } from 'react-router-dom';
 
 const styles = (theme) => ({
@@ -26,75 +27,87 @@ export class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      fetchTags: false,
       tags: [],
+      fetchedPosts: false,
       questions: [],
     };
   }
 
   fetchPosts = async () => {
-    const uri = `//${backend}/api/fetch/all`;
-    const requestData = {
-      type: 'question',
-    };
-    const config = {
-      timeout: 2000,
-    };
-    try {
-      const users = await axios.post(uri, requestData, config);
-      const { data } = await users;
-      this.setState(
-        {
-          tags: data,
-          fetchedTags: true,
-        },
-        () => {
-          if (debug) {
-            console.log('Successfully retrieved posts from API');
-          }
-        },
-      );
-    } catch (error) {
-      if (debug) {
-        console.log('Unable to retrieve posts:', error);
+    const { fetchedPosts } = this.state;
+    if (!fetchedPosts) {
+      const uri = `//${backend}/api/fetch/all`;
+      const requestData = {
+        type: 'question',
+      };
+      const config = {
+        timeout: 2000,
+      };
+      try {
+        const users = await axios.post(uri, requestData, config);
+        const { data } = await users;
+        this.setState(
+          {
+            questions: data,
+            fetchedPosts: true,
+          },
+          () => {
+            if (debug) {
+              console.log('Successfully retrieved posts from API');
+            }
+          },
+        );
+      } catch (error) {
+        if (debug) {
+          console.log('Unable to retrieve posts:', error);
+        }
       }
     }
   };
 
   fetchTags = async () => {
-    const uri = `//${backend}/api/fetch/all`;
-    const requestData = {
-      type: 'tag',
-    };
-    const config = {
-      timeout: 2000,
-    };
-    try {
-      const users = await axios.post(uri, requestData, config);
-      const { data } = await users;
-      this.setState(
-        {
-          tags: data,
-          fetchedTags: true,
-        },
-        () => {
-          if (debug) {
-            console.log('Successfully retrieved tags from API');
-          }
-        },
-      );
-    } catch (error) {
-      if (debug) {
-        console.log('Unable to retrieve tags:', error);
+    const { fetchedTags } = this.state;
+    if (!fetchedTags) {
+      const uri = `//${backend}/api/fetch/all`;
+      const requestData = {
+        type: 'tag',
+      };
+      const config = {
+        timeout: 2000,
+      };
+      try {
+        const users = await axios.post(uri, requestData, config);
+        const { data } = await users;
+        this.setState(
+          {
+            tags: data,
+            fetchedTags: true,
+          },
+          () => {
+            if (debug) {
+              console.log('Successfully retrieved tags from API');
+            }
+          },
+        );
+      } catch (error) {
+        if (debug) {
+          console.log('Unable to retrieve tags:', error);
+        }
       }
     }
   };
 
-  createPostPreviews = (post) => (
+  createPostPreview = (post) => (
     <PostPreview
       key={post.id}
       title={post.title}
       bodyPreview={
-        post.body.length < 150 ? post.body : post.body.substring(0, 150) + '...'
+        post.content.length < 150 ? (
+          <RenderContent content={post.content} />
+        ) : (
+          <RenderContent content={post.content.substring(0, 150) + '...'} />
+        )
       }
       link={post.link}
     />
@@ -109,11 +122,15 @@ export class HomePage extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, levelIdx, levelName, numHubSessionKey } = this.props;
+    console.log('key', numHubSessionKey);
     const { questions, tags } = this.state;
+    const thisLevelQuestions = questions.filter((question) => {
+      return question.levelID === levelIdx;
+    });
     let previewsToRender =
-      questions.length > 0 ? (
-        questions.map((question) => this.createPostPreview(question))
+      thisLevelQuestions.length > 0 ? (
+        thisLevelQuestions.map((question) => this.createPostPreview(question))
       ) : (
         <div className={classes.emptyText}>
           <Typography variant="h5">The question bank is empty.</Typography>
@@ -124,11 +141,15 @@ export class HomePage extends Component {
             </Link>
             .
           </Typography>
+          <Typography style={{ marginTop: '2vh' }}>
+            Expecting some questions? Make sure you're browsing the right site
+            level.
+          </Typography>
         </div>
       );
     return (
       <div className={classes.posts}>
-        <Title>Welcome to NumHub</Title>
+        <Title>Welcome to NumHub {levelName}</Title>
         {previewsToRender}
       </div>
     );
@@ -139,6 +160,9 @@ HomePage.propTypes = {
   classes: PropTypes.object.isRequired,
   enqueueSnackbar: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
+  levelIdx: PropTypes.number.isRequired,
+  levelName: PropTypes.string.isRequired,
+  numHubSessionKey: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(HomePage);

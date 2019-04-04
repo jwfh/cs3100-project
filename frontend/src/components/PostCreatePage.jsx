@@ -116,8 +116,8 @@ export class PostCreatePage extends Component {
   isContentSyntaxErrorFree = () => {
     const { content } = this.state;
     let inlineMathValid =
-      (content.match(/\(/g) || []).length ===
-      (content.match(/\)/g) || []).length;
+      (content.match(/\\\(/g) || []).length ===
+      (content.match(/\\\)/g) || []).length;
     if (!inlineMathValid) {
       this.setState({
         contentSyntaxErrorMsg: 'Unbalanced inline math',
@@ -125,8 +125,8 @@ export class PostCreatePage extends Component {
       return false;
     }
     let displayMathValid =
-      (content.match(/\[/g) || []).length ===
-      (content.match(/\]/g) || []).length;
+      (content.match(/\\\[/g) || []).length ===
+      (content.match(/\\\]/g) || []).length;
     if (!displayMathValid) {
       this.setState({
         contentSyntaxErrorMsg: 'Unbalanced display math',
@@ -224,37 +224,40 @@ export class PostCreatePage extends Component {
   };
 
   fetchTags = async () => {
-    const uri = '//' + backend + '/api/fetch/all';
-    const reqData = {
-      type: 'tag',
-    };
-    const config = {
-      timeout: 2000,
-    };
-    try {
-      const users = await axios.post(uri, reqData, config);
-      const { data } = await users;
-      this.setState(
-        {
-          availableTags: data,
-          fetchedTags: true,
-        },
-        () => {
-          if (debug) {
-            console.log('Successfully retrieved tags from API');
-          }
-        },
-      );
-    } catch (error) {
-      if (debug) {
-        console.log('Unable to retrieve tags:', error);
+    const { fetchedTags } = this.state;
+    if (!fetchedTags) {
+      const uri = '//' + backend + '/api/fetch/all';
+      const reqData = {
+        type: 'tag',
+      };
+      const config = {
+        timeout: 2000,
+      };
+      try {
+        const users = await axios.post(uri, reqData, config);
+        const { data } = await users;
+        this.setState(
+          {
+            availableTags: data,
+            fetchedTags: true,
+          },
+          () => {
+            if (debug) {
+              console.log('Successfully retrieved tags from API');
+            }
+          },
+        );
+      } catch (error) {
+        if (debug) {
+          console.log('Unable to retrieve tags:', error);
+        }
       }
     }
   };
 
   submit = () => {
     const { title, content, tags, activeStep } = this.state;
-    const { level, uid } = this.props;
+    const { levelIdx, uid, numHubSessionKey } = this.props;
     const uri = '//' + backend + '/api/create';
     const data = {
       type: 'question',
@@ -262,8 +265,8 @@ export class PostCreatePage extends Component {
         title,
         content,
         tags,
-        level,
-        uid,
+        level: levelIdx,
+        sessionKey: numHubSessionKey,
       },
     };
     const config = {
@@ -309,8 +312,7 @@ export class PostCreatePage extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-
+    const { classes, levelName } = this.props;
     const { activeStep, postSuccessful, postRoute, fetchedTags } = this.state;
 
     const steps = this.getSteps();
@@ -318,7 +320,7 @@ export class PostCreatePage extends Component {
       return (
         <div className={classes.container}>
           <div className={classes.root}>
-            <Title>Post an Exercise</Title>
+            <Title>Post an Exercise to NumHub {levelName}</Title>
             <Stepper activeStep={activeStep} orientation="vertical">
               {steps.map((step, index) => (
                 <Step key={step.label}>
@@ -393,6 +395,8 @@ PostCreatePage.propTypes = {
   enqueueSnackbar: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
   authenticated: PropTypes.bool.isRequired,
+  levelIdx: PropTypes.number.isRequired,
+  levelName: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(PostCreatePage);

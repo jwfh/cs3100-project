@@ -38,9 +38,8 @@ module.exports.fetch = (req, res) => {
       }
       break;
     case 'question':
-      if (req.body.value && req.body.value.id) {
-        db.get('question', {id: req.body.value.id}, (error, row) => {
-          console.log('q');
+      if (req.body.value && req.body.value.idHash) {
+        db.get('question', {idHash: req.body.value.idHash}, (error, row) => {
           if (!error) {
             if (typeof row !== 'undefined') {
               res.send({
@@ -157,7 +156,7 @@ module.exports.create = (req, res) => {
         req.body.value.content &&
         req.body.value.tags &&
         req.body.value.level &&
-        req.body.value.uid
+        req.body.value.sessionKey
       ) {
         db.create(
           'question',
@@ -166,7 +165,7 @@ module.exports.create = (req, res) => {
             content: req.body.value.content,
             tags: req.body.value.tags,
             level: req.body.value.level,
-            authorID: req.body.value.uid,
+            sessionKey: req.body.value.sessionKey,
           },
           (error, route) => {
             if (!error) {

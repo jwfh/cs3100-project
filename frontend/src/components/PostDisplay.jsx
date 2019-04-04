@@ -6,7 +6,6 @@ import { Typography } from '@material-ui/core';
 
 // https://stackoverflow.com/questions/3410464/how-to-find-indices-of-all-occurrences-of-one-string-in-another-in-javascript
 const getIndicesOf = (searchStr, str, caseSensitive) => {
-  console.log(str);
   var searchStrLen = searchStr.length;
   if (searchStrLen === 0) {
     return [];
@@ -44,7 +43,8 @@ const displayMath = (mathContent) => (
   </div>
 );
 
-const renderContent = (content) => {
+export const RenderContent = (props) => {
+  const { content } = props;
   const inlineOpen = getIndicesOf('\\(', content),
     inlineClose = getIndicesOf('\\)', content),
     displayOpen = getIndicesOf('\\[', content),
@@ -59,8 +59,6 @@ const renderContent = (content) => {
     console.log('Missing $ inserted.');
   } else {
     // Merge indices into one array for open and one array for close
-    let open = [],
-      close = [];
     let i = 0,
       j = 0,
       k = 0;
@@ -103,12 +101,9 @@ const renderContent = (content) => {
         i++;
         mathType = 'inline';
       }
-      console.log(k, openIdx, closeIdx);
+
       let before = content.substring(k, openIdx),
         inside = content.substring(openIdx + 2, closeIdx);
-
-      console.log('before', before);
-      console.log('inside', inside);
 
       components.push(
         <Typography style={{ display: 'inline' }}>{before}</Typography>,
@@ -127,11 +122,11 @@ const renderContent = (content) => {
       k = closeIdx + 2;
     }
     let last = content.substring(k + 2, content.length);
-    console.log('last', last);
+
     components.push(<Typography>{last}</Typography>);
   }
 
-  return components;
+  return <div style={{ display: 'block' }}>{components}</div>;
 };
 
 const PostDisplay = (props) => (
@@ -139,7 +134,7 @@ const PostDisplay = (props) => (
     <Typography variant="h6" component="p" style={{ display: 'block' }}>
       {props.title}
     </Typography>
-    <div style={{ display: 'block' }}>{renderContent(props.content)}</div>
+    <RenderContent {...props} />
   </Fragment>
 );
 

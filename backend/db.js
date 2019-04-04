@@ -1,5 +1,6 @@
 const settings = require('../settings');
 const sha256 = require('sha-256-js');
+const md5 = require('md5');
 const sqlite3 = require('sqlite3').verbose();
 
 const dbFile = __dirname + '/../numhub.db';
@@ -49,6 +50,7 @@ module.exports.init = () => {
     CREATE TABLE IF NOT EXISTS \`SESSIONS\` (
       \`id\` INT AUTO_INCREMENT PRIMARY KEY,
       \`uid\` INT NOT NULL,
+      \`idHash\` TEXT NOT NULL,
       \`updatedAt\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (\`uid\`) REFERENCES \`USERS\`(\`id\`)
     )`);
@@ -326,10 +328,10 @@ module.exports.get = (type, params, callback) => {
       }
       break;
     case 'question':
-      if (params.id) {
+      if (params.idHash) {
         db.get(
-          'SELECT * from `QUESTIONS` WHERE id=?',
-          [params.id],
+          'SELECT * from `QUESTIONS` WHERE `idHash`=?',
+          [params.idHash],
           (error, row) => {
             if (!error) {
               let res = row;
@@ -342,6 +344,17 @@ module.exports.get = (type, params, callback) => {
         );
       } else {
         callback('No UID provided.', null);
+      }
+      break;
+    case 'session':
+      if (params.sessionKey) {
+        db.get(
+          'SELECT * FROM `SESSIONS` WHERE `idHash`=?',
+          [params.sessionKey],
+          callback
+        );
+      } else {
+        callback('No session key provided.', null);
       }
       break;
     default:
@@ -373,40 +386,61 @@ module.exports.create = (type, params, callback) => {
         params.content &&
         params.tags &&
         params.level &&
-        params.authorID
+        params.sessionKey
       ) {
         db.get(
           'SELECT COUNT(`id`) AS count, MAX(`id`) AS max FROM `QUESTIONS`',
           (error1, row1) => {
             if (!error1) {
               db.get(
-                'SELECT `id` FROM `Q_LEVELS` WHERE `level`=?',
-                [params.level],
+                'SELECT * FROM `SESSIONS` WHERE `idHash`=?',
+                [params.sessionKey],
                 (error2, row2) => {
-                  if (!error2) {
-                    const newQID = row1.count < 1 ? 1 : row1.max + 1;
-                    db.run(
-                      'INSERT INTO `QUESTIONS` (id, title, content, authorID, levelID, idHash) VALUES (?, ?, ?, ?, ?, ?)',
-                      [
-                        newQID,
-                        params.title,
-                        params.content,
-                        params.authorID,
-                        row2.id,
-                        sha256(newQID.toString()),
-                      ],
-                      (error) => {
-                        if (!error) {
-                          const newRoute = `/post/${newQID}`;
-                          callback(null, newRoute);
+                  if (!error2 && row2.uid) {
+                    const uid = row2.uid;
+                    db.get(
+                      'SELECT `id` FROM `Q_LEVELS` WHERE `level`=?',
+                      [params.level],
+                      (error3, row3) => {
+                        if (!error3) {
+                          const newQID = row1.count < 1 ? 1 : row1.max + 1;
+                          db.run(
+                            'INSERT INTO `QUESTIONS` (id, title, content, authorID, levelID, idHash) VALUES (?, ?, ?, ?, ?, ?)',
+                            [
+                              newQID,
+                              params.title,
+                              params.content,
+                              uid,
+                              row3.id,
+                              md5(newQID.toString()),
+                            ],
+                            (error4) => {
+                              if (!error4) {
+                                const newRoute = `/post/${md5(
+                                  newQID.toString()
+                                )}`;
+                                callback(null, newRoute);
+                              } else {
+                                callback(
+                                  'Error adding new question: ' + error4,
+                                  null
+                                );
+                              }
+                            }
+                          );
                         } else {
-                          callback('Error adding new question: ' + error, null);
+                          if (settings.debug) {
+                            console.log('Error getting level name:', error3);
+                          }
                         }
                       }
                     );
                   } else {
                     if (settings.debug) {
-                      console.log('Error getting level name:', error1);
+                      console.log(
+                        'Error getting session information from the database:',
+                        error2
+                      );
                     }
                   }
                 }

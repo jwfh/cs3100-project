@@ -11,6 +11,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import FormFunc from './FormFunc';
+import { withCookies, Cookies } from 'react-cookie';
 
 const styles = (theme) => ({
   container: {
@@ -633,18 +634,23 @@ class LoginPage extends Component {
                   isValid,
                 },
                 () => {
-                  this.props.enqueueSnackbar(
-                    'You are now signed in to NumHub.',
-                    { variant: 'success' },
+                  this.props.globalUpdate(
+                    'numHubSessionKey',
+                    this.props.cookies.get('numHubSessionKey'),
+                    () => {
+                      this.props.enqueueSnackbar(
+                        'You are now signed in to NumHub.',
+                        { variant: 'success' },
+                      );
+                      if ('uid' in response.data) {
+                        this.props.globalUpdate('uid', response.data.uid);
+                      }
+                      if ('admin' in response.data) {
+                        this.props.globalUpdate('isAdmin', response.data.admin);
+                      }
+                      history.push('/');
+                    },
                   );
-                  this.props.globalUpdate('isAuthenticated', true);
-                  if ('uid' in response.data) {
-                    this.props.globalUpdate('uid', response.data.uid);
-                  }
-                  if ('admin' in response.data) {
-                    this.props.globalUpdate('isAdmin', response.data.admin);
-                  }
-                  history.push('/');
                 },
               );
             } else {
@@ -1037,7 +1043,8 @@ LoginPage.propTypes = {
   classes: PropTypes.object.isRequired,
   globalUpdate: PropTypes.func.isRequired,
   enqueueSnackbar: PropTypes.func.isRequired,
+  numHubSessionKey: PropTypes.string.isRequired,
   history: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(LoginPage);
+export default withStyles(styles)(withCookies(LoginPage));

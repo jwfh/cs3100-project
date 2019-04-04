@@ -36,7 +36,7 @@ export class PostViewPage extends Component {
     const requestData = {
       type: 'question',
       value: {
-        id: match.params.id,
+        idHash: match.params.idHash,
       },
     };
     const config = {
@@ -70,7 +70,7 @@ export class PostViewPage extends Component {
   render() {
     const { classes, match } = this.props;
     const { question, fetched } = this.state;
-    if (typeof match.params.id === 'undefined' || !fetched) {
+    if (typeof match.params.idHash === 'undefined' || !fetched || !question) {
       return (
         <div className={classes.emptyText}>
           <Typography variant="h5">

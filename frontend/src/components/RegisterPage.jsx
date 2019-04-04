@@ -14,6 +14,7 @@ import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
+import { FormatListBulletedRounded } from '@material-ui/icons';
 
 const styles = (theme) => ({
   container: {
@@ -216,14 +217,13 @@ export class RegisterPage extends Component {
       showValid: [false, false],
       isValid: [
         {
-          usernameLength: false,
-          usernameNotTaken: false,
+          usernameValid: false,
           passwordComplex: false,
-          passwordsMatch: true,
+          passwordsMatch: false,
         },
         {
           givenNameNotEmpty: false,
-          surnameNotEmpty: false,
+          surnameNotEFormatListBulletedRoundedmpty: false,
           emailValid: false,
         },
       ],
@@ -333,21 +333,82 @@ export class RegisterPage extends Component {
     });
   };
 
-  validate = (step) => {
-    const { isValid } = this.state;
+  validate = async (step) => {
+    const { isValid, username, password, confirmPassword } = this.state;
+    const uri = `//${backend}/api/validate`;
+    let passwordErrorMessage;
     switch (step) {
       case 0:
         // Login info
+        try {
+          const requestData = {
+            type: 'username',
+            value: {
+              username,
+            },
+          };
+          const response = await axios.post(uri, requestData);
+          const { data } = await response;
+          if (data.ok) {
+            if (data.exists) {
+              isValid[0].usernameValid = false;
+            } else {
+              isValid[0].usernameValid = true;
+            }
+          } else {
+            isValid[0].usernameValid = false;
+            if (debug) {
+              console.log('Invalid response when validating username.');
+            }
+          }
+        } catch (error) {
+          isValid[0].usernameValid = false;
+          if (debug) {
+            console.log('Error when attempting to validate username:', error);
+          }
+        }
+        try {
+          const requestData = {
+            type: 'password',
+            value: {
+              password,
+            },
+          };
+          const response = await axios.post(uri, requestData);
+          const { data } = await response;
+          if (data.ok === true) {
+            isValid[0].passwordComplex = true;
+            passwordErrorMessage = '';
+          } else {
+            isValid[0].passwordComplex = false;
+            if (data.message) {
+              passwordErrorMessage = data.message;
+            }
+          }
+        } catch (error) {
+          isValid[0].passwordComplex = false;
+          if (debug) {
+            console.log(
+              'Error when attempting to validate password complexity:',
+              error,
+            );
+          }
+        }
+        isValid[0].passwordsMatch = password === confirmPassword;
+        this.setState({
+          isValid,
+          passwordErrorMessage,
+        });
         break;
       case 1:
         // Personal info
+        this.setState({
+          isValid,
+        });
         break;
       default:
         break;
     }
-    this.setState({
-      isValid,
-    });
   };
 
   isValid = (step) => {

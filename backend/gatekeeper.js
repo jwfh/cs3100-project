@@ -108,7 +108,7 @@ const signIn = (req, res) => {
               ) === row.password
             ) {
               newSession(row.id, (sessionKey) => {
-                res.cookie('numHubSession', sessionKey);
+                res.cookie('numHubSessionKey', sessionKey);
                 res.send({
                   ok: true,
                   message: 'Access granted',
@@ -222,11 +222,11 @@ const reset = (req, res) => {
 module.exports.auth = (req) => {
   let authenticated = false;
   let admin = false;
-  if (typeof req.cookies.numHubSession !== 'undefined') {
+  if (typeof req.cookies.numHubSessionKey !== 'undefined') {
     // Yes, cookie was present. Now check the database for the session.
     db.get(
       'session',
-      {sessionKey: req.cookies.numHubSession},
+      {sessionKey: req.cookies.numHubSessionKey},
       (error, session) => {
         if (!error) {
           db.get('userByID', {id: session.uid}, (error, user) => {
@@ -253,6 +253,14 @@ module.exports.auth = (req) => {
   };
 };
 
+const auth = (req, res) => {
+  const authInfo = module.exports.auth(req);
+  res.send({
+    isAdmin: authInfo.admin,
+    isAuthenticated: authInfo.authenticated,
+  });
+};
+
 module.exports.gatekeeper = (req, res) => {
   switch (req.body.action) {
     case 'sign-in':
@@ -266,6 +274,9 @@ module.exports.gatekeeper = (req, res) => {
       break;
     case 'reset':
       reset(req, res);
+      break;
+    case 'auth':
+      auth(req, res);
       break;
     default:
       res.status(400);
