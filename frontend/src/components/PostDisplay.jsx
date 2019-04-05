@@ -102,9 +102,11 @@ export const RenderContent = (props) => {
         mathType = 'inline';
       }
 
+
       let before = content.substring(k, openIdx),
         inside = content.substring(openIdx + 2, closeIdx);
 
+        console.log(before);
       components.push(
         <Typography style={{ display: 'inline' }}>{before}</Typography>,
       );

@@ -32,6 +32,12 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(jsonParser);
 
+app.use((req, res, next) => {
+  console.log('Cookie:', req.cookie);
+  res.header('Access-Control-Allow-Credentials', true);
+  next();
+});
+
 const robots = require('./backend/robots');
 app.use('/robots.txt', robots.txt);
 

@@ -268,6 +268,18 @@ module.exports.all = (type, callback) => {
         }
       );
       break;
+    case 'secQ':
+      db.all('SELECT `id`,`question` FROM `SEC_Q`', (error, rows) => {
+        if (error) {
+          console.log(
+            '[' + __filename + ']',
+            'Error retrieving questions:',
+            error
+          );
+        }
+        callback(error, rows);
+      });
+      break;
     default:
       break;
   }
@@ -398,43 +410,36 @@ module.exports.create = (type, params, callback) => {
                 (error2, row2) => {
                   if (!error2 && row2.uid) {
                     const uid = row2.uid;
-                    db.get(
-                      'SELECT `id` FROM `Q_LEVELS` WHERE `level`=?',
-                      [params.level],
-                      (error3, row3) => {
-                        if (!error3) {
-                          const newQID = row1.count < 1 ? 1 : row1.max + 1;
-                          db.run(
-                            'INSERT INTO `QUESTIONS` (id, title, content, authorID, levelID, idHash) VALUES (?, ?, ?, ?, ?, ?)',
-                            [
-                              newQID,
-                              params.title,
-                              params.content,
-                              uid,
-                              row3.id,
-                              md5(newQID.toString()),
-                            ],
-                            (error4) => {
-                              if (!error4) {
-                                const newRoute = `/post/${md5(
-                                  newQID.toString()
-                                )}`;
-                                callback(null, newRoute);
-                              } else {
-                                callback(
-                                  'Error adding new question: ' + error4,
-                                  null
-                                );
-                              }
-                            }
-                          );
-                        } else {
-                          if (settings.debug) {
-                            console.log('Error getting level name:', error3);
+
+                    if (!error2) {
+                      const newQID = row1.count < 1 ? 1 : row1.max + 1;
+                      db.run(
+                        'INSERT INTO `QUESTIONS` (id, title, content, authorID, levelID, idHash) VALUES (?, ?, ?, ?, ?, ?)',
+                        [
+                          newQID,
+                          params.title,
+                          params.content,
+                          uid,
+                          params.level,
+                          md5(newQID.toString()),
+                        ],
+                        (error3) => {
+                          if (!error3) {
+                            const newRoute = `/post/${md5(newQID.toString())}`;
+                            callback(null, newRoute);
+                          } else {
+                            callback(
+                              'Error adding new question: ' + error3,
+                              null
+                            );
                           }
                         }
+                      );
+                    } else {
+                      if (settings.debug) {
+                        console.log('Error getting level name:', error2);
                       }
-                    );
+                    }
                   } else {
                     if (settings.debug) {
                       console.log(
@@ -507,9 +512,10 @@ module.exports.create = (type, params, callback) => {
               const newSessionKey = sha256(
                 newSessID.toString() + params.uid.toString()
               );
+
               db.run(
-                'INSERT INTO `SESSIONS` (id, uid) VALUES (?, ?)',
-                [newSessID, params.uid],
+                'INSERT INTO `SESSIONS` (id, uid, idHash) VALUES (?, ?, ?)',
+                [newSessID, params.uid, newSessionKey],
                 (error2) => {
                   if (!error2) {
                     callback(error2, newSessionKey);

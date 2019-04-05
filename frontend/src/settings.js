@@ -1,3 +1,3 @@
-module.exports.backend = 'localhost:3100';
+module.exports.backend = '';
 module.exports.debug = true;
 module.exports.lockoutCount = 10;

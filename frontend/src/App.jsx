@@ -16,6 +16,7 @@ import RegisterPage from './components/RegisterPage';
 import PageBody from './components/PageBody';
 import PostViewPage from './components/PostViewPage';
 import Error404 from './components/Error404';
+import { withCookies } from 'react-cookie';
 import {
   Filter1,
   Filter2,
@@ -97,6 +98,7 @@ class AppBody extends Component {
       sideBarOpen: false,
       siteLevelIdx: 0,
       showBrand: true,
+      fetchedAuth: false,
       isAuthenticated: false,
       isAdmin: false,
       numHubSessionKey: '',
@@ -116,54 +118,56 @@ class AppBody extends Component {
   getState = (key) => this.state[key];
 
   getAuthenticated = () => {
-    // The cookie should automatically be sent by the browser if it exists
-    const uri = `//${backend}/api/gatekeeper`;
-    const data = {
-      action: 'auth',
-    };
-    axios
-      .post(uri, data)
-      .then((response) => {
-        if (response.status === 200 && response.data) {
+    const sessionKey = this.props.cookies.get('numHubSessionKey');
+    if (sessionKey && !this.state.isAuthenticated && !this.state.fetchedAuth) {
+      const uri = backend ? `//${backend}/api/gatekeeper` : '/api/gatekeeper';
+      const data = {
+        action: 'auth',
+        value: {
+          sessionKey,
+        },
+      };
+      const config = {
+        timeout: 2000,
+        crossOrigin: true,
+        withCredentials: true,
+      };
+      axios
+        .post(uri, data, config)
+        .then((response) => {
           if (
+            response.status === 200 &&
+            response.data &&
             response.data.ok === true &&
-            response.data.isAuthenticated === true
+            'authenticated' in response.data &&
+            'admin' in response.data
           ) {
-            if (response.data.isAdmin === true) {
-              this.setState({
-                isAdmin: true,
-                isAuthenticated: true,
-              });
-            } else {
-              this.setState({
-                isAdmin: false,
-                isAuthenticated: true,
-              });
-            }
-          } else {
             this.setState({
-              isAdmin: false,
-              isAuthenticated: false,
+              fetchedAuth: true,
+              isAuthenticated: response.data.authenticated,
+              isAdmin: response.data.admin,
+            });
+          } else {
+            if (debug) {
+              console.log('Error fetching authentication information.');
+            }
+            this.setState({
+              fetchedAuth: true,
             });
           }
-        } else {
+        })
+        .catch((error) => {
           if (debug) {
-            console.log("Couldn't fetch authentication data from API.");
+            console.log('Error fetching authentication information:', error);
           }
-        }
-      })
-      .catch((error) => {
-        if (debug) {
-          console.log("Couldn't fetch authentication data from API:", error);
-        }
-      });
+          this.setState({
+            fetchedAuth: true,
+          });
+        });
+    }
   };
 
   componentDidMount() {
-    this.getAuthenticated();
-  }
-
-  componentDidUpdate() {
     this.getAuthenticated();
   }
 
@@ -272,7 +276,6 @@ class AppBody extends Component {
                       numHubSessionKey={numHubSessionKey}
                       authenticated={isAuthenticated}
                       admin={isAdmin}
-                      uid={uid}
                     />
                   ))}
                   exact
@@ -286,7 +289,6 @@ class AppBody extends Component {
                       enqueueSnackbar={enqueueSnackbar}
                       numHubSessionKey={numHubSessionKey}
                       authenticated={isAuthenticated}
-                      uid={uid}
                     />
                   ))}
                   exact
@@ -316,7 +318,9 @@ AppBody.propTypes = {
   enqueueSnackbar: PropTypes.func.isRequired,
 };
 
-const AppWithStyles = withStyles(styles, { withTheme: true })(AppBody);
+const AppWithStyles = withStyles(styles, { withTheme: true })(
+  withCookies(AppBody),
+);
 
 const AppWithSnackBar = withSnackbar(AppWithStyles);
 

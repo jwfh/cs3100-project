@@ -21,7 +21,7 @@ module.exports.validate = (req, res) => {
                 res.send({
                   ok: true,
                   exists: true,
-                  message: 'Username exists.',
+                  message: 'Username exists already.',
                 });
               }
             } else {
@@ -142,10 +142,10 @@ module.exports.validate = (req, res) => {
           });
         }
       } else {
-        res.status(400);
+        res.status(200);
         res.send({
           ok: false,
-          message: 'Bad Request. Candidate password missing.',
+          message: 'Password cannot be blank.',
         });
       }
       break;

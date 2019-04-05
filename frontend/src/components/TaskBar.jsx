@@ -11,7 +11,6 @@ import {
   Menu,
   Button,
 } from '@material-ui/core';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import {
   AccountCircle,
   Add,
@@ -189,20 +188,20 @@ class TaskBar extends React.Component {
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-    const renderMenu = (
-      <Menu
-        anchorEl={anchorEl}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        open={isMenuOpen}
-        onClose={this.handleMenuClose}
-      >
-        <MenuItem onClick={this.handleMenuClose}>Notification 1</MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>Notification 2</MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>Notification 3</MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>Notification 4</MenuItem>
-      </Menu>
-    );
+    // const renderMenu = (
+    //   <Menu
+    //     anchorEl={anchorEl}
+    //     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    //     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+    //     open={isMenuOpen}
+    //     onClose={this.handleMenuClose}
+    //   >
+    //     <MenuItem onClick={this.handleMenuClose}>Notification 1</MenuItem>
+    //     <MenuItem onClick={this.handleMenuClose}>Notification 2</MenuItem>
+    //     <MenuItem onClick={this.handleMenuClose}>Notification 3</MenuItem>
+    //     <MenuItem onClick={this.handleMenuClose}>Notification 4</MenuItem>
+    //   </Menu>
+    // );
 
     const renderMobileMenu = (
       <Menu
@@ -223,14 +222,14 @@ class TaskBar extends React.Component {
           </IconButton>
           <p>New Question</p>
         </MenuItem>
-        <MenuItem onClick={this.handleMobileMenuClose}>
+        {/* <MenuItem onClick={this.handleMobileMenuClose}>
           <IconButton color="inherit">
             <Badge badgeContent={11} color="secondary">
               <NotificationsIcon />
             </Badge>
           </IconButton>
           <p>Notifications</p>
-        </MenuItem>
+        </MenuItem> */}
         <MenuButton onClick={this.handleProfileMenuOpen}>
           <AccountCircle items={['Profile', 'My account']} />
           <p>Profile</p>
@@ -311,11 +310,11 @@ class TaskBar extends React.Component {
                 >
                   <Add />
                 </IconButton>
-                <IconButton color="inherit">
+                {/* <IconButton color="inherit">
                   <Badge badgeContent={17} color="secondary">
                     <NotificationsIcon />
                   </Badge>
-                </IconButton>
+                </IconButton> */}
                 <IconButton
                   component={Link}
                   to="/profile"
@@ -349,7 +348,7 @@ class TaskBar extends React.Component {
             </div>
           </Toolbar>
         </AppBar>
-        {renderMenu}
+        {/* {/* {renderMenu} */}
         {renderMobileMenu}
       </div>
     );

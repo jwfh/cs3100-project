@@ -41,35 +41,41 @@ const newSession = (uid, callback) => {
     },
     (error, sessionKey) => {
       if (!error) {
-        callback(sessionKey);
+        callback(null, sessionKey);
       } else if (settings.debug) {
         console.log(`Unable to create session: ${error}`);
+        callback(`Unable to create session: ${error}`, null);
       }
     }
   );
 };
 
 const register = (req, res) => {
+  console.log(req.body);
   if (
-    req.body.name &&
-    req.body.username &&
-    req.body.password &&
-    req.body.email &&
-    req.body.secQ &&
-    req.body.secA
+    req.body &&
+    req.body.value &&
+    req.body.value.name &&
+    req.body.value.username &&
+    req.body.value.password &&
+    req.body.value.email &&
+    req.body.value.secQ &&
+    req.body.value.secA
   ) {
     db.create(
       'user',
       {
-        name: req.body.name,
-        username: req.body.username.toLowerCase(),
-        email: req.body.email,
-        password: sha256(req.body.username.toLowerCase() + req.body.password),
-        secA: sha256(
-          req.body.username.toLowerCase() +
-            req.body.secA.toLowerCase().replace(/\s/g, '')
+        name: req.body.value.name,
+        username: req.body.value.username.toLowerCase(),
+        email: req.body.value.email,
+        password: sha256(
+          req.body.value.username.toLowerCase() + req.body.value.password
         ),
-        secQ: req.body.secQ,
+        secA: sha256(
+          req.body.value.username.toLowerCase() +
+            req.body.value.secA.toLowerCase().replace(/\s/g, '')
+        ),
+        secQ: req.body.value.secQ,
       },
       (error) => {
         if (!error) {
@@ -107,14 +113,21 @@ const signIn = (req, res) => {
                 req.body.value.username.toLowerCase() + req.body.value.password
               ) === row.password
             ) {
-              newSession(row.id, (sessionKey) => {
-                res.cookie('numHubSessionKey', sessionKey);
-                res.send({
-                  ok: true,
-                  message: 'Access granted',
-                  uid: row.id,
-                  admin: row.admin,
-                });
+              newSession(row.id, (error, sessionKey) => {
+                if (!error) {
+                  res.cookie('numHubSessionKey', sessionKey);
+                  res.send({
+                    ok: true,
+                    message: 'Access granted',
+                    uid: row.id,
+                    admin: row.admin,
+                  });
+                } else {
+                  res.send({
+                    ok: false,
+                    message: error,
+                  });
+                }
               });
             } else {
               db.update(
@@ -219,47 +232,60 @@ const reset = (req, res) => {
   }
 };
 
-module.exports.auth = (req) => {
-  let authenticated = false;
-  let admin = false;
-  if (typeof req.cookies.numHubSessionKey !== 'undefined') {
+auth = (req, res) => {
+  var authenticated = false;
+  var admin = false;
+  if (
+    typeof req.cookies.numHubSessionKey !== 'undefined' ||
+    (req.body.value && typeof req.body.value.sessionKey != 'undefined')
+  ) {
     // Yes, cookie was present. Now check the database for the session.
-    db.get(
-      'session',
-      {sessionKey: req.cookies.numHubSessionKey},
-      (error, session) => {
-        if (!error) {
-          db.get('userByID', {id: session.uid}, (error, user) => {
-            if (!error) {
-              authenticated = true;
-              admin = user.admin;
-            } else if (settings.debug) {
-              console.log('Unable to fetch user from the database.');
-            }
-          });
-        } else if (settings.debug) {
+    const numHubSessionKey =
+      req.cookies.numHubSessionKey || req.body.value.sessionKey;
+    db.get('session', {sessionKey: numHubSessionKey}, (error, session) => {
+      if (!error && typeof session !== 'undefined') {
+        db.get('userByID', {id: session.uid}, (error, user) => {
+          if (!error) {
+            authenticated = true;
+            admin = user.admin;
+            res.send({
+              ok: true,
+              admin,
+              authenticated,
+            });
+          } else if (settings.debug) {
+            console.log('Unable to fetch user from the database.');
+            res.send({
+              ok: false,
+              admin: false,
+              authenticated: false,
+            });
+          }
+        });
+      } else {
+        if (settings.debug) {
           console.log(
-            `Unable to fetch cookie ${
-              req.cookies.numHubSession
-            } from the database.`
+            `Unable to fetch cookie ${numHubSessionKey} from the database.`
           );
         }
+        res.send({
+          ok: false,
+          admin: false,
+          authenticated: false,
+        });
       }
-    );
+    });
   }
-  return {
-    authenticated,
-    admin,
-  };
 };
 
-const auth = (req, res) => {
-  const authInfo = module.exports.auth(req);
-  res.send({
-    isAdmin: authInfo.admin,
-    isAuthenticated: authInfo.authenticated,
-  });
-};
+// const auth = (req, res) => {
+//   const authInfo = module.exports.auth(req);
+//   console.log('sending', authInfo);
+//   res.send({
+//     isAdmin: authInfo.admin,
+//     isAuthenticated: authInfo.authenticated,
+//   });
+// };
 
 module.exports.gatekeeper = (req, res) => {
   switch (req.body.action) {

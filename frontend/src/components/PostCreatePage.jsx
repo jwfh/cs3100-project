@@ -226,7 +226,7 @@ export class PostCreatePage extends Component {
   fetchTags = async () => {
     const { fetchedTags } = this.state;
     if (!fetchedTags) {
-      const uri = '//' + backend + '/api/fetch/all';
+      const uri = backend ? `//${backend}/api/fetch/all` : '/api/fetch/all';
       const reqData = {
         type: 'tag',
       };
@@ -257,8 +257,8 @@ export class PostCreatePage extends Component {
 
   submit = () => {
     const { title, content, tags, activeStep } = this.state;
-    const { levelIdx, uid, numHubSessionKey } = this.props;
-    const uri = '//' + backend + '/api/create';
+    const { levelIdx, numHubSessionKey } = this.props;
+    const uri = backend ? `//${backend}/api/create` : '/api/create';
     const data = {
       type: 'question',
       value: {

@@ -11,7 +11,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import FormFunc from './FormFunc';
-import { withCookies, Cookies } from 'react-cookie';
+import { withCookies } from 'react-cookie';
 
 const styles = (theme) => ({
   container: {
@@ -302,7 +302,7 @@ class LoginPage extends Component {
   };
 
   validate = (componentIdx, callback) => {
-    const uri = '//' + backend + '/api/validate';
+    const uri = backend ? `//${backend}/api/validate` : '/api/validate';
     const config = {
       timeout: 2000,
     };
@@ -605,10 +605,10 @@ class LoginPage extends Component {
   };
 
   attemptSignIn = () => {
-    const { history } = this.props;
+    const { history, globalUpdate } = this.props;
     const { username, password, isValid, showValid } = this.state;
-    const uri = '//' + backend + '/api/gatekeeper';
-    const data = {
+    const uri = backend ? `//${backend}/api/gatekeeper` : '/api/gatekeeper';
+    const data1 = {
       action: 'sign-in',
       value: {
         username,
@@ -622,7 +622,7 @@ class LoginPage extends Component {
     };
     showValid[1] = true;
     axios
-      .post(uri, data, config)
+      .post(uri, data1, config)
       .then((response) => {
         if (response.status === 200) {
           if (response.data) {
@@ -634,23 +634,65 @@ class LoginPage extends Component {
                   isValid,
                 },
                 () => {
-                  this.props.globalUpdate(
-                    'numHubSessionKey',
-                    this.props.cookies.get('numHubSessionKey'),
-                    () => {
-                      this.props.enqueueSnackbar(
-                        'You are now signed in to NumHub.',
-                        { variant: 'success' },
-                      );
-                      if ('uid' in response.data) {
-                        this.props.globalUpdate('uid', response.data.uid);
-                      }
-                      if ('admin' in response.data) {
-                        this.props.globalUpdate('isAdmin', response.data.admin);
-                      }
-                      history.push('/');
+                  const sessionKey = this.props.cookies.get('numHubSessionKey');
+                  const data2 = {
+                    action: 'auth',
+                    value: {
+                      sessionKey,
                     },
-                  );
+                  };
+                  globalUpdate('numHubSessionKey', sessionKey, () => {
+                    axios
+                      .post(uri, data2, config)
+                      .then((response) => {
+                        if (
+                          response.status === 200 &&
+                          response.data &&
+                          response.data.ok === true &&
+                          'authenticated' in response.data &&
+                          'admin' in response.data
+                        ) {
+                          globalUpdate(
+                            'isAuthenticated',
+                            response.data.authenticated,
+                            () => {
+                              globalUpdate(
+                                'isAdmin',
+                                response.data.admin,
+                                () => {
+                                  this.props.enqueueSnackbar(
+                                    'You are now signed in to NumHub.',
+                                    { variant: 'success' },
+                                  );
+                                  history.push('/');
+                                },
+                              );
+                            },
+                          );
+                        } else {
+                          if (debug) {
+                            console.log(
+                              'Error fetching authentication information.',
+                            );
+                          }
+                          this.props.enqueueSnackbar(
+                            'Unable to authenticate.',
+                            { variant: 'warning' },
+                          );
+                        }
+                      })
+                      .catch((error) => {
+                        if (debug) {
+                          console.log(
+                            'Error fetching authentication information:',
+                            error,
+                          );
+                        }
+                        this.props.enqueueSnackbar('Unable to authenticate.', {
+                          variant: 'warning',
+                        });
+                      });
+                  });
                 },
               );
             } else {
@@ -701,7 +743,7 @@ class LoginPage extends Component {
       secA,
       resetPassword,
     } = this.state;
-    const uri = `//${backend}/api/gatekeeper`;
+    const uri = backend ? `//${backend}/api/gatekeeper` : '/api/gatekeeper';
     const data = {
       action: 'reset',
       value: {
@@ -774,7 +816,7 @@ class LoginPage extends Component {
 
   fetchAssets = (componentIdx, callback) => {
     const { username } = this.state;
-    const uri = `//${backend}/api/fetch`;
+    const uri = backend ? `//${backend}/api/fetch` : '/api/fetch';
     let data;
     const config = {
       timeout: 2000,

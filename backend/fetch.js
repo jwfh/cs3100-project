@@ -79,6 +79,7 @@ module.exports.all = (req, res) => {
     case 'level':
     case 'user':
     case 'question':
+    case 'secQ':
       db.all(req.body.type, (error, rows) => {
         if (!error) {
           res.status(200);

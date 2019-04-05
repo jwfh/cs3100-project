@@ -37,7 +37,7 @@ export class HomePage extends Component {
   fetchPosts = async () => {
     const { fetchedPosts } = this.state;
     if (!fetchedPosts) {
-      const uri = `//${backend}/api/fetch/all`;
+      const uri = backend ? `//${backend}/api/fetch/all` : '/api/fetch/all';
       const requestData = {
         type: 'question',
       };
@@ -69,7 +69,7 @@ export class HomePage extends Component {
   fetchTags = async () => {
     const { fetchedTags } = this.state;
     if (!fetchedTags) {
-      const uri = `//${backend}/api/fetch/all`;
+      const uri = backend ? `//${backend}/api/fetch/all` : '/api/fetch/all';
       const requestData = {
         type: 'tag',
       };
@@ -122,8 +122,7 @@ export class HomePage extends Component {
   }
 
   render() {
-    const { classes, levelIdx, levelName, numHubSessionKey } = this.props;
-    console.log('key', numHubSessionKey);
+    const { classes, levelIdx, levelName } = this.props;
     const { questions, tags } = this.state;
     const thisLevelQuestions = questions.filter((question) => {
       return question.levelID === levelIdx;

@@ -6,6 +6,8 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Button from '@material-ui/core/Button';
+import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
 
 const styles = (theme) => ({
   heading: {
@@ -26,6 +28,11 @@ export class PostPreview extends Component {
         <ExpansionPanelDetails>
           <Typography>{bodyPreview}</Typography>
         </ExpansionPanelDetails>
+        <ExpansionPanelActions>
+          <Button size="small" color="primary">
+            More
+          </Button>
+        </ExpansionPanelActions>
       </ExpansionPanel>
     );
   }

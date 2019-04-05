@@ -53,7 +53,7 @@ export class AdminPage extends Component {
   }
 
   fetchUsers = async () => {
-    const uri = '//' + backend + '/api/fetch/all';
+    const uri = backend ? `//${backend}/api/fetch/all` : '/api/fetch/all';
     const requestData = {
       type: 'user',
     };
@@ -82,7 +82,7 @@ export class AdminPage extends Component {
   };
 
   fetchTags = async () => {
-    const uri = `//${backend}/api/fetch/all`;
+    const uri = backend ? `//${backend}/api/fetch/all` : '/api/fetch/all';
     const requestData = {
       type: 'tag',
     };
@@ -116,7 +116,7 @@ export class AdminPage extends Component {
       if (debug) {
         console.log('Submitting tag', newTag, 'for creation.');
       }
-      const uri = `//${backend}/api/post/create`;
+      const uri = backend ? `//${backend}/api/post/create` : '/api/post/create';
       const requestData = {
         type: 'tag',
         value: {
@@ -160,7 +160,7 @@ export class AdminPage extends Component {
   };
 
   makeAdmin = (uid) => () => {
-    const uri = `//${backend}/api/update`;
+    const uri = backend ? `//${backend}/api/update` : '/api/update';
     const data = {
       type: 'admin',
       value: {
@@ -190,7 +190,7 @@ export class AdminPage extends Component {
   };
 
   deleteAccount = (uid) => () => {
-    const uri = `//${backend}/api/delete`;
+    const uri = backend ? `//${backend}/api/delete` : '/api/delete';
     const data = {
       type: 'user',
       value: {

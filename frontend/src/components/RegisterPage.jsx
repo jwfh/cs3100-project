@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
@@ -13,7 +14,18 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import FormControl from '@material-ui/core/FormControl';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import InputLabel from '@material-ui/core/InputLabel';
 import axios from 'axios';
+import FormFunc from './FormFunc';
 import { FormatListBulletedRounded } from '@material-ui/icons';
 
 const styles = (theme) => ({
@@ -42,10 +54,15 @@ const styles = (theme) => ({
     textAlign: 'center',
   },
   formContent: {
+    textAlign: 'left',
     paddingBottom: '1vh',
   },
   boldFace: {
     fontWeight: 'bold',
+  },
+  formControl: {
+    // margin: theme.spacing.unit,
+    minWidth: 240,
   },
   hidden: {
     display: 'none',
@@ -83,7 +100,7 @@ const styles = (theme) => ({
 });
 
 const RegisterFormAccount = (props) => (
-  <Fragment>
+  <FormFunc onSubmit={props.onReturnKey}>
     <TextField
       label="Username"
       onChange={props.handleChange('username')}
@@ -92,15 +109,14 @@ const RegisterFormAccount = (props) => (
       variant="outlined"
       fullWidth
       helperText={
-        !props.showValid || props.isValid.usernameNotTaken
+        !props.showValid || props.isValid.usernameValid
           ? ''
-          : 'That username already exists.'
+          : props.usernameErrorMsg
       }
-      error={props.showValid && !props.isValid.usernameNotTaken}
+      error={props.showValid && !props.isValid.usernameValid}
     />
-    <br />
     <TextField
-      type="password"
+      type={props.hidePassword ? 'password' : 'text'}
       label="Password"
       onChange={props.handleChange('password')}
       value={props.password}
@@ -110,13 +126,24 @@ const RegisterFormAccount = (props) => (
       helperText={
         !props.showValid || props.isValid.passwordComplex
           ? ''
-          : 'Your password does not meet complexity requirements.'
+          : props.passwordErrorMessage
       }
       error={props.showValid && !props.isValid.passwordComplex}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="Toggle password visibility"
+              onClick={props.toggleShowPassword}
+            >
+              {props.hidePassword ? <Visibility /> : <VisibilityOff />}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
     />
-    <br />
     <TextField
-      type="password"
+      type={props.hideConfirmPassword ? 'password' : 'text'}
       label="Confirm Password"
       onChange={props.handleChange('confirmPassword')}
       value={props.confirmPassword}
@@ -129,23 +156,42 @@ const RegisterFormAccount = (props) => (
           : 'Please confirm that your passwords match.'
       }
       error={props.showValid && !props.isValid.passwordsMatch}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="Toggle password visibility"
+              onClick={props.toggleShowConfirm}
+            >
+              {props.hideConfirmPassword ? <Visibility /> : <VisibilityOff />}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
     />
-  </Fragment>
+  </FormFunc>
 );
 
 RegisterFormAccount.propTypes = {
+  onReturnKey: PropTypes.func.isRequired,
   handleChange: PropTypes.func.isRequired,
   username: PropTypes.string.isRequired,
   password: PropTypes.string.isRequired,
+  usernameErrorMsg: PropTypes.string.isRequired,
+  passwordErrorMessage: PropTypes.string.isRequired,
   confirmPassword: PropTypes.string.isRequired,
   showValid: PropTypes.bool.isRequired,
   isValid: PropTypes.object.isRequired,
+  hidePassword: PropTypes.bool.isRequired,
+  hideConfirmPassword: PropTypes.bool.isRequired,
+  toggleShowPassword: PropTypes.func.isRequired,
+  toggleShowConfirm: PropTypes.func.isRequired,
 };
 
 const RegisterFormDetails = (props) => (
-  <Fragment>
+  <FormFunc onSubmit={props.onReturnKey}>
     <TextField
-      label="Name"
+      label="Given name"
       onChange={props.handleChange('givenName')}
       value={props.givenName}
       margin="normal"
@@ -187,10 +233,11 @@ const RegisterFormDetails = (props) => (
       }
       error={props.showValid && !props.isValid.emailValid}
     />
-  </Fragment>
+  </FormFunc>
 );
 
 RegisterFormDetails.propTypes = {
+  onReturnKey: PropTypes.func.isRequired,
   handleChange: PropTypes.func.isRequired,
   givenName: PropTypes.string.isRequired,
   surname: PropTypes.string.isRequired,
@@ -199,7 +246,89 @@ RegisterFormDetails.propTypes = {
   isValid: PropTypes.object.isRequired,
 };
 
-const RegisterFormSecurity = (props) => <Fragment />;
+export class RegisterFormSecurity extends Component {
+  componentDidMount() {
+    this.setState({
+      labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
+    });
+  }
+
+  render() {
+    const props = this.props;
+
+    return (
+      <FormFunc onSubmit={props.onReturnKey}>
+        <FormControl
+          fullWidth
+          variant="outlined"
+          className={props.classes.formControl}
+        >
+          <InputLabel
+            ref={(ref) => {
+              this.InputLabelRef = ref;
+            }}
+            htmlFor="secQ"
+          >
+            Security Question
+          </InputLabel>
+          <Select
+            variant="outlined"
+            value={props.chosenSecurityQuestion}
+            onChange={props.handleChange('chosenSecurityQuestion')}
+            input={<OutlinedInput labelWidth={2} name="secQ" id="secQ" />}
+          >
+            {props.securityQuestions.map((question, index) => (
+              <MenuItem key={index} value={question.id}>
+                {question.question}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <TextField
+          type={props.hideSecA ? 'password' : 'text'}
+          label="Security answer"
+          onChange={props.handleChange('securityAnswer')}
+          value={props.securityAnswer}
+          margin="normal"
+          variant="outlined"
+          fullWidth
+          helperText={
+            !props.showValid || props.isValid.secANotEmpty
+              ? ''
+              : 'This field is required.'
+          }
+          error={props.showValid && !props.isValid.secANotEmpty}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="Toggle security question visibility"
+                  onClick={props.toggleShowSecA}
+                >
+                  {props.hideSecA ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </FormFunc>
+    );
+  }
+}
+
+RegisterFormSecurity.propTypes = {
+  onReturnKey: PropTypes.func.isRequired,
+  classes: PropTypes.object.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  handleChangeSelect: PropTypes.func.isRequired,
+  securityAnswer: PropTypes.string.isRequired,
+  securityQuestions: PropTypes.array.isRequired,
+  chosenSecurityQuestion: PropTypes.number.isRequired,
+  showValid: PropTypes.bool.isRequired,
+  isValid: PropTypes.object.isRequired,
+  hideSecA: PropTypes.bool.isRequired,
+  toggleShowSecA: PropTypes.func.isRequired,
+};
 
 export class RegisterPage extends Component {
   constructor(props) {
@@ -207,14 +336,20 @@ export class RegisterPage extends Component {
     this.state = {
       activeComponent: 0,
       username: '',
+      usernameErrorMsg: '',
       password: '',
+      passwordErrorMessage: '',
       confirmPassword: '',
       givenName: '',
       surname: '',
       email: '',
-      securityQuestionID: -1,
+      hidePassword: true,
+      hideConfirmPassword: true,
+      hideSecA: true,
+      securityQuestionList: [],
+      chosenSecurityQuestion: 0,
       securityAnswer: '',
-      showValid: [false, false],
+      showValid: [false, false, false],
       isValid: [
         {
           usernameValid: false,
@@ -223,23 +358,32 @@ export class RegisterPage extends Component {
         },
         {
           givenNameNotEmpty: false,
-          surnameNotEFormatListBulletedRoundedmpty: false,
+          surnameNotEmpty: false,
           emailValid: false,
+        },
+        {
+          secANotEmpty: false,
         },
       ],
       postSuccessful: false,
     };
   }
 
-  toggleHide = () => {
-    const { activeComponent, hidePassword, hideSecA } = this.state;
-    switch (activeComponent) {
-      case 1:
+  toggleHide = (field) => () => {
+    const { hidePassword, hideConfirmPassword, hideSecA } = this.state;
+    switch (field) {
+      case 'password':
         this.setState({
           hidePassword: !hidePassword,
         });
         break;
-      case 2:
+
+      case 'confirmPassword':
+        this.setState({
+          hideConfirmPassword: !hideConfirmPassword,
+        });
+        break;
+      case 'securityAnswer':
         this.setState({
           hideSecA: !hideSecA,
         });
@@ -250,7 +394,7 @@ export class RegisterPage extends Component {
   };
 
   fetchAssets = (componentIdx, callback) => {
-    const uri = `//${backend}/api/fetch/all`;
+    const uri = backend ? `//${backend}/api/fetch/all` : '/api/fetch/all';
     let data;
     const config = {
       timeout: 2000,
@@ -267,13 +411,19 @@ export class RegisterPage extends Component {
             if (response.status === 200) {
               // Valid response
               if (
-                response.body &&
-                response.body.secQs &&
-                response.body.ok === true
+                response.data &&
+                response.data.length > 0 &&
+                'id' in response.data[0] &&
+                'question' in response.data[0]
               ) {
+                const sortedQuestions = response.data.sort((a, b) => {
+                  if (a.id < b.id) return -1;
+                  if (a.id > b.id) return 1;
+                  return 0;
+                });
                 this.setState(
                   {
-                    secQs: response.body.secQs,
+                    securityQuestionList: sortedQuestions,
                   },
                   callback,
                 );
@@ -303,7 +453,13 @@ export class RegisterPage extends Component {
   nextStep = (validateFirst) => () => {
     const { activeComponent, isValid, showValid } = this.state;
     this.validate(activeComponent, () => {
-      let componentIsValid = isValid[activeComponent];
+      let componentIsValid = true;
+      for (let val in isValid[activeComponent]) {
+        if (!isValid[activeComponent][val]) {
+          componentIsValid = false;
+          break;
+        }
+      }
       if (!validateFirst || componentIsValid) {
         this.fetchAssets(activeComponent + 1, () => {
           this.setState({
@@ -333,39 +489,65 @@ export class RegisterPage extends Component {
     });
   };
 
-  validate = async (step) => {
-    const { isValid, username, password, confirmPassword } = this.state;
-    const uri = `//${backend}/api/validate`;
-    let passwordErrorMessage;
+  handleChangeSelect = (name) => (value) => {
+    this.setState({
+      [name]: value,
+    });
+  };
+
+  validate = async (step, callback) => {
+    const {
+      isValid,
+      username,
+      password,
+      confirmPassword,
+      givenName,
+      surname,
+      email,
+      securityAnswer,
+    } = this.state;
+    const uri = backend ? `//${backend}/api/validate` : '/api/validate';
+    let passwordErrorMessage, usernameErrorMsg;
     switch (step) {
       case 0:
         // Login info
-        try {
-          const requestData = {
-            type: 'username',
-            value: {
-              username,
-            },
-          };
-          const response = await axios.post(uri, requestData);
-          const { data } = await response;
-          if (data.ok) {
-            if (data.exists) {
-              isValid[0].usernameValid = false;
+        if (username !== '') {
+          try {
+            const requestData = {
+              type: 'username',
+              value: {
+                username,
+              },
+            };
+            const response = await axios.post(uri, requestData);
+            const { data } = await response;
+            if (data.ok === true) {
+              if (data.exists === false) {
+                isValid[0].usernameValid = true;
+                usernameErrorMsg = '';
+              } else {
+                isValid[0].usernameValid = false;
+                if (data.message) {
+                  usernameErrorMsg = data.message;
+                } else {
+                  usernameErrorMsg = 'Username exists already.';
+                }
+              }
             } else {
-              isValid[0].usernameValid = true;
+              isValid[0].usernameValid = false;
+              if (debug) {
+                console.log('Invalid response when validating username.');
+              }
             }
-          } else {
+          } catch (error) {
             isValid[0].usernameValid = false;
             if (debug) {
-              console.log('Invalid response when validating username.');
+              console.log('Error when attempting to validate username:', error);
             }
           }
-        } catch (error) {
+        } else {
           isValid[0].usernameValid = false;
-          if (debug) {
-            console.log('Error when attempting to validate username:', error);
-          }
+          usernameErrorMsg = 'Username cannot be empty.';
         }
         try {
           const requestData = {
@@ -395,16 +577,38 @@ export class RegisterPage extends Component {
           }
         }
         isValid[0].passwordsMatch = password === confirmPassword;
-        this.setState({
-          isValid,
-          passwordErrorMessage,
-        });
+        this.setState(
+          {
+            isValid,
+            usernameErrorMsg,
+            passwordErrorMessage,
+          },
+          callback,
+        );
         break;
       case 1:
         // Personal info
-        this.setState({
-          isValid,
-        });
+        isValid[1].givenNameNotEmpty = givenName !== '';
+        isValid[1].surnameNotEmpty = surname !== '';
+        isValid[1].emailValid = email.match(
+          /^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i,
+        );
+        this.setState(
+          {
+            isValid,
+          },
+          callback,
+        );
+        break;
+      case 2:
+        // Security answer
+        isValid[2].secANotEmpty = securityAnswer !== '';
+        this.setState(
+          {
+            isValid,
+          },
+          callback,
+        );
         break;
       default:
         break;
@@ -422,18 +626,85 @@ export class RegisterPage extends Component {
     return true;
   };
 
-  attemptRegistration = () => {};
+  attemptRegistration = () => {
+    const {
+      activeComponent,
+      username,
+      password,
+      chosenSecurityQuestion,
+      securityQuestionList,
+      securityAnswer,
+      givenName,
+      surname,
+      email,
+    } = this.state;
+    this.validate(activeComponent, () => {
+      if (this.isValid(activeComponent)) {
+        const uri = backend ? `//${backend}/api/gatekeeper` : '/api/gatekeeper';
+        const data = {
+          action: 'register',
+          value: {
+            username,
+            password,
+            name: givenName + ' ' + surname,
+            secQ: securityQuestionList[chosenSecurityQuestion].question,
+            secA: securityAnswer,
+            email,
+          },
+        };
+        const config = {
+          timeout: 2000,
+          crossOrigin: true,
+          withCredentials: true,
+        };
+        axios
+          .post(uri, data, config)
+          .then((response) => {
+            if (response.status === 200 && response.data) {
+              if (response.data.ok === true) {
+                this.props.enqueueSnackbar(
+                  'You are now registered; try signing in.',
+                  { variant: 'success' },
+                );
+                this.props.history.push('/login');
+              } else if (debug) {
+                if ('message' in response.data) {
+                  console.log(
+                    'The server rejected the register request:',
+                    response.data.message,
+                  );
+                } else {
+                  console.log(
+                    'The server rejected the register request but neglected to say why.',
+                  );
+                }
+              }
+            } else if (debug) {
+              console.log('Bodyless response from server.');
+            }
+          })
+          .catch((error) => {});
+      } else {
+      }
+    });
+  };
 
   getDisplayedComponents = () => {
     const { classes } = this.props;
     const {
       username,
       password,
+      usernameErrorMsg,
+      passwordErrorMessage,
       confirmPassword,
       givenName,
       surname,
+      hideConfirmPassword,
+      hidePassword,
+      hideSecA,
       email,
-      securityQuestionID,
+      securityQuestionList,
+      chosenSecurityQuestion,
       securityAnswer,
       showValid,
       isValid,
@@ -462,13 +733,20 @@ export class RegisterPage extends Component {
         },
         content: (
           <RegisterFormAccount
+            onReturnKey={this.nextStep(true)}
             classes={classes}
             handleChange={this.handleChange}
             username={username}
             password={password}
+            hidePassword={hidePassword}
+            hideConfirmPassword={hideConfirmPassword}
             confirmPassword={confirmPassword}
             showValid={showValid[0]}
             isValid={isValid[0]}
+            toggleShowPassword={this.toggleHide('password')}
+            toggleShowConfirm={this.toggleHide('confirmPassword')}
+            usernameErrorMsg={usernameErrorMsg}
+            passwordErrorMessage={passwordErrorMessage}
           />
         ),
       },
@@ -485,6 +763,7 @@ export class RegisterPage extends Component {
         ),
         content: (
           <RegisterFormDetails
+            onReturnKey={this.nextStep(true)}
             classes={classes}
             handleChange={this.handleChange}
             givenName={givenName}
@@ -492,6 +771,41 @@ export class RegisterPage extends Component {
             email={email}
             showValid={showValid[1]}
             isValid={isValid[1]}
+          />
+        ),
+        nextButton: {
+          label: 'Next',
+          action: this.nextStep(true),
+        },
+        backButton: {
+          label: 'Back',
+          action: this.prevStep,
+        },
+      },
+      {
+        header: (
+          <Fragment>
+            <Typography variant="h4" component="p">
+              One last step...
+            </Typography>
+            <Typography variant="h6" component="p">
+              Help us secure your account.
+            </Typography>
+          </Fragment>
+        ),
+        content: (
+          <RegisterFormSecurity
+            onReturnKey={this.attemptRegistration}
+            classes={classes}
+            hideSecA={hideSecA}
+            handleChange={this.handleChange}
+            handleChangeSelect={this.handleChangeSelect}
+            securityQuestions={securityQuestionList}
+            chosenSecurityQuestion={chosenSecurityQuestion}
+            securityAnswer={securityAnswer}
+            toggleShowSecA={this.toggleHide('securityAnswer')}
+            showValid={showValid[2]}
+            isValid={isValid[2]}
           />
         ),
         nextButton: {

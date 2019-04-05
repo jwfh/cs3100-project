@@ -32,7 +32,7 @@ export class PostViewPage extends Component {
 
   fetchPost = async () => {
     const { match } = this.props;
-    const uri = `//${backend}/api/fetch`;
+    const uri = backend ? `//${backend}/api/fetch` : '/api/fetch';
     const requestData = {
       type: 'question',
       value: {
