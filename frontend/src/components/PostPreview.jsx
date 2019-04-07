@@ -18,7 +18,7 @@ const styles = (theme) => ({
 
 export class PostPreview extends Component {
   render() {
-    const { classes } = this.props;
+    const { classes, history, hash } = this.props;
     const { title, bodyPreview } = this.props;
     return (
       <ExpansionPanel>
@@ -29,7 +29,13 @@ export class PostPreview extends Component {
           <Typography>{bodyPreview}</Typography>
         </ExpansionPanelDetails>
         <ExpansionPanelActions>
-          <Button size="small" color="primary">
+          <Button
+            size="small"
+            color="primary"
+            onClick={() => {
+              history.push(`/post/${hash}`);
+            }}
+          >
             More
           </Button>
         </ExpansionPanelActions>

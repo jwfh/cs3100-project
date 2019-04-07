@@ -102,11 +102,10 @@ export const RenderContent = (props) => {
         mathType = 'inline';
       }
 
-
       let before = content.substring(k, openIdx),
         inside = content.substring(openIdx + 2, closeIdx);
 
-        console.log(before);
+      console.log(before);
       components.push(
         <Typography style={{ display: 'inline' }}>{before}</Typography>,
       );
@@ -131,9 +130,18 @@ export const RenderContent = (props) => {
   return <div style={{ display: 'block' }}>{components}</div>;
 };
 
+export const AnswerDisplay = (props) => (
+  <Fragment>
+    <Typography variant="h5" component="p" style={{ display: 'block' }}>
+      {props.title}
+    </Typography>
+    <RenderContent {...props} />
+  </Fragment>
+);
+
 const PostDisplay = (props) => (
   <Fragment>
-    <Typography variant="h6" component="p" style={{ display: 'block' }}>
+    <Typography variant="h4" component="p" style={{ display: 'block' }}>
       {props.title}
     </Typography>
     <RenderContent {...props} />

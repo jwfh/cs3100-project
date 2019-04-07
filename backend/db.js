@@ -358,6 +358,39 @@ module.exports.get = (type, params, callback) => {
         callback('No UID provided.', null);
       }
       break;
+    case 'answer':
+      if (params.idHash) {
+        db.get(
+          'SELECT `id` FROM `QUESTIONS` WHERE `idHash`=?',
+          [params.idHash],
+          (error, row) => {
+            if (!error) {
+              if (row && row.id) {
+                db.all(
+                  'SELECT * FROM `ANSWERS` WHERE `qID`=?',
+                  [row.id],
+                  (error, rows) => {
+                    if (!error) {
+                      // Got answers!
+                      callback(error, rows);
+                    } else {
+                      // Failed to get answers
+                      callback(error, null);
+                    }
+                  }
+                );
+              } else {
+                // No post found
+                callback('The requested post could not be found.', null);
+              }
+            } else {
+              // DB query failed
+              callback(error, null);
+            }
+          }
+        );
+      }
+      break;
     case 'session':
       if (params.sessionKey) {
         db.get(
@@ -477,9 +510,10 @@ module.exports.create = (type, params, callback) => {
           (error, row) => {
             if (!error) {
               const newUID = row.count < 1 ? 1 : row.max + 1;
+              const admin = newUID === 1 ? 1 : 0;
               db.run(
                 'INSERT INTO `USERS` (`id`, `name`, `username`, `password`, `secQ`, `secA`,' +
-                  ' `email`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                  ' `email`, `admin`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 [
                   newUID,
                   params.name,
@@ -488,6 +522,7 @@ module.exports.create = (type, params, callback) => {
                   params.secQ,
                   params.secA,
                   params.email,
+                  admin,
                 ],
                 callback
               );

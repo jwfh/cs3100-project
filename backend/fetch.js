@@ -1,4 +1,5 @@
 const db = require('./db');
+const settings = require('../settings');
 
 module.exports.fetch = (req, res) => {
   console.log(req.path, req.body);
@@ -65,6 +66,45 @@ module.exports.fetch = (req, res) => {
         res.send('Bad Request');
       }
       break;
+    case 'profile':
+      var authenticated;
+      if (
+        typeof req.cookies.numHubSessionKey !== 'undefined' ||
+        (req.body.value && typeof req.body.value.sessionKey != 'undefined')
+      ) {
+        // Yes, cookie was present. Now check the database for the session.
+        const numHubSessionKey =
+          req.cookies.numHubSessionKey || req.body.value.sessionKey;
+        db.get('session', {sessionKey: numHubSessionKey}, (error, session) => {
+          if (!error && typeof session !== 'undefined') {
+            db.get('userByID', {id: session.uid}, (error, user) => {
+              if (!error) {
+                res.send({
+                  ok: true,
+                  profile: user,
+                });
+              } else if (settings.debug) {
+                console.log('Unable to fetch user from the database.');
+                res.send({
+                  ok: false,
+                  message: 'No cookie or session key.',
+                });
+              }
+            });
+          } else {
+            if (settings.debug) {
+              console.log(
+                `Unable to fetch cookie ${numHubSessionKey} from the database.`
+              );
+            }
+            res.send({
+              ok: false,
+              message: 'No cookie or session key.',
+            });
+          }
+        });
+      }
+      break;
     default:
       res.status(400);
       res.type('text');
@@ -92,6 +132,35 @@ module.exports.all = (req, res) => {
           );
         }
       });
+      break;
+    case 'answer':
+      // TODO: Add check for cookie; only authenticated users should be able to see answers
+      if (req.body.value && req.body.value.idHash) {
+        db.get(
+          req.body.type,
+          {idHash: req.body.value.idHash},
+          (error, rows) => {
+            if (!error) {
+              res.send({
+                ok: true,
+                answers: rows,
+              });
+            } else {
+              res.send({
+                ok: false,
+                answers: null,
+                message: error,
+              });
+            }
+          }
+        );
+      } else {
+        res.status(400);
+        res.send({
+          ok: false,
+          message: 'Unable to find question; no question hash given.',
+        });
+      }
       break;
     default:
       res.status(400);

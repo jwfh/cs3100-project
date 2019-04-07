@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import { 
-  List, 
-  ListItem, 
-  ListItemIcon, 
-  ListItemText, 
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   ListSubheader,
   Divider,
   IconButton,
@@ -16,9 +16,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from '@material-ui/icons';
-import {
-  sideBarDrawerWidth as drawerWidth,
-} from '../App';
+import { sideBarDrawerWidth as drawerWidth } from '../App';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 const styles = (theme) => ({
@@ -76,12 +74,10 @@ const styles = (theme) => ({
   },
 });
 
-
 export class SideBar extends Component {
-
   handleLevelChange = (idx) => {
     this.props.globalUpdate('siteLevelIdx', idx);
-    this.setState({ 'siteLevelIdx': idx });
+    this.setState({ siteLevelIdx: idx });
     this.handleDrawerClose();
   };
 
@@ -94,7 +90,13 @@ export class SideBar extends Component {
   };
 
   render() {
-    const { classes, siteLevelItems, theme, sideBarOpen, siteLevelIdx } = this.props;
+    const {
+      classes,
+      siteLevelItems,
+      theme,
+      sideBarOpen,
+      siteLevelIdx,
+    } = this.props;
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -114,14 +116,18 @@ export class SideBar extends Component {
         >
           <div className={classes.toolbar}>
             <IconButton onClick={this.handleDrawerClose}>
-              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              {theme.direction === 'rtl' ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
             </IconButton>
           </div>
           <Divider />
           <List
             component="nav"
             subheader={
-              <ListSubheader 
+              <ListSubheader
                 component="div"
                 className={classNames(sideBarOpen || classes.hide)}
               >
@@ -130,7 +136,7 @@ export class SideBar extends Component {
             }
           >
             {siteLevelItems.map((item, index) => (
-              <ListItem 
+              <ListItem
                 button
                 className={classes.sidebarItem}
                 selected={index === siteLevelIdx}
@@ -140,7 +146,10 @@ export class SideBar extends Component {
                 }}
               >
                 <ListItemIcon>{item['icon']}</ListItemIcon>
-                <ListItemText className={classes.numHubType} primary={item['label']} />
+                <ListItemText
+                  className={classes.numHubType}
+                  primary={item['label']}
+                />
               </ListItem>
             ))}
           </List>
@@ -151,7 +160,7 @@ export class SideBar extends Component {
 }
 
 SideBar.propTypes = {
-  classes: PropTypes.object.isRequired,  
+  classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
   sideBarOpen: PropTypes.bool,
   globalUpdate: PropTypes.func,
@@ -160,4 +169,3 @@ SideBar.propTypes = {
 };
 
 export default withStyles(styles, { withTheme: true })(SideBar);
-

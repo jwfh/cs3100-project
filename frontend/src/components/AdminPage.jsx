@@ -264,6 +264,12 @@ export class AdminPage extends Component {
   };
 
   async componentDidMount() {
+    if (!this.props.admin) {
+      this.props.enqueueSnackbar('You need to be an admin to view this page.', {
+        variant: 'error',
+      });
+      this.props.history.push('/');
+    }
     await this.fetchAll();
   }
 

@@ -143,6 +143,7 @@ class AppBody extends Component {
             'admin' in response.data
           ) {
             this.setState({
+              numHubSessionKey: sessionKey,
               fetchedAuth: true,
               isAuthenticated: response.data.authenticated,
               isAdmin: response.data.admin,
@@ -176,7 +177,6 @@ class AppBody extends Component {
       sideBarOpen,
       isAuthenticated,
       isAdmin,
-      uid,
       numHubSessionKey,
     } = this.state;
     const { enqueueSnackbar } = this.props;
@@ -222,7 +222,6 @@ class AppBody extends Component {
                         this.siteLevelItems[this.state.siteLevelIdx].label
                       }
                       authenticated={isAuthenticated}
-                      uid={uid}
                     />
                   ))}
                   exact

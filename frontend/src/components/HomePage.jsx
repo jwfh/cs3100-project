@@ -101,6 +101,9 @@ export class HomePage extends Component {
   createPostPreview = (post) => (
     <PostPreview
       key={post.id}
+      enqueueSnackbar={this.props.enqueueSnackbar}
+      history={this.props.history}
+      hash={post.idHash}
       title={post.title}
       bodyPreview={
         post.content.length < 150 ? (

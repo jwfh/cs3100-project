@@ -1023,6 +1023,13 @@ class LoginPage extends Component {
     return components;
   };
 
+  componentDidMount() {
+    if (this.props.authenticated) {
+      this.props.enqueueSnackbar('You are already signed in.');
+      this.props.history.push('/');
+    }
+  }
+
   render() {
     const { classes } = this.props;
     const { activeComponent } = this.state;
