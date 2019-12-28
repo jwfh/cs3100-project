@@ -18,10 +18,11 @@ demo: install
 
 audit: install 
 	npm audit fix 
+	$(MAKE) -C frontend audit
 
-install: package.json 
-	npm install
-	$(MAKE) -C frontend install
+install update: package.json
+	npm $@
+	$(MAKE) -C frontend $@
 
 frontend-dev: frontend/package.json .FORCE
 	$(MAKE) -C frontend dev

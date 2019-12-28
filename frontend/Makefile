@@ -10,8 +10,8 @@ build: install
 dev: install
 	npm start
 
-install: package.json 
-	npm install
+install update: package.json 
+	npm $@
 
 audit: install 
 	npm audit fix
